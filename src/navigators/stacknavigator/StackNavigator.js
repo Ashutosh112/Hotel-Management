@@ -6,6 +6,7 @@ import Login from '../../screens/Login';
 import BottomNavigator from '../bottomnavigator/BottomNavigator';
 import SplashScreen from '../../screens/SplashScreen';
 import Signup from '../../screens/Signup';
+import CreateReport from '../../screens/CreateReport';
 
 
 const Stack = createNativeStackNavigator();
@@ -27,8 +28,9 @@ const StackNavigator = () => {
                     {showSplashScreen ? (<Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />) : null}
                     <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                     <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
-
                     <Stack.Screen name="BottomNavigator" component={BottomNavigator} options={{ headerShown: false }} />
+                    <Stack.Screen name="CreateReport" component={CreateReport} options={{ headerShown: true, headerTitle: "Create Report" }} />
+
                 </Stack.Navigator>
             </NavigationContainer>
         </>
