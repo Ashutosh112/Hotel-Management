@@ -1,8 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal } from 'react-native';
 import Logo from "../assets/images/UjjainPoliceLogo.png"
+import Cross from "react-native-vector-icons/Entypo"
 
 const Login = ({ navigation }) => {
+
+  const [showOtpModal, setShowOtpModal] = useState(false)
+
+  // FOR OTP START
+  const firstInput = useRef();
+  const secondInput = useRef();
+  const thirdInput = useRef();
+  const fourthInput = useRef();
+  const fifthInput = useRef();
+  const sixthInput = useRef();
+
+  const [otp, setOtp] = useState({ 1: '', 2: '', 3: '', 4: '', 5: '', 6: '' });
+  const [counter, setCounter] = useState(60)
+  const [otpResend, setOtpResend] = useState(false)
+
+  useEffect(() => {
+    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000)
+    return () => clearInterval(timer);
+  }
+    , [counter])
+  // FOR OTP END
+
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
@@ -15,9 +39,8 @@ const Login = ({ navigation }) => {
 
         <View style={styles.inputContainer}>
           <TextInput maxLength={10} keyboardType='number-pad' placeholderTextColor='darkgrey' placeholder='Mobile No.' style={styles.input}></TextInput>
-          <TextInput placeholderTextColor='darkgrey' placeholder='Enter OTP' style={[styles.input, { marginTop: 20 }]}></TextInput>
 
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate("BottomNavigator")}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={() => setShowOtpModal(true)}>
             <Text style={styles.button}>Login</Text>
           </TouchableOpacity>
         </View>
@@ -26,11 +49,150 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Signup")}>
-        <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Don't have an account?
+        <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>New Hotel Registration
 
-          <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Signup here</Text>
+          <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Click here</Text>
         </Text>
       </TouchableOpacity>
+
+      {/*  - MODAL for OTP SEND START - */}
+      <Modal transparent={true} visible={showOtpModal} animationType='fade' >
+        <Pressable style={styles.modalbgforsuggestbtn} >
+          <Pressable style={styles.modalforsuggestbtn} >
+            <View style={styles.modalheader}>
+              <View style={{ flex: 1, alignItems: "center" }} >
+                <Text style={{ fontSize: 14, color: "#fff" }} >One Time Password Verification</Text>
+              </View>
+              <Pressable onPress={() => setShowOtpModal(false)} >
+                <Cross name="cross" size={22} color="#fff" />
+              </Pressable>
+            </View>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={styles.content}>We have sent a verification code to</Text>
+                <Text style={[styles.content, { color: "#595970", marginTop: 5 }]}>8878590380</Text>
+              </View>
+
+              <View style={styles.otpContainer}>
+                <View style={styles.otpBox}>
+                  <TextInput
+                    style={styles.otpText}
+                    placeholder="1"
+                    placeholderTextColor="#B5B5B5"
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={firstInput}
+                    onChangeText={value => {
+                      setOtp({ ...otp, 1: value });
+                      value && secondInput.current.focus();
+                    }}
+                  />
+                </View>
+                <View style={styles.otpBox}>
+                  <TextInput
+                    style={styles.otpText}
+                    placeholder="2"
+                    placeholderTextColor="#B5B5B5"
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={secondInput}
+                    onChangeText={value => {
+                      setOtp({ ...otp, 2: value });
+                      value ? thirdInput.current.focus() : firstInput.current.focus();
+                    }}
+                  />
+                </View>
+                <View style={styles.otpBox}>
+                  <TextInput
+                    style={styles.otpText}
+                    placeholder="3"
+                    placeholderTextColor="#B5B5B5"
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={thirdInput}
+                    onChangeText={value => {
+                      setOtp({ ...otp, 3: value });
+                      value ? fourthInput.current.focus() : secondInput.current.focus();
+                    }}
+                  />
+                </View>
+                <View style={styles.otpBox}>
+                  <TextInput
+                    style={styles.otpText}
+                    placeholder="4"
+                    placeholderTextColor="#B5B5B5"
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={fourthInput}
+                    onChangeText={value => {
+                      setOtp({ ...otp, 4: value });
+                      value ? fifthInput.current.focus() : thirdInput.current.focus();
+
+                    }}
+                  />
+                </View>
+
+                <View style={styles.otpBox}>
+                  <TextInput
+                    style={styles.otpText}
+                    placeholder="5"
+                    placeholderTextColor="#B5B5B5"
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={fifthInput}
+                    onChangeText={value => {
+                      setOtp({ ...otp, 5: value });
+                      value ? sixthInput.current.focus() : fourthInput.current.focus();
+                    }}
+                  />
+                </View>
+
+                <View style={styles.otpBox}>
+                  <TextInput
+                    style={styles.otpText}
+                    placeholder="6"
+                    placeholderTextColor="#B5B5B5"
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={sixthInput}
+                    onChangeText={value => {
+                      setOtp({ ...otp, 6: value });
+                      !value && fifthInput.current.focus();
+                    }}
+                  />
+                </View>
+
+              </View>
+
+              <View style={{ flex: 0.6 }}>
+                {
+                  counter > 0 ?
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                      <View style={{ flexDirection: "row" }}>
+                        {/* <Watch /> */}
+                        <Text style={{ fontSize: 12, color: "#000", marginLeft: 5 }}>Resend SMS in 00:{counter}</Text>
+                      </View>
+
+                    </View>
+                    : otpResend === false ?
+
+                      <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 12, color: "#000" }}>Resend OTP</Text>
+                      </TouchableOpacity> : null
+                }
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 30 }]} onPress={() => navigation.navigate("BottomNavigator")}>
+                  <Text style={{ fontSize: 12, color: "#fff", letterSpacing: 1, }}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      {/* - MODAL for OTP SEND END -*/}
+
     </View>
   );
 }
@@ -66,12 +228,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 20,
     color: "#000",
-    height: 55,
+    height: 50,
 
   },
   inputContainer: {
-    marginTop: 20,
-    width: "100%",
+    marginTop: 40,
+    width: Dimensions.get('window').width,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -79,7 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 16,
     width: Dimensions.get('window').width - 60,
-    height: 55,
+    height: 50,
     marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -97,17 +259,75 @@ const styles = StyleSheet.create({
     color: "#FFBF00",
     fontWeight: "bold"
   },
-  google_button: {
-    color: 'white',
-    width: Dimensions.get('window').width - 60,
-    backgroundColor: "#000",
-    borderRadius: 30,
-    justifyContent: "center",
-    flexDirection: "row",
-    marginTop: 20,
-    paddingHorizontal: 20,
-    height: 50
+
+  otpContainer: {
+    flex: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
+  otpBox: {
+    borderColor: "#B5B5B5",
+    borderWidth: 0.8,
+    width: 45,
+    height: 40,
+    marginHorizontal: 2,
+    borderRadius: 5,
+  },
+  otpText: {
+    fontSize: 20,
+    color: "black",
+    padding: 0,
+    textAlign: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  content: {
+    fontSize: 14,
+    marginHorizontal: 20,
+    color: "#000",
+  },
+
+  // FOR MODAL START
+  modalbgforsuggestbtn: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#00000888"
+  },
+  modalforsuggestbtn: {
+    height: Dimensions.get('window').height / 3,
+    width: Dimensions.get('window').width - 50,
+    backgroundColor: "#fff",
+    borderRadius: 24,
+    minHeight: 330,
+  },
+  modalheader: {
+    flexDirection: "row",
+    backgroundColor: '#2AAA8A',
+    padding: 15,
+    justifyContent: "center",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    alignItems: "center",
+  },
+  nextButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: '#2AAA8A',
+    marginHorizontal: 30,
+    padding: 10,
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  closeButton: {
+    height: 40,
+    paddingHorizontal: 50,
+    paddingVertical: 10,
+    borderRadius: 30,
+    margin: 20,
+  },
+  // FOR MODAL END
 
 
 });

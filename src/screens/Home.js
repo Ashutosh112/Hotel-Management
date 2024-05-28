@@ -1,13 +1,12 @@
-
-
-
-
-
-import { Dimensions, StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Logo from "../assets/images/UjjainPoliceLogo.png"
 import CreateIcon from "react-native-vector-icons/Ionicons"
+import PendingIcon from "react-native-vector-icons/MaterialCommunityIcons"
+import CrossIcon from "react-native-vector-icons/Entypo"
+
+
 const Home = ({ navigation }) => {
 
     const data = [
@@ -45,27 +44,37 @@ const Home = ({ navigation }) => {
                 </View>
 
             </LinearGradient>
-
             <View style={styles.underContainer}>
                 <View style={{ flexDirection: "row" }}>
-                    <TouchableOpacity style={[styles.listItem, { borderColor: '#088F8F' }]} onPress={() => navigation.navigate("CreateReport")}>
-                        <CreateIcon name="create" size={40} style={{ color: '#088F8F' }} />
-                        <Text style={{ fontSize: 16, color: '#000', fontWeight: "400" }}>Create Report</Text>
+                    <TouchableOpacity style={[styles.listItem, { borderColor: '#00C0EF', backgroundColor: "#00C0EF" }]} onPress={() => navigation.navigate("CreateReport")}>
+                        <CreateIcon name="create" size={30} style={{ color: '#fff' }} />
+                        <Text style={styles.text2}>चेक इन रिपोर्ट बनाये</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.listItem, { borderColor: '#AAFF00' }]}>
-                        <CreateIcon name="download" size={40} style={{ color: '#AAFF00' }} />
-                        <Text style={{ fontSize: 18, color: '#000', fontWeight: "400" }}>Download</Text>
+                    <TouchableOpacity style={[styles.listItem, { borderColor: '#00A65A', backgroundColor: '#00A65A' }]}>
+                        <CreateIcon name="person" size={30} style={{ color: '#fff' }} />
+                        <Text style={styles.text2}>रिपोर्ट में गेस्ट जोड़े</Text>
                     </TouchableOpacity>
                 </View>
 
                 <View style={{ flexDirection: "row" }}>
-                    <TouchableOpacity style={[styles.listItem, { borderColor: '#87CEEB' }]}>
-                        <CreateIcon name="search-outline" size={40} style={{ color: '#87CEEB' }} />
-                        <Text style={{ fontSize: 18, color: '#000', fontWeight: "400" }}>Search</Text>
+                    <TouchableOpacity style={[styles.listItem, { borderColor: '#F06292', backgroundColor: '#F06292' }]}>
+                        <CreateIcon name="search-outline" size={30} style={{ color: '#fff' }} />
+                        <Text style={styles.text2}>सर्च गेस्ट</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.listItem, { borderColor: "#FFBF00" }]}>
-                        <CreateIcon name="person" size={40} style={{ color: "#FFBF00" }} />
-                        <Text style={{ fontSize: 18, color: '#000', fontWeight: "400" }}>Profile</Text>
+                    <TouchableOpacity style={[styles.listItem, { borderColor: "#FF7043", backgroundColor: "#FF7043" }]}>
+                        <CreateIcon name="download" size={30} style={{ color: "#fff" }} />
+                        <Text style={styles.text2}>सब्मिटेड रिपोर्ट को डाउनलोड करे या देखे</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity style={[styles.listItem, { borderColor: "#F29C13", backgroundColor: "#F29C13" }]}>
+                        <PendingIcon name="clipboard-text-clock-outline" size={30} style={{ color: "#fff" }} />
+                        <Text style={styles.text2}>पेंडिंग रिपोर्ट</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.listItem, { borderColor: "#d99ca5", backgroundColor: "#d99ca5" }]}>
+                        <CrossIcon name="circle-with-cross" size={30} style={{ color: "#fff" }} />
+                        <Text style={styles.text2}>कल कोई चेक इन नहीं हुआ</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -102,10 +111,16 @@ const styles = StyleSheet.create({
         color: "white",
         marginVertical: 2
     },
+    text2: {
+        fontSize: 14,
+        color: '#fff',
+        fontWeight: "500",
+        textAlign: "center",
+    },
 
     underContainer: {
         flex: 5,
-        backgroundColor: "white",
+        backgroundColor: "#fff",
         borderTopLeftRadius: 50,
         borderTopRightRadius: 50,
         justifyContent: "center",
@@ -113,15 +128,13 @@ const styles = StyleSheet.create({
     },
     listItem: {
         flex: 1,
-        height: 120,
-        width: Dimensions.get('window').width,
+        height: 110,
         backgroundColor: 'white',
-        margin: 10,
-        marginVertical: 20,
-        borderRadius: 18,
-        justifyContent: "center",
+        marginHorizontal: 15,
+        marginVertical: 10,
+        borderRadius: 12,
         alignItems: "center",
-        // elevation: 3,
+        elevation: 2,
         borderWidth: 2,
         justifyContent: "space-evenly"
 

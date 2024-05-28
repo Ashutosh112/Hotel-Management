@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const Settings = () => {
+const Profile = () => {
     return (
         <View style={{ flex: 1, backgroundColor: "#fff", justifyContent: "center", alignItems: "center" }}>
             <Text style={{ fontSize: 24 }}>Coming Soon</Text>
@@ -9,6 +9,6 @@ const Settings = () => {
     )
 }
 
-export default Settings
+export default Profile
 
 const styles = StyleSheet.create({})
