@@ -1,16 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, ScrollView, Pressable } from 'react-native';
-import Logo from "../assets/images/UjjainPoliceLogo.png"
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, ScrollView } from 'react-native';
+import Logo from "../assets/images/UjjainPoliceLogo.png";
 import CheckBox from '@react-native-community/checkbox';
 import DocumentPicker from 'react-native-document-picker';
 import Toast from 'react-native-toast-message';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+// Define validation schema with Yup
+const validationSchema = Yup.object().shape({
+    hotelName: Yup.string().required('होटल का नाम आवश्यक है'),
+    hotelAddress: Yup.string().required('होटल का पता आवश्यक है'),
+    ownerName: Yup.string().required('होटल मलिक का नाम आवश्यक है'),
+    ownerMobile: Yup.string().required('होटल मलिक का मोबाइल आवश्यक है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+    hotelWebsite: Yup.string().url('मान्य वेबसाइट URL दर्ज करें'),
+    hotelEmail: Yup.string().email('मान्य मेल आईडी दर्ज करें').required('होटल मेल आईडी आवश्यक है'),
+    registeredMobile: Yup.string().required('रजिस्टर मोबाइल न. आवश्यक है'),
+    propertyType: Yup.string().required('प्रॉपर्टी प्रकार आवश्यक है'),
+    city: Yup.string().required('शहर आवश्यक है'),
+    state: Yup.string().required('राज्य आवश्यक है'),
+    area: Yup.string().required('क्षेत्र आवश्यक है'),
+    policeStation: Yup.string().required('थाना आवश्यक है'),
+    agreeToTerms: Yup.boolean().oneOf([true], 'आपको सभी शर्तों और नियमों से सहमत होना होगा'),
+    gumastaFile: Yup.array().min(1, 'होटल का गुमस्ता आवश्यक है'),
+    aadharFile: Yup.array().min(1, 'मालिक का आधार आवश्यक है'),
+});
 
 
 const Signup = ({ navigation }) => {
-    const [toggleCheckBox, setToggleCheckBox] = useState(false)
-    const [GumastaFile, setGumastaFile] = useState([])
-    const [aadharFile, setAadharFile] = useState([])
-
+    const [toggleCheckBox, setToggleCheckBox] = useState(false);
+    const [gumastaFile, setGumastaFile] = useState([]);
+    const [aadharFile, setAadharFile] = useState([]);
 
     const selectGumastaFile = async () => {
         try {
@@ -18,19 +38,19 @@ const Signup = ({ navigation }) => {
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false
             });
-            setGumastaFile(doc)
+            setGumastaFile(doc);
         } catch (err) {
-            if (DocumentPicker.isCancel(err))
+            if (DocumentPicker.isCancel(err)) {
                 Toast.show({
                     type: 'info',
                     text1: 'Info',
                     text2: 'User cancelled the file selection'
                 });
-
-            else
-                console.log(err)
+            } else {
+                console.log(err);
+            }
         }
-    }
+    };
 
     const selectAadharFile = async () => {
         try {
@@ -38,19 +58,19 @@ const Signup = ({ navigation }) => {
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false
             });
-            console.log(doc)
-            setAadharFile(doc)
+            setAadharFile(doc);
         } catch (err) {
-            if (DocumentPicker.isCancel(err))
+            if (DocumentPicker.isCancel(err)) {
                 Toast.show({
                     type: 'info',
                     text1: 'Info',
                     text2: 'User cancelled the file selection'
                 });
-            else
-                console.log(err)
+            } else {
+                console.log(err);
+            }
         }
-    }
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -60,60 +80,218 @@ const Signup = ({ navigation }) => {
                 <Image source={Logo} style={{ height: 80, width: 80 }} />
                 <Text style={styles.text}>Hotel Registration</Text>
                 <Text style={styles.text2}>Register to create account</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='होटल का नाम' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='होटल का पता' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='होटल मलिक का नाम' style={styles.input}></TextInput>
-                    <TextInput maxLength={10} keyboardType='number-pad' placeholderTextColor='darkgrey' placeholder='होटल मलिक का मोबाइल' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='होटल की वेबसाइट' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='होटल मेल आईडी' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='रजिस्टर मोबाइल न.' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='प्रॉपर्टी प्रकार' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='शहर' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='राज्य' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='क्षेत्र' style={styles.input}></TextInput>
-                    <TextInput placeholderTextColor='darkgrey' placeholder='थाना' style={styles.input}></TextInput>
 
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                        {
-                            GumastaFile.length > 0 ?
-                                <TextInput placeholderTextColor='darkgrey' placeholder='File Uploaded' style={[styles.input, { width: "45%" }]}></TextInput>
-                                :
-                                <TextInput placeholderTextColor='darkgrey' placeholder='होटल का गुमस्ता' style={[styles.input, { width: "45%" }]}></TextInput>
-                        }
+                <Formik
+                    initialValues={{
+                        hotelName: '',
+                        hotelAddress: '',
+                        ownerName: '',
+                        ownerMobile: '',
+                        hotelWebsite: '',
+                        hotelEmail: '',
+                        registeredMobile: '',
+                        propertyType: '',
+                        city: '',
+                        state: '',
+                        area: '',
+                        policeStation: '',
+                        agreeToTerms: false,
+                    }}
+                    validationSchema={validationSchema}
+                    onSubmit={(values) => {
+                        console.log(values);
+                        navigation.navigate("Login");
+                    }}
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल का नाम'
+                                style={styles.input}
+                                onChangeText={handleChange('hotelName')}
+                                onBlur={handleBlur('hotelName')}
+                                value={values.hotelName}
+                            />
+                            {errors.hotelName && touched.hotelName && <Text style={styles.errorText}>{errors.hotelName}</Text>}
 
-                        <TouchableOpacity onPress={selectGumastaFile} style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }]}>
-                            <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
-                        </TouchableOpacity>
-                    </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल का पता'
+                                style={styles.input}
+                                onChangeText={handleChange('hotelAddress')}
+                                onBlur={handleBlur('hotelAddress')}
+                                value={values.hotelAddress}
+                            />
+                            {errors.hotelAddress && touched.hotelAddress && <Text style={styles.errorText}>{errors.hotelAddress}</Text>}
 
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                        {
-                            aadharFile.length > 0 ?
-                                <TextInput placeholderTextColor='darkgrey' placeholder='Aadhar Uploaded' style={[styles.input, { width: "45%" }]}></TextInput>
-                                :
-                                <TextInput placeholderTextColor='darkgrey' placeholder='मालिक का आधार' style={[styles.input, { width: "45%" }]}></TextInput>
-                        }
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल मलिक का नाम'
+                                style={styles.input}
+                                onChangeText={handleChange('ownerName')}
+                                onBlur={handleBlur('ownerName')}
+                                value={values.ownerName}
+                            />
+                            {errors.ownerName && touched.ownerName && <Text style={styles.errorText}>{errors.ownerName}</Text>}
 
-                        <TouchableOpacity onPress={selectAadharFile} style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }]}>
-                            <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
-                        </TouchableOpacity>
-                    </View>
+                            <TextInput
+                                maxLength={10}
+                                keyboardType='number-pad'
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल मलिक का मोबाइल'
+                                style={styles.input}
+                                onChangeText={handleChange('ownerMobile')}
+                                onBlur={handleBlur('ownerMobile')}
+                                value={values.ownerMobile}
+                            />
+                            {errors.ownerMobile && touched.ownerMobile && <Text style={styles.errorText}>{errors.ownerMobile}</Text>}
 
-                    <View style={{ width: "85%", marginTop: 20, flexDirection: "row", alignItems: "center" }}>
-                        <CheckBox
-                            disabled={false}
-                            value={toggleCheckBox}
-                            onValueChange={(newValue) => setToggleCheckBox(newValue)}
-                        />
-                        <Text> I agree to all terms & conditions</Text>
-                    </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल की वेबसाइट'
+                                style={styles.input}
+                                onChangeText={handleChange('hotelWebsite')}
+                                onBlur={handleBlur('hotelWebsite')}
+                                value={values.hotelWebsite}
+                            />
+                            {errors.hotelWebsite && touched.hotelWebsite && <Text style={styles.errorText}>{errors.hotelWebsite}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल मेल आईडी'
+                                style={styles.input}
+                                onChangeText={handleChange('hotelEmail')}
+                                onBlur={handleBlur('hotelEmail')}
+                                value={values.hotelEmail}
+                            />
+                            {errors.hotelEmail && touched.hotelEmail && <Text style={styles.errorText}>{errors.hotelEmail}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='रजिस्टर मोबाइल न.'
+                                style={styles.input}
+                                onChangeText={handleChange('registeredMobile')}
+                                onBlur={handleBlur('registeredMobile')}
+                                value={values.registeredMobile}
+                            />
+                            {errors.registeredMobile && touched.registeredMobile && <Text style={styles.errorText}>{errors.registeredMobile}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='प्रॉपर्टी प्रकार'
+                                style={styles.input}
+                                onChangeText={handleChange('propertyType')}
+                                onBlur={handleBlur('propertyType')}
+                                value={values.propertyType}
+                            />
+                            {errors.propertyType && touched.propertyType && <Text style={styles.errorText}>{errors.propertyType}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='शहर'
+                                style={styles.input}
+                                onChangeText={handleChange('city')}
+                                onBlur={handleBlur('city')}
+                                value={values.city}
+                            />
+                            {errors.city && touched.city && <Text style={styles.errorText}>{errors.city}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='राज्य'
+                                style={styles.input}
+                                onChangeText={handleChange('state')}
+                                onBlur={handleBlur('state')}
+                                value={values.state}
+                            />
+                            {errors.state && touched.state && <Text style={styles.errorText}>{errors.state}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='क्षेत्र'
+                                style={styles.input}
+                                onChangeText={handleChange('area')}
+                                onBlur={handleBlur('area')}
+                                value={values.area}
+                            />
+                            {errors.area && touched.area && <Text style={styles.errorText}>{errors.area}</Text>}
+
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='थाना'
+                                style={styles.input}
+                                onChangeText={handleChange('policeStation')}
+                                onBlur={handleBlur('policeStation')}
+                                value={values.policeStation}
+                            />
+                            {errors.policeStation && touched.policeStation && <Text style={styles.errorText}>{errors.policeStation}</Text>}
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {gumastaFile.length > 0 ? (
+                                    <TextInput
+                                        placeholderTextColor='darkgrey'
+                                        placeholder='File Uploaded'
+                                        style={[styles.input, { width: "45%" }]}
+                                    />
+                                ) : (
+                                    <TextInput
+                                        placeholderTextColor='darkgrey'
+                                        placeholder='होटल का गुमस्ता'
+                                        style={[styles.input, { width: "45%" }]}
+                                    />
+                                )}
+                                <TouchableOpacity
+                                    onPress={selectGumastaFile}
+                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, gumastaFile.length > 0 ? { backgroundColor: 'grey' } : null]}
+                                    disabled={gumastaFile.length > 0}
+                                >
+                                    <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {errors.gumastaFile && touched.gumastaFile && <Text style={styles.errorText}>{errors.gumastaFile}</Text>}
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {aadharFile.length > 0 ? (
+                                    <TextInput
+                                        placeholderTextColor='darkgrey'
+                                        placeholder='Aadhar Uploaded'
+                                        style={[styles.input, { width: "45%" }]}
+                                    />
+                                ) : (
+                                    <TextInput
+                                        placeholderTextColor='darkgrey'
+                                        placeholder='मालिक का आधार'
+                                        style={[styles.input, { width: "45%" }]}
+                                    />
+                                )}
+                                <TouchableOpacity
+                                    onPress={selectAadharFile}
+                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, aadharFile.length > 0 ? { backgroundColor: 'grey' } : null]}
+                                    disabled={aadharFile.length > 0}
+                                >
+                                    <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {errors.aadharFile && touched.aadharFile && <Text style={styles.errorText}>{errors.aadharFile}</Text>}
 
 
-                    <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate("Login")}>
-                        <Text style={styles.button}>Register</Text>
-                    </TouchableOpacity>
-                </View>
+                            <View style={{ width: "85%", marginTop: 20, flexDirection: "row", alignItems: "center" }}>
+                                <CheckBox
+                                    disabled={false}
+                                    value={values.agreeToTerms}
+                                    onValueChange={(newValue) => setFieldValue('agreeToTerms', newValue)}
+                                />
+                                <Text> I agree to all terms & conditions</Text>
+                            </View>
+                            {errors.agreeToTerms && touched.agreeToTerms && <Text style={styles.errorText}>{errors.agreeToTerms}</Text>}
+
+                            <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                                <Text style={styles.button}>Register</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </Formik>
             </View>
 
             <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Login")}>
@@ -121,12 +299,11 @@ const Signup = ({ navigation }) => {
                     <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Login</Text>
                 </Text>
             </TouchableOpacity>
-
         </ScrollView>
     );
 }
 
-export default Signup
+export default Signup;
 
 const styles = StyleSheet.create({
     container: {
@@ -136,7 +313,7 @@ const styles = StyleSheet.create({
     body: {
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 20
+        marginTop: 20,
     },
     text: {
         color: "#000",
@@ -156,8 +333,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         color: "#000",
         height: 50,
-        marginTop: 20
-
+        marginTop: 20,
     },
     inputContainer: {
         marginTop: 20,
@@ -173,34 +349,25 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: '#2AAA8A'
+        backgroundColor: '#2AAA8A',
     },
     button: {
         fontSize: 18,
         textAlign: 'center',
         color: '#fff',
-        fontWeight: "bold"
+        fontWeight: "bold",
     },
     greyText: {
         marginTop: 15,
         fontSize: 14,
         color: "#FFBF00",
-        fontWeight: "bold"
+        fontWeight: "bold",
     },
-    google_button: {
-        color: 'white',
-        width: Dimensions.get('window').width - 60,
-        backgroundColor: "#000",
-        borderRadius: 30,
-        justifyContent: "center",
-        flexDirection: "row",
-        marginTop: 20,
-        paddingHorizontal: 20,
-        height: 50
+    errorText: {
+        color: "#FF4545",
+        marginTop: 5,
+        width: "100%",
+        marginLeft: 70,
+        fontSize: 12
     },
-    checkbox: {
-        width: 64,
-        height: 64
-    }
-
 });

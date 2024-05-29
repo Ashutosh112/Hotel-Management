@@ -10,65 +10,7 @@ const SubmittedReport = ({ navigation }) => {
     const [checkoutDate, setCheckoutDate] = useState(null)
     const [open, setOpen] = useState(false)
     const [open2, setOpen2] = useState(false)
-    const [travelReason, setTravelReason] = useState(null);
-    const [selectgender, setSelectgender] = useState(null)
-    const [idFront, setIdFront] = useState([])
-    const [idBack, setIdBack] = useState([])
 
-    const data = [
-        { label: 'Darshan', value: '1' },
-        { label: 'Business', value: '2' },
-        { label: 'Normal Visit', value: '3' },
-        { label: 'Appointment', value: '4' },
-        { label: 'Meeting', value: '5' },
-        { label: 'Guest', value: '6' },
-
-    ];
-
-    const genderData = [
-        { label: 'Male', value: '1' },
-        { label: 'Female', value: '2' },
-        { label: 'Other', value: '2' },
-    ];
-    const selectIdFrontFile = async () => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false
-            });
-            setIdFront(doc)
-        } catch (err) {
-            if (DocumentPicker.isCancel(err))
-                Toast.show({
-                    type: 'info',
-                    text1: 'Info',
-                    text2: 'User cancelled the file selection'
-                });
-
-            else
-                console.log(err)
-        }
-    }
-
-    const selectIdBackFile = async () => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false
-            });
-            console.log(doc)
-            setIdBack(doc)
-        } catch (err) {
-            if (DocumentPicker.isCancel(err))
-                Toast.show({
-                    type: 'info',
-                    text1: 'Info',
-                    text2: 'User cancelled the file selection'
-                });
-            else
-                console.log(err)
-        }
-    }
     return (
         <ScrollView style={styles.container}>
             <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />

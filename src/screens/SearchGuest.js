@@ -1,113 +1,79 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, ScrollView, Button } from 'react-native';
-import DatePicker from 'react-native-date-picker'
-import { Dropdown } from 'react-native-element-dropdown';
-import DocumentPicker from 'react-native-document-picker';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView } from 'react-native';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+    name: Yup.string().required('नाम अनिवार्य'),
+    mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+    idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
+});
 
 const SearchGuest = ({ navigation }) => {
-
-    const [checkinDate, setCheckinDate] = useState(null)
-    const [checkoutDate, setCheckoutDate] = useState(null)
-    const [open, setOpen] = useState(false)
-    const [open2, setOpen2] = useState(false)
-    const [travelReason, setTravelReason] = useState(null);
-    const [selectgender, setSelectgender] = useState(null)
-    const [idFront, setIdFront] = useState([])
-    const [idBack, setIdBack] = useState([])
-
-    const data = [
-        { label: 'Darshan', value: '1' },
-        { label: 'Business', value: '2' },
-        { label: 'Normal Visit', value: '3' },
-        { label: 'Appointment', value: '4' },
-        { label: 'Meeting', value: '5' },
-        { label: 'Guest', value: '6' },
-
-    ];
-
-    const genderData = [
-        { label: 'Male', value: '1' },
-        { label: 'Female', value: '2' },
-        { label: 'Other', value: '2' },
-    ];
-    const selectIdFrontFile = async () => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false
-            });
-            setIdFront(doc)
-        } catch (err) {
-            if (DocumentPicker.isCancel(err))
-                Toast.show({
-                    type: 'info',
-                    text1: 'Info',
-                    text2: 'User cancelled the file selection'
-                });
-
-            else
-                console.log(err)
-        }
-    }
-
-    const selectIdBackFile = async () => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false
-            });
-            console.log(doc)
-            setIdBack(doc)
-        } catch (err) {
-            if (DocumentPicker.isCancel(err))
-                Toast.show({
-                    type: 'info',
-                    text1: 'Info',
-                    text2: 'User cancelled the file selection'
-                });
-            else
-                console.log(err)
-        }
-    }
     return (
-        <ScrollView style={styles.container}>
-            <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
-            <View style={styles.inputContainer}>
-                <TextInput placeholderTextColor='darkgrey' placeholder='नाम*' style={[styles.input, { marginTop: 0 }]}></TextInput>
-                <TextInput placeholderTextColor='darkgrey' placeholder='मोबाइल नंबर*' style={styles.input}></TextInput>
-                <TextInput placeholderTextColor='darkgrey' placeholder='आईडी नंबर*' style={styles.input}></TextInput>
+        <Formik
+            initialValues={{
+                name: '',
+                mobileNumber: '',
+                idNumber: '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={values => {
+                console.log(values);
+                navigation.navigate("Login");
+            }}
+        >
+            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                <ScrollView style={styles.container}>
+                    <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            placeholderTextColor='darkgrey'
+                            placeholder='नाम*'
+                            style={[styles.input, { marginTop: 0 }]}
+                            onChangeText={handleChange('name')}
+                            onBlur={handleBlur('name')}
+                            value={values.name}
+                        />
+                        {touched.name && errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
 
-                <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate("Login")}>
-                    <Text style={styles.button}>Search</Text>
-                </TouchableOpacity>
-            </View>
+                        <TextInput
+                            placeholderTextColor='darkgrey'
+                            placeholder='मोबाइल नंबर*'
+                            style={styles.input}
+                            keyboardType='number-pad'
+                            onChangeText={handleChange('mobileNumber')}
+                            onBlur={handleBlur('mobileNumber')}
+                            value={values.mobileNumber}
+                        />
+                        {touched.mobileNumber && errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
 
-        </ScrollView>
+                        <TextInput
+                            placeholderTextColor='darkgrey'
+                            placeholder='आईडी नंबर*'
+                            style={styles.input}
+                            onChangeText={handleChange('idNumber')}
+                            onBlur={handleBlur('idNumber')}
+                            value={values.idNumber}
+                        />
+                        {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
+
+                        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                            <Text style={styles.button}>Search</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            )}
+        </Formik>
     );
-}
+};
 
-export default SearchGuest
+export default SearchGuest;
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         flex: 1,
-    },
-    body: {
-        flex: 4,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    text: {
-        color: "#000",
-        fontWeight: "bold",
-        fontSize: 28,
-        marginTop: 20
-    },
-    text2: {
-        color: "#000",
-        fontSize: 16,
-        // marginTop: 10
     },
     input: {
         width: Dimensions.get('window').width - 60,
@@ -118,8 +84,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         color: "#000",
         height: 50,
-        marginTop: 20
-
+        marginTop: 20,
     },
     inputContainer: {
         marginTop: 20,
@@ -134,51 +99,19 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: '#2AAA8A'
+        backgroundColor: '#2AAA8A',
     },
     button: {
         fontSize: 18,
         textAlign: 'center',
         color: '#fff',
-        fontWeight: "bold"
+        fontWeight: "bold",
     },
-    greyText: {
-        marginTop: 15,
-        fontSize: 14,
-        color: "#FFBF00",
-        fontWeight: "bold"
-    },
-    google_button: {
-        color: 'white',
-        width: Dimensions.get('window').width - 60,
-        backgroundColor: "#000",
-        borderRadius: 30,
-        justifyContent: "center",
-        flexDirection: "row",
-        marginTop: 20,
-        paddingHorizontal: 20,
-        height: 50
-    },
-
-    dropdown: {
-        margin: 16,
-        height: 50,
-        borderBottomColor: 'gray',
-        borderBottomWidth: 0.5,
-    },
-
-    placeholderStyle: {
-        fontSize: 14,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
+    errorText: {
+        color: "#FF4545",
+        marginTop: 5,
+        width: "100%",
+        marginLeft: 70,
+        fontSize: 12
     },
 });

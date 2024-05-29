@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal } from 'react-native';
 import Logo from "../assets/images/UjjainPoliceLogo.png"
 import Cross from "react-native-vector-icons/Entypo"
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 const Login = ({ navigation }) => {
 
   const [showOtpModal, setShowOtpModal] = useState(false)
 
-  // FOR OTP START
   const firstInput = useRef();
   const secondInput = useRef();
   const thirdInput = useRef();
@@ -22,9 +23,27 @@ const Login = ({ navigation }) => {
   useEffect(() => {
     const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000)
     return () => clearInterval(timer);
+  }, [counter])
+
+
+  const sendOtp = ({ mobileNumber }) => {
+    const config = {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-type": "application/json"
+      }
+    };
+    const body = {
+      mobile_no: mobileNumber,
+    }
+    console.log("bodyy", body)
+    axios.post(`${baseUrl}login/`, body, config)
+      .then((res) => {
+      })
+      .catch(err => {
+      }
+      )
   }
-    , [counter])
-  // FOR OTP END
 
 
   return (
@@ -37,20 +56,42 @@ const Login = ({ navigation }) => {
         <Text style={[styles.text2, { marginTop: 5 }]}>Welcome back!</Text>
         <Text style={styles.text2}>Please login to continue</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput maxLength={10} keyboardType='number-pad' placeholderTextColor='darkgrey' placeholder='मोबाइल न.' style={styles.input}></TextInput>
+        <Formik
+          initialValues={{ mobileNumber: '' }}
+          validationSchema={Yup.object().shape({
+            mobileNumber: Yup.string().required('मोबाइल नंबर आवश्यक है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+          })}
+          onSubmit={(values) => {
+            sendOtp(values)
+          }}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            <View style={styles.inputContainer}>
+              <TextInput
+                maxLength={10}
+                keyboardType='number-pad'
+                placeholderTextColor='darkgrey'
+                placeholder='मोबाइल न.'
+                style={[styles.input, { borderColor: touched.mobileNumber && errors.mobileNumber ? "#FF4545" : '#E3E2E2' }]}
+                onChangeText={handleChange('mobileNumber')}
+                onBlur={handleBlur('mobileNumber')}
+                value={values.mobileNumber}
+              />
+              {errors.mobileNumber && touched.mobileNumber && <Text style={styles.errorText}>{errors.mobileNumber}</Text>}
 
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => setShowOtpModal(true)}>
-            <Text style={styles.button}>Login</Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                <Text style={styles.button}>Login</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </Formik>
+
         <TouchableOpacity>
           <Text style={[styles.greyText, { marginTop: 5 }]}>Forgot Password</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Signup")}>
         <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>New Hotel Registration
-
           <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Click here</Text>
         </Text>
       </TouchableOpacity>
@@ -184,6 +225,8 @@ const Login = ({ navigation }) => {
 
               <View style={{ marginBottom: 15 }}>
                 <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 30 }]} onPress={() => navigation.navigate("BottomNavigator")}>
+                  {/* <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 30 }]} onPress={() => sendOtp()}> */}
+
                   <Text style={{ fontSize: 12, color: "#fff", letterSpacing: 1, }}>Submit</Text>
                 </TouchableOpacity>
               </View>
@@ -192,7 +235,6 @@ const Login = ({ navigation }) => {
         </Pressable>
       </Modal>
       {/* - MODAL for OTP SEND END -*/}
-
     </View>
   );
 }
@@ -329,5 +371,11 @@ const styles = StyleSheet.create({
   },
   // FOR MODAL END
 
-
+  errorText: {
+    color: "#FF4545",
+    marginTop: 5,
+    width: "100%",
+    marginLeft: 70,
+    fontSize: 12
+  },
 });

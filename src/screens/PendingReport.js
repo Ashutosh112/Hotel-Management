@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, FlatList, Text, Pressable, Dimensions, View, Image, TouchableOpacity, TextInput } from "react-native";
 
-
-
-
 const PendingReport = ({ navigation }) => {
 
     const data = [
@@ -38,7 +35,7 @@ const PendingReport = ({ navigation }) => {
 
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
                             <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 8, borderColor: '#2AAA8A', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails")}>
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "5000", color: '#2AAA8A', padding: 10, paddingVertical: 8 }}>Show Detail</Text>
+                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "500", color: '#2AAA8A', padding: 10, paddingVertical: 8 }}>Show Detail</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
