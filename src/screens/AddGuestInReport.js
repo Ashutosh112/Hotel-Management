@@ -1,10 +1,13 @@
+
+
+
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, ScrollView, Button } from 'react-native';
 import DatePicker from 'react-native-date-picker'
 import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
 
-const CreateReport = ({ navigation }) => {
+const AddGuestInReport = ({ navigation }) => {
 
     const [checkinDate, setCheckinDate] = useState(null)
     const [checkoutDate, setCheckoutDate] = useState(null)
@@ -183,7 +186,7 @@ const CreateReport = ({ navigation }) => {
     );
 }
 
-export default CreateReport
+export default AddGuestInReport
 
 const styles = StyleSheet.create({
     container: {

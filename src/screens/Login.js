@@ -38,7 +38,7 @@ const Login = ({ navigation }) => {
         <Text style={styles.text2}>Please login to continue</Text>
 
         <View style={styles.inputContainer}>
-          <TextInput maxLength={10} keyboardType='number-pad' placeholderTextColor='darkgrey' placeholder='Mobile No.' style={styles.input}></TextInput>
+          <TextInput maxLength={10} keyboardType='number-pad' placeholderTextColor='darkgrey' placeholder='मोबाइल न.' style={styles.input}></TextInput>
 
           <TouchableOpacity style={styles.buttonContainer} onPress={() => setShowOtpModal(true)}>
             <Text style={styles.button}>Login</Text>

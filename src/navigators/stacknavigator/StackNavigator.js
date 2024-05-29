@@ -7,7 +7,12 @@ import BottomNavigator from '../bottomnavigator/BottomNavigator';
 import SplashScreen from '../../screens/SplashScreen';
 import Signup from '../../screens/Signup';
 import CreateReport from '../../screens/CreateReport';
-
+import AddGuestInReport from '../../screens/AddGuestInReport';
+import SearchGuest from '../../screens/SearchGuest';
+import SubmittedReport from '../../screens/SubmittedReport';
+import NoCheckIn from '../../screens/NoCheckIn';
+import PendingReport from '../../screens/PendingReport';
+import PendingReportDetails from '../../screens/PendingReportDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +35,12 @@ const StackNavigator = () => {
                     <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
                     <Stack.Screen name="BottomNavigator" component={BottomNavigator} options={{ headerShown: false }} />
                     <Stack.Screen name="CreateReport" component={CreateReport} options={{ headerShown: true, headerTitle: "Create Report" }} />
+                    <Stack.Screen name="AddGuestInReport" component={AddGuestInReport} options={{ headerShown: true, headerTitle: "Add Guest" }} />
+                    <Stack.Screen name="SearchGuest" component={SearchGuest} options={{ headerShown: true, headerTitle: "Search Guest" }} />
+                    <Stack.Screen name="SubmittedReport" component={SubmittedReport} options={{ headerShown: true, headerTitle: "Submitted Report" }} />
+                    <Stack.Screen name="PendingReport" component={PendingReport} options={{ headerShown: true, headerTitle: "Pending Reports" }} />
+                    <Stack.Screen name="NoCheckIn" component={NoCheckIn} options={{ headerShown: true, headerTitle: "No Check In" }} />
+                    <Stack.Screen name="PendingReportDetails" component={PendingReportDetails} options={{ headerShown: true, headerTitle: "Report Details" }} />
 
                 </Stack.Navigator>
             </NavigationContainer>

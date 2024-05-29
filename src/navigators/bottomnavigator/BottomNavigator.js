@@ -21,7 +21,7 @@ const BottomNavigator = ({ navigation }) => {
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return <ProfileLogo name="user-o" size={24} style={{ color: focused ? '#04686d' : "grey", }} />
-                    }, headerTitleAlign: "left", headerTintColor: "#fff", headerShown: false
+                    }, headerTitleAlign: "left", headerTintColor: '#000', headerShown: true
                 }}
             />
         </Tab.Navigator>
