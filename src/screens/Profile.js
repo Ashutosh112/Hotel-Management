@@ -16,7 +16,7 @@ const Profile = ({ navigation }) => {
                 <TextInput placeholderTextColor='darkgrey' placeholder='संपर्क न.*' style={styles.input}></TextInput>
                 <TextInput placeholderTextColor='darkgrey' placeholder='ईमेल आईडी*' style={styles.input}></TextInput>
                 <TextInput placeholderTextColor='darkgrey' placeholder='पुलिस स्टेशन*' style={styles.input}></TextInput>
-                <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate("Login")}>
+                <TouchableOpacity style={styles.buttonContainer} >
                     <Text style={styles.button}>Save</Text>
                 </TouchableOpacity>
             </View>

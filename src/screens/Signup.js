@@ -28,17 +28,13 @@ const validationSchema = Yup.object().shape({
 
 
 const Signup = ({ navigation }) => {
-    const [toggleCheckBox, setToggleCheckBox] = useState(false);
-    const [gumastaFile, setGumastaFile] = useState([]);
-    const [aadharFile, setAadharFile] = useState([]);
-
-    const selectGumastaFile = async () => {
+    const selectGumastaFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false
             });
-            setGumastaFile(doc);
+            setFieldValue('gumastaFile', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 Toast.show({
@@ -52,13 +48,13 @@ const Signup = ({ navigation }) => {
         }
     };
 
-    const selectAadharFile = async () => {
+    const selectAadharFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false
             });
-            setAadharFile(doc);
+            setFieldValue('aadharFile', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 Toast.show({
@@ -96,11 +92,13 @@ const Signup = ({ navigation }) => {
                         area: '',
                         policeStation: '',
                         agreeToTerms: false,
+                        gumastaFile: [],
+                        aadharFile: []
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
                         console.log(values);
-                        navigation.navigate("Login");
+
                     }}
                 >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
@@ -228,11 +226,12 @@ const Signup = ({ navigation }) => {
                             {errors.policeStation && touched.policeStation && <Text style={styles.errorText}>{errors.policeStation}</Text>}
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                {gumastaFile.length > 0 ? (
+                                {values.gumastaFile.length > 0 ? (
                                     <TextInput
                                         placeholderTextColor='darkgrey'
                                         placeholder='File Uploaded'
                                         style={[styles.input, { width: "45%" }]}
+                                        value='File Uploaded'
                                     />
                                 ) : (
                                     <TextInput
@@ -242,9 +241,9 @@ const Signup = ({ navigation }) => {
                                     />
                                 )}
                                 <TouchableOpacity
-                                    onPress={selectGumastaFile}
-                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, gumastaFile.length > 0 ? { backgroundColor: 'grey' } : null]}
-                                    disabled={gumastaFile.length > 0}
+                                    onPress={() => selectGumastaFile(setFieldValue)}
+                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, values.gumastaFile.length > 0 ? { backgroundColor: 'grey' } : null, values.gumastaFile.length > 0 ? { borderColor: 'grey' } : null]}
+                                    disabled={values.gumastaFile.length > 0}
                                 >
                                     <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
                                 </TouchableOpacity>
@@ -252,11 +251,12 @@ const Signup = ({ navigation }) => {
                             {errors.gumastaFile && touched.gumastaFile && <Text style={styles.errorText}>{errors.gumastaFile}</Text>}
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                {aadharFile.length > 0 ? (
+                                {values.aadharFile.length > 0 ? (
                                     <TextInput
                                         placeholderTextColor='darkgrey'
                                         placeholder='Aadhar Uploaded'
                                         style={[styles.input, { width: "45%" }]}
+                                        value='Aadhar Uploaded'
                                     />
                                 ) : (
                                     <TextInput
@@ -266,15 +266,14 @@ const Signup = ({ navigation }) => {
                                     />
                                 )}
                                 <TouchableOpacity
-                                    onPress={selectAadharFile}
-                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, aadharFile.length > 0 ? { backgroundColor: 'grey' } : null]}
-                                    disabled={aadharFile.length > 0}
+                                    onPress={() => selectAadharFile(setFieldValue)}
+                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, values.aadharFile.length > 0 ? { backgroundColor: 'grey' } : null, values.aadharFile.length > 0 ? { borderColor: 'grey' } : null]}
+                                    disabled={values.aadharFile.length > 0}
                                 >
                                     <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
                                 </TouchableOpacity>
                             </View>
                             {errors.aadharFile && touched.aadharFile && <Text style={styles.errorText}>{errors.aadharFile}</Text>}
-
 
                             <View style={{ width: "85%", marginTop: 20, flexDirection: "row", alignItems: "center" }}>
                                 <CheckBox
@@ -294,7 +293,7 @@ const Signup = ({ navigation }) => {
                 </Formik>
             </View>
 
-            <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Login")}>
+            <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} >
                 <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Already have an account?
                     <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Login</Text>
                 </Text>
@@ -304,6 +303,7 @@ const Signup = ({ navigation }) => {
 }
 
 export default Signup;
+
 
 const styles = StyleSheet.create({
     container: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         color: '#fff',
-        fontWeight: "bold",
+        fontWeight: "500",
     },
     greyText: {
         marginTop: 15,

@@ -24,7 +24,7 @@ const NoCheckIn = ({ navigation }) => {
                 validationSchema={validationSchema}
                 onSubmit={(values) => {
                     console.log(values);
-                    navigation.navigate("Login");
+
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (

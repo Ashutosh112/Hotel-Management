@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, ScrollView, Button } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
@@ -31,8 +31,6 @@ const AddGuestInReport = ({ navigation }) => {
     const [open2, setOpen2] = useState(false);
     const [travelReason, setTravelReason] = useState(null);
     const [selectgender, setSelectgender] = useState(null);
-    const [idFront, setIdFront] = useState([]);
-    const [idBack, setIdBack] = useState([]);
 
     const data = [
         { label: 'Darshan', value: '1' },
@@ -49,13 +47,13 @@ const AddGuestInReport = ({ navigation }) => {
         { label: 'Other', value: '3' },
     ];
 
-    const selectIdFrontFile = async () => {
+    const selectIdFrontFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false,
             });
-            setIdFront(doc);
+            setFieldValue('idFront', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled the file selection');
@@ -65,13 +63,13 @@ const AddGuestInReport = ({ navigation }) => {
         }
     };
 
-    const selectIdBackFile = async () => {
+    const selectIdBackFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false,
             });
-            setIdBack(doc);
+            setFieldValue('idBack', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled the file selection');
@@ -279,7 +277,7 @@ const AddGuestInReport = ({ navigation }) => {
                         {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
 
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {idFront.length > 0 ? (
+                            {values.idFront.length > 0 ? (
                                 <TextInput
                                     placeholderTextColor='darkgrey'
                                     placeholder='File Uploaded'
@@ -296,11 +294,8 @@ const AddGuestInReport = ({ navigation }) => {
                                 />
                             )}
                             <TouchableOpacity
-                                onPress={async () => {
-                                    await selectIdFrontFile();
-                                    setFieldValue('idFront', idFront);
-                                }}
-                                style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }]}
+                                onPress={() => selectIdFrontFile(setFieldValue)}
+                                style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, values.idFront.length > 0 ? { backgroundColor: 'grey' } : null, values.idFront.length > 0 ? { borderColor: 'grey' } : null]}
                             >
                                 <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
                             </TouchableOpacity>
@@ -308,9 +303,9 @@ const AddGuestInReport = ({ navigation }) => {
                         {touched.idFront && errors.idFront ? <Text style={styles.errorText}>{errors.idFront}</Text> : null}
 
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {idBack.length > 0 ? (
+                            {values.idBack.length > 0 ? (
                                 <TextInput
-                                    placeholderTextColor='darkgrey'
+                                    placeholderTextColor='grey'
                                     placeholder='Aadhar Uploaded'
                                     style={[styles.input, { width: "45%" }]}
                                     editable={false}
@@ -318,18 +313,15 @@ const AddGuestInReport = ({ navigation }) => {
                                 />
                             ) : (
                                 <TextInput
-                                    placeholderTextColor='darkgrey'
+                                    placeholderTextColor='grey'
                                     placeholder='आईडी का Back*'
                                     style={[styles.input, { width: "45%" }]}
                                     editable={false}
                                 />
                             )}
                             <TouchableOpacity
-                                onPress={async () => {
-                                    await selectIdBackFile();
-                                    setFieldValue('idBack', idBack);
-                                }}
-                                style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }]}
+                                onPress={() => selectIdBackFile(setFieldValue)}
+                                style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, values.idBack.length > 0 ? { backgroundColor: 'grey' } : null, values.idBack.length > 0 ? { borderColor: 'grey' } : null]}
                             >
                                 <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
                             </TouchableOpacity>
@@ -383,7 +375,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         color: '#fff',
-        fontWeight: "bold",
+        fontWeight: "500",
     },
     errorText: {
         color: "#FF4545",

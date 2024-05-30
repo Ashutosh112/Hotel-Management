@@ -62,7 +62,8 @@ const Login = ({ navigation }) => {
             mobileNumber: Yup.string().required('मोबाइल नंबर आवश्यक है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
           })}
           onSubmit={(values) => {
-            sendOtp(values)
+            // sendOtp(values)
+            setShowOtpModal(true)
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
@@ -224,9 +225,7 @@ const Login = ({ navigation }) => {
               </View>
 
               <View style={{ marginBottom: 15 }}>
-                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 30 }]} onPress={() => navigation.navigate("BottomNavigator")}>
-                  {/* <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 30 }]} onPress={() => sendOtp()}> */}
-
+                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 30 }]} onPress={() => navigation.navigate("BottomNavigator", setShowOtpModal(false))}>
                   <Text style={{ fontSize: 12, color: "#fff", letterSpacing: 1, }}>Submit</Text>
                 </TouchableOpacity>
               </View>
@@ -293,7 +292,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     color: '#fff',
-    fontWeight: "bold"
+    fontWeight: "500"
   },
   greyText: {
     marginTop: 15,
