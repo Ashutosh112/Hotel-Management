@@ -34,7 +34,7 @@ const StackNavigator = () => {
                     <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                     <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
                     <Stack.Screen name="BottomNavigator" component={BottomNavigator} options={{ headerShown: false }} />
-                    <Stack.Screen name="CreateReport" component={CreateReport} options={{ headerShown: true, headerTitle: "Create Report" }} />
+                    <Stack.Screen name="CreateReport" component={CreateReport} options={{ headerShown: false, headerTitle: "Create Report" }} />
                     <Stack.Screen name="AddGuestInReport" component={AddGuestInReport} options={{ headerShown: true, headerTitle: "Add Guest" }} />
                     <Stack.Screen name="SearchGuest" component={SearchGuest} options={{ headerShown: true, headerTitle: "Search Guest" }} />
                     <Stack.Screen name="SubmittedReport" component={SubmittedReport} options={{ headerShown: true, headerTitle: "Submitted Report" }} />

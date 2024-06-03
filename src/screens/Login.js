@@ -59,7 +59,7 @@ const Login = ({ navigation }) => {
         <Formik
           initialValues={{ mobileNumber: '' }}
           validationSchema={Yup.object().shape({
-            mobileNumber: Yup.string().required('मोबाइल नंबर आवश्यक है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+            mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
           })}
           onSubmit={(values) => {
             // sendOtp(values)

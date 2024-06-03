@@ -9,21 +9,21 @@ import * as Yup from 'yup';
 
 // Define validation schema with Yup
 const validationSchema = Yup.object().shape({
-    hotelName: Yup.string().required('होटल का नाम आवश्यक है'),
-    hotelAddress: Yup.string().required('होटल का पता आवश्यक है'),
-    ownerName: Yup.string().required('होटल मलिक का नाम आवश्यक है'),
-    ownerMobile: Yup.string().required('होटल मलिक का मोबाइल आवश्यक है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+    hotelName: Yup.string().required('होटल का नाम अनिवार्य है'),
+    hotelAddress: Yup.string().required('होटल का पता अनिवार्य है'),
+    ownerName: Yup.string().required('होटल मलिक का नाम अनिवार्य है'),
+    ownerMobile: Yup.string().required('होटल मलिक का मोबाइल अनिवार्य है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
     hotelWebsite: Yup.string().url('मान्य वेबसाइट URL दर्ज करें'),
-    hotelEmail: Yup.string().email('मान्य मेल आईडी दर्ज करें').required('होटल मेल आईडी आवश्यक है'),
-    registeredMobile: Yup.string().required('रजिस्टर मोबाइल न. आवश्यक है'),
-    propertyType: Yup.string().required('प्रॉपर्टी प्रकार आवश्यक है'),
-    city: Yup.string().required('शहर आवश्यक है'),
-    state: Yup.string().required('राज्य आवश्यक है'),
-    area: Yup.string().required('क्षेत्र आवश्यक है'),
-    policeStation: Yup.string().required('थाना आवश्यक है'),
+    hotelEmail: Yup.string().email('मान्य मेल आईडी दर्ज करें').required('होटल मेल आईडी अनिवार्य है'),
+    registeredMobile: Yup.string().required('रजिस्टर मोबाइल न. अनिवार्य है'),
+    propertyType: Yup.string().required('प्रॉपर्टी प्रकार अनिवार्य है'),
+    city: Yup.string().required('शहर अनिवार्य है'),
+    state: Yup.string().required('राज्य अनिवार्य है'),
+    area: Yup.string().required('क्षेत्र अनिवार्य है'),
+    policeStation: Yup.string().required('थाना अनिवार्य है'),
     agreeToTerms: Yup.boolean().oneOf([true], 'आपको सभी शर्तों और नियमों से सहमत होना होगा'),
-    gumastaFile: Yup.array().min(1, 'होटल का गुमस्ता आवश्यक है'),
-    aadharFile: Yup.array().min(1, 'मालिक का आधार आवश्यक है'),
+    gumastaFile: Yup.array().min(1, 'होटल का गुमस्ता अनिवार्य है'),
+    aadharFile: Yup.array().min(1, 'मालिक का आधार अनिवार्य है'),
 });
 
 
@@ -293,7 +293,7 @@ const Signup = ({ navigation }) => {
                 </Formik>
             </View>
 
-            <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} >
+            <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Login")}>
                 <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Already have an account?
                     <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Login</Text>
                 </Text>

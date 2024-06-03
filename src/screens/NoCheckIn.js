@@ -8,7 +8,7 @@ const NoCheckIn = ({ navigation }) => {
 
     const validationSchema = Yup.object().shape({
         reporterName: Yup.string()
-            .required('रिपोर्ट निर्माता का नाम आवश्यक है'),
+            .required('रिपोर्ट निर्माता का नाम अनिवार्य है'),
         agreeToTerms: Yup.boolean()
             .oneOf([true], 'कृपया बॉक्स को टिक करें'),
     });
