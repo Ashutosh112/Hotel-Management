@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, FlatList, Text, Pressable, Dimensions, View, Image, TouchableOpacity, TextInput } from "react-native";
+import BackIcon from "react-native-vector-icons/Ionicons"
 
 const PendingReport = ({ navigation }) => {
 
@@ -14,8 +15,13 @@ const PendingReport = ({ navigation }) => {
     ];
 
     return (
-        <View style={{ paddingHorizontal: 8, marginTop: 5, backgroundColor: "#F5F5F8" }}>
-
+        <View style={{ backgroundColor: "#F5F5F8" }}>
+            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                </TouchableOpacity>
+                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>Pending Report</Text>
+            </View>
             <TextInput placeholderTextColor="darkgrey" placeholder='Search' style={styles.input}></TextInput>
             <FlatList
                 data={data}
@@ -34,8 +40,8 @@ const PendingReport = ({ navigation }) => {
                         </View>
 
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
-                            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 8, borderColor: '#2AAA8A', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails")}>
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "500", color: '#2AAA8A', padding: 10, paddingVertical: 8 }}>Show Detail</Text>
+                            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 8, borderColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails")}>
+                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "500", color: '#1AA7FF', padding: 10, paddingVertical: 8 }}>Show Detail</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

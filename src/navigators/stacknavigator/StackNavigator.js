@@ -38,9 +38,9 @@ const StackNavigator = () => {
                     <Stack.Screen name="AddGuestInReport" component={AddGuestInReport} options={{ headerShown: false, headerTitle: "Add Guest" }} />
                     <Stack.Screen name="SearchGuest" component={SearchGuest} options={{ headerShown: false, headerTitle: "Search Guest" }} />
                     <Stack.Screen name="SubmittedReport" component={SubmittedReport} options={{ headerShown: false, headerTitle: "Submitted Report" }} />
-                    <Stack.Screen name="PendingReport" component={PendingReport} options={{ headerShown: true, headerTitle: "Pending Reports" }} />
+                    <Stack.Screen name="PendingReport" component={PendingReport} options={{ headerShown: false, headerTitle: "Pending Reports" }} />
                     <Stack.Screen name="NoCheckIn" component={NoCheckIn} options={{ headerShown: true, headerTitle: "No Check In" }} />
-                    <Stack.Screen name="PendingReportDetails" component={PendingReportDetails} options={{ headerShown: true, headerTitle: "Report Details" }} />
+                    <Stack.Screen name="PendingReportDetails" component={PendingReportDetails} options={{ headerShown: false, headerTitle: "Report Details" }} />
 
                 </Stack.Navigator>
             </NavigationContainer>
