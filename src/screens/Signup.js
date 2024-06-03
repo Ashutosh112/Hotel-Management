@@ -1,301 +1,385 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, ScrollView } from 'react-native';
-import Logo from "../assets/images/UjjainPoliceLogo.png";
-import CheckBox from '@react-native-community/checkbox';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
+import DatePicker from 'react-native-date-picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
-import Toast from 'react-native-toast-message';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import PhotoIcon from "../assets/images/photologoicon.png"
+import CalendorIcon from "../assets/images/CalenderIcon.png"
+import Logo from "../assets/images/UjjainPoliceLogo.png"
 
-// Define validation schema with Yup
 const validationSchema = Yup.object().shape({
-    hotelName: Yup.string().required('होटल का नाम अनिवार्य है'),
-    hotelAddress: Yup.string().required('होटल का पता अनिवार्य है'),
-    ownerName: Yup.string().required('होटल मलिक का नाम अनिवार्य है'),
-    ownerMobile: Yup.string().required('होटल मलिक का मोबाइल अनिवार्य है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
-    hotelWebsite: Yup.string().url('मान्य वेबसाइट URL दर्ज करें'),
-    hotelEmail: Yup.string().email('मान्य मेल आईडी दर्ज करें').required('होटल मेल आईडी अनिवार्य है'),
-    registeredMobile: Yup.string().required('रजिस्टर मोबाइल न. अनिवार्य है'),
-    propertyType: Yup.string().required('प्रॉपर्टी प्रकार अनिवार्य है'),
-    city: Yup.string().required('शहर अनिवार्य है'),
-    state: Yup.string().required('राज्य अनिवार्य है'),
-    area: Yup.string().required('क्षेत्र अनिवार्य है'),
-    policeStation: Yup.string().required('थाना अनिवार्य है'),
-    agreeToTerms: Yup.boolean().oneOf([true], 'आपको सभी शर्तों और नियमों से सहमत होना होगा'),
-    gumastaFile: Yup.array().min(1, 'होटल का गुमस्ता अनिवार्य है'),
-    aadharFile: Yup.array().min(1, 'मालिक का आधार अनिवार्य है'),
+
+    firstName: Yup.string().required('प्रथम नाम अनिवार्य'),
+    lastName: Yup.string().required('अंतिम नाम अनिवार्य'),
+    hotelName: Yup.string().required('होटल का नाम अनिवार्य'),
+    propertyType: Yup.string().required('सम्पत्ती का प्रकार अनिवार्य'),
+    gender: Yup.string().required('जेंडर अनिवार्य'),
+    mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+    address: Yup.string().required('होटल का पता अनिवार्य'),
+    city: Yup.string().required('शहर अनिवार्य'),
+    pin: Yup.string().required('पिन अनिवार्य').matches(/^[0-9]{6}$/, 'पिन 6 अंकों का होना चाहिए'),
+    state: Yup.string().required('राज्य अनिवार्य'),
+    policeStation: Yup.string().required('थाना का नाम अनिवार्य'),
+    area: Yup.string().required('क्षेत्र अनिवार्य'),
+    emailID: Yup.string().required('होटल की ईमेल आईडी अनिवार्य'),
+    website: Yup.string().required('होटल की वेबसाइट अनिवार्य'),
+    idType: Yup.string().required('आईडी प्रकार अनिवार्य'),
+    idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
+    idFront: Yup.array().min(1, 'होटल का गुमस्ता अनिवार्य'),
+    idBack: Yup.array().min(1, 'मालिक का आधार अनिवार्य'),
 });
 
-
 const Signup = ({ navigation }) => {
-    const selectGumastaFile = async (setFieldValue) => {
+    const [propertyTypes, setPropertyTypes] = useState(null)
+
+    const data = [
+        { label: 'Movable Property', value: '1' },
+        { label: 'Immovable Property', value: '2' },
+        { label: 'Private Property', value: '3' },
+        { label: 'Personal Property  ', value: '4' },
+        { label: 'Public Property', value: '5' },
+        { label: 'Tangible Property', value: '6' },
+        { label: ' Intangible Property', value: '7' },
+        { label: 'Real Property', value: '8' },
+        { label: 'Corporeal Property', value: '9' },
+        { label: 'Incorporeal Property', value: '10' },
+    ];
+
+    const selectIdFrontFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false
+                allowMultiSelection: false,
             });
-            setFieldValue('gumastaFile', doc);
+            setFieldValue('idFront', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
-                Toast.show({
-                    type: 'info',
-                    text1: 'Info',
-                    text2: 'User cancelled the file selection'
-                });
+                console.log('User cancelled the file selection');
             } else {
                 console.log(err);
             }
         }
     };
 
-    const selectAadharFile = async (setFieldValue) => {
+    const selectIdBackFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false
+                allowMultiSelection: false,
             });
-            setFieldValue('aadharFile', doc);
+            setFieldValue('idBack', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
-                Toast.show({
-                    type: 'info',
-                    text1: 'Info',
-                    text2: 'User cancelled the file selection'
-                });
+                console.log('User cancelled the file selection');
             } else {
                 console.log(err);
             }
         }
     };
+
 
     return (
         <ScrollView style={styles.container}>
-            <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
+            <Formik
+                initialValues={{
+                    firstName: '',
+                    lastName: '',
+                    hotelName: '',
+                    propertyType: '',
+                    gender: '',
+                    mobileNumber: '',
+                    address: '',
+                    city: '',
+                    pin: '',
+                    state: '',
+                    area: '',
+                    policeStation: '',
+                    emailID: '',
+                    website: '',
+                    idType: '',
+                    idNumber: '',
+                    idFront: [],
+                    idBack: [],
+                }}
+                validationSchema={validationSchema}
+                onSubmit={values => {
+                    console.log(values);
+                    navigation.navigate("Login");
+                }}
+            >
+                {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
+                    <ScrollView style={styles.container}>
 
-            <View style={styles.body}>
-                <Image source={Logo} style={{ height: 80, width: 80 }} />
-                <Text style={styles.text}>Hotel Registration</Text>
-                <Text style={styles.text2}>Register to create account</Text>
+                        <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
+                        <View style={{ justifyContent: "center", alignItems: "center", marginTop: 15 }}>
+                            <Image source={Logo} style={{ height: 80, width: 80 }} resizeMode='contain' />
+                            <Text style={styles.text}>Hotel Guest Registration</Text>
+                            <Text style={styles.text2}>Register to create account</Text>
+                        </View>
 
-                <Formik
-                    initialValues={{
-                        hotelName: '',
-                        hotelAddress: '',
-                        ownerName: '',
-                        ownerMobile: '',
-                        hotelWebsite: '',
-                        hotelEmail: '',
-                        registeredMobile: '',
-                        propertyType: '',
-                        city: '',
-                        state: '',
-                        area: '',
-                        policeStation: '',
-                        agreeToTerms: false,
-                        gumastaFile: [],
-                        aadharFile: []
-                    }}
-                    validationSchema={validationSchema}
-                    onSubmit={(values) => {
-                        console.log(values);
-
-                    }}
-                >
-                    {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
                         <View style={styles.inputContainer}>
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='होटल का नाम'
-                                style={styles.input}
-                                onChangeText={handleChange('hotelName')}
-                                onBlur={handleBlur('hotelName')}
-                                value={values.hotelName}
-                            />
-                            {errors.hotelName && touched.hotelName && <Text style={styles.errorText}>{errors.hotelName}</Text>}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <Text style={styles.lableText}>होटल मालिक नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <TextInput
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='होटल मालिक नाम*'
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                    onChangeText={handleChange('firstName')}
+                                    onBlur={handleBlur('firstName')}
+                                    value={values.firstName}
+                                />
+                                <TextInput
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='अंतिम नाम*'
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                    onChangeText={handleChange('lastName')}
+                                    onBlur={handleBlur('lastName')}
+                                    value={values.lastName}
+                                />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.firstName && errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
+                                {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+                            </View>
 
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='होटल का पता'
-                                style={styles.input}
-                                onChangeText={handleChange('hotelAddress')}
-                                onBlur={handleBlur('hotelAddress')}
-                                value={values.hotelAddress}
-                            />
-                            {errors.hotelAddress && touched.hotelAddress && <Text style={styles.errorText}>{errors.hotelAddress}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='होटल मलिक का नाम'
-                                style={styles.input}
-                                onChangeText={handleChange('ownerName')}
-                                onBlur={handleBlur('ownerName')}
-                                value={values.ownerName}
-                            />
-                            {errors.ownerName && touched.ownerName && <Text style={styles.errorText}>{errors.ownerName}</Text>}
-
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>होटल का नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
                             <TextInput
                                 maxLength={10}
                                 keyboardType='number-pad'
                                 placeholderTextColor='darkgrey'
-                                placeholder='होटल मलिक का मोबाइल'
-                                style={styles.input}
-                                onChangeText={handleChange('ownerMobile')}
-                                onBlur={handleBlur('ownerMobile')}
-                                value={values.ownerMobile}
+                                placeholder='होटल का नाम*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('hotelName')}
+                                onBlur={handleBlur('hotelName')}
+                                value={values.hotelName}
                             />
-                            {errors.ownerMobile && touched.ownerMobile && <Text style={styles.errorText}>{errors.ownerMobile}</Text>}
+                            {touched.hotelName && errors.hotelName ? <Text style={styles.errorText}>{errors.hotelName}</Text> : null}
 
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>होटल की ईमेल आईडी<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                maxLength={10}
+                                keyboardType='number-pad'
+                                placeholderTextColor='darkgrey'
+                                placeholder='होटल ईमेल आईडी*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('emailID')}
+                                onBlur={handleBlur('emailID')}
+                                value={values.emailID}
+                            />
+                            {touched.emailID && errors.emailID ? <Text style={styles.errorText}>{errors.emailID}</Text> : null}
+
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>होटल का पता<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
                             <TextInput
                                 placeholderTextColor='darkgrey'
-                                placeholder='होटल की वेबसाइट'
-                                style={styles.input}
-                                onChangeText={handleChange('hotelWebsite')}
-                                onBlur={handleBlur('hotelWebsite')}
-                                value={values.hotelWebsite}
+                                placeholder='होटल का पता*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('address')}
+                                onBlur={handleBlur('address')}
+                                value={values.address}
                             />
-                            {errors.hotelWebsite && touched.hotelWebsite && <Text style={styles.errorText}>{errors.hotelWebsite}</Text>}
+                            {touched.address && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
 
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>सम्पत्ती का प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <Dropdown
+                                style={[styles.input, { marginTop: 8 }]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={data}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                placeholder="सम्पत्ती का प्रकार*"
+                                value={propertyTypes}
+                                onChange={item => {
+                                    setPropertyTypes(item.value);
+                                    setFieldValue('propertyType', item.value);
+                                }}
+                            />
+                            {touched.propertyType && errors.propertyType ? <Text style={styles.errorText}>{errors.propertyType}</Text> : null}
+
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>होटल मालिक का मो. नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                maxLength={10}
+                                keyboardType='number-pad'
+                                placeholderTextColor='darkgrey'
+                                placeholder='मोबाइल नंबर*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('mobileNumber')}
+                                onBlur={handleBlur('mobileNumber')}
+                                value={values.mobileNumber}
+                            />
+                            {touched.mobileNumber && errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
+
+
+
+
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>पिन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+
+                                <TextInput
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='शहर*'
+                                    onChangeText={handleChange('city')}
+                                    onBlur={handleBlur('city')}
+                                    value={values.city}
+                                />
+
+
+                                <TextInput
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='पिन*'
+                                    onChangeText={handleChange('pin')}
+                                    onBlur={handleBlur('pin')}
+                                    value={values.pin}
+                                    keyboardType='number-pad'
+                                />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.city && errors.city ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.city}</Text> : null}
+                                {touched.pin && errors.pin ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.pin}</Text> : null}
+                            </View>
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>राज्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>क्षेत्र<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+
+                                <TextInput
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='राज्य*'
+                                    onChangeText={handleChange('state')}
+                                    onBlur={handleBlur('state')}
+                                    value={values.state}
+                                />
+
+
+                                <TextInput
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='क्षेत्र*'
+                                    onChangeText={handleChange('area')}
+                                    onBlur={handleBlur('area')}
+                                    value={values.area}
+                                />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.state && errors.state ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.state}</Text> : null}
+                                {touched.area && errors.area ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.area}</Text> : null}
+                            </View>
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>थाना<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
                             <TextInput
                                 placeholderTextColor='darkgrey'
-                                placeholder='होटल मेल आईडी'
-                                style={styles.input}
-                                onChangeText={handleChange('hotelEmail')}
-                                onBlur={handleBlur('hotelEmail')}
-                                value={values.hotelEmail}
-                            />
-                            {errors.hotelEmail && touched.hotelEmail && <Text style={styles.errorText}>{errors.hotelEmail}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='रजिस्टर मोबाइल न.'
-                                style={styles.input}
-                                onChangeText={handleChange('registeredMobile')}
-                                onBlur={handleBlur('registeredMobile')}
-                                value={values.registeredMobile}
-                            />
-                            {errors.registeredMobile && touched.registeredMobile && <Text style={styles.errorText}>{errors.registeredMobile}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='प्रॉपर्टी प्रकार'
-                                style={styles.input}
-                                onChangeText={handleChange('propertyType')}
-                                onBlur={handleBlur('propertyType')}
-                                value={values.propertyType}
-                            />
-                            {errors.propertyType && touched.propertyType && <Text style={styles.errorText}>{errors.propertyType}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='शहर'
-                                style={styles.input}
-                                onChangeText={handleChange('city')}
-                                onBlur={handleBlur('city')}
-                                value={values.city}
-                            />
-                            {errors.city && touched.city && <Text style={styles.errorText}>{errors.city}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='राज्य'
-                                style={styles.input}
-                                onChangeText={handleChange('state')}
-                                onBlur={handleBlur('state')}
-                                value={values.state}
-                            />
-                            {errors.state && touched.state && <Text style={styles.errorText}>{errors.state}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='क्षेत्र'
-                                style={styles.input}
-                                onChangeText={handleChange('area')}
-                                onBlur={handleBlur('area')}
-                                value={values.area}
-                            />
-                            {errors.area && touched.area && <Text style={styles.errorText}>{errors.area}</Text>}
-
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='थाना'
-                                style={styles.input}
+                                placeholder='थाना*'
+                                style={[styles.input, { marginTop: 8 }]}
                                 onChangeText={handleChange('policeStation')}
                                 onBlur={handleBlur('policeStation')}
                                 value={values.policeStation}
                             />
-                            {errors.policeStation && touched.policeStation && <Text style={styles.errorText}>{errors.policeStation}</Text>}
+                            {touched.policeStation && errors.policeStation ? <Text style={styles.errorText}>{errors.policeStation}</Text> : null}
 
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='आईडी प्रकार*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('idType')}
+                                onBlur={handleBlur('idType')}
+                                value={values.idType}
+                            />
+                            {touched.idType && errors.idType ? <Text style={styles.errorText}>{errors.idType}</Text> : null}
+
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='आईडी नंबर*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('idNumber')}
+                                onBlur={handleBlur('idNumber')}
+                                value={values.idNumber}
+                            />
+                            {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                {values.gumastaFile.length > 0 ? (
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='File Uploaded'
-                                        style={[styles.input, { width: "45%" }]}
-                                        value='File Uploaded'
-                                    />
+                                {values.idFront.length > 0 ? (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
+                                        <Text>Image Uploaded</Text>
+                                    </TouchableOpacity>
                                 ) : (
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='होटल का गुमस्ता'
-                                        style={[styles.input, { width: "45%" }]}
-                                    />
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
+                                        <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                    </TouchableOpacity>
                                 )}
-                                <TouchableOpacity
-                                    onPress={() => selectGumastaFile(setFieldValue)}
-                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, values.gumastaFile.length > 0 ? { backgroundColor: 'grey' } : null, values.gumastaFile.length > 0 ? { borderColor: 'grey' } : null]}
-                                    disabled={values.gumastaFile.length > 0}
-                                >
-                                    <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
-                                </TouchableOpacity>
-                            </View>
-                            {errors.gumastaFile && touched.gumastaFile && <Text style={styles.errorText}>{errors.gumastaFile}</Text>}
 
+                                {values.idBack.length > 0 ? (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
+                                        <Text>Image Uploaded</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
+                                        <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                    </TouchableOpacity>
+
+                                )}
+
+                            </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                {values.aadharFile.length > 0 ? (
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='Aadhar Uploaded'
-                                        style={[styles.input, { width: "45%" }]}
-                                        value='Aadhar Uploaded'
-                                    />
-                                ) : (
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='मालिक का आधार'
-                                        style={[styles.input, { width: "45%" }]}
-                                    />
-                                )}
-                                <TouchableOpacity
-                                    onPress={() => selectAadharFile(setFieldValue)}
-                                    style={[styles.input, { width: "45%", backgroundColor: '#2AAA8A', borderColor: '#2AAA8A', justifyContent: "center", alignItems: "center" }, values.aadharFile.length > 0 ? { backgroundColor: 'grey' } : null, values.aadharFile.length > 0 ? { borderColor: 'grey' } : null]}
-                                    disabled={values.aadharFile.length > 0}
-                                >
-                                    <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "500", color: "white" }}>Choose File</Text>
-                                </TouchableOpacity>
+                                {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>होटल का गुमस्ता</Text>}
+                                {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>मालिक का आधार</Text>}
                             </View>
-                            {errors.aadharFile && touched.aadharFile && <Text style={styles.errorText}>{errors.aadharFile}</Text>}
-
-                            <View style={{ width: "85%", marginTop: 20, flexDirection: "row", alignItems: "center" }}>
-                                <CheckBox
-                                    disabled={false}
-                                    value={values.agreeToTerms}
-                                    onValueChange={(newValue) => setFieldValue('agreeToTerms', newValue)}
-                                />
-                                <Text> I agree to all terms & conditions</Text>
-                            </View>
-                            {errors.agreeToTerms && touched.agreeToTerms && <Text style={styles.errorText}>{errors.agreeToTerms}</Text>}
 
                             <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-                                <Text style={styles.button}>Register</Text>
+                                <Text style={styles.button}>Save</Text>
                             </TouchableOpacity>
                         </View>
-                    )}
-                </Formik>
-            </View>
+                    </ScrollView>
+                )}
+            </Formik>
 
             <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Login")}>
                 <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Already have an account?
-                    <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> Login</Text>
+                    <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500", color: '#1AA7FF' }]}> Login</Text>
                 </Text>
             </TouchableOpacity>
         </ScrollView>
@@ -310,20 +394,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         flex: 1,
     },
-    body: {
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 20,
-    },
-    text: {
-        color: "#000",
-        fontWeight: "bold",
-        fontSize: 28,
-    },
-    text2: {
-        color: "#000",
-        fontSize: 16,
-    },
     input: {
         width: Dimensions.get('window').width - 60,
         backgroundColor: '#fff',
@@ -337,31 +407,34 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         marginTop: 20,
-        width: "100%",
         justifyContent: "center",
         alignItems: "center",
     },
+    text: {
+        color: "black",
+        fontSize: 22,
+        fontWeight: "bold"
+    },
+    text2: {
+        color: "grey",
+        fontSize: 16,
+        fontWeight: "400"
+    },
     buttonContainer: {
-        borderRadius: 10,
+        borderRadius: 20,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
         height: 50,
-        marginBottom: 10,
+        marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: '#2AAA8A',
+        backgroundColor: '#1AA7FF',
     },
     button: {
         fontSize: 18,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
-    },
-    greyText: {
-        marginTop: 15,
-        fontSize: 14,
-        color: "#FFBF00",
-        fontWeight: "bold",
     },
     errorText: {
         color: "#FF4545",
@@ -370,4 +443,23 @@ const styles = StyleSheet.create({
         marginLeft: 70,
         fontSize: 12
     },
+    placeholderStyle: {
+        fontSize: 14,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
+    },
+    lableText: {
+        fontSize: 12,
+        color: "#000",
+        marginLeft: 0,
+        width: "45%",
+        marginTop: 10
+    }
 });
+
+

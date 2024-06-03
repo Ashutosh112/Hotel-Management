@@ -7,6 +7,8 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import PhotoIcon from "../assets/images/photologoicon.png"
 import BackIcon from "react-native-vector-icons/Ionicons"
+import CalendorIcon from "../assets/images/CalenderIcon.png"
+
 
 const validationSchema = Yup.object().shape({
     checkinDate: Yup.date().required('चेक इन तारीख अनिवार्य'),
@@ -178,9 +180,10 @@ const CreateReport = ({ navigation }) => {
                                     setOpen(false);
                                 }}
                             />
-                            <TouchableOpacity style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                            <TouchableOpacity style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15, }]}
                                 onPress={() => setOpen(true)}>
                                 <Text>{checkinDate ? checkinDate.toLocaleDateString() : "चेक इन तारीख*"}</Text>
+                                <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                             </TouchableOpacity>
                             <DatePicker
                                 modal
@@ -196,9 +199,11 @@ const CreateReport = ({ navigation }) => {
                                     setOpen2(false);
                                 }}
                             />
-                            <TouchableOpacity style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                            <TouchableOpacity style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                                 onPress={() => setOpen2(true)}>
                                 <Text>{checkoutDate ? checkoutDate.toLocaleDateString() : "चेक आउट तारीख*"}</Text>
+                                <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
+
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
