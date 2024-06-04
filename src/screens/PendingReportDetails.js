@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity
 import React from 'react'
 import BackIcon from "react-native-vector-icons/Ionicons"
 
-const PendingReportDetails = () => {
+const PendingReportDetails = ({ navigation }) => {
     return (
         <ScrollView >
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
