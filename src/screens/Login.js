@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, ScrollView, SafeAreaView } from 'react-native';
-import Logo1 from "../assets/images/UjjainPoliceLogo.png"
-import Logo2 from "../assets/images/LoginLogo.svg"
-import Logo4 from "../assets/images/Temple.png"
-import GoogleLogo from "../assets/images/googleLogo.svg"
-import Cross from "react-native-vector-icons/Entypo"
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal, Alert } from 'react-native';
+import Logo1 from "../assets/images/UjjainPoliceLogo.png";
+import Logo2 from "../assets/images/LoginLogo.svg";
+import GoogleLogo from "../assets/images/googleLogo.svg";
+import Cross from "react-native-vector-icons/Entypo";
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import { baseUrl } from '../utils/env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
-
-  const [showOtpModal, setShowOtpModal] = useState(false)
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState('');
 
   const firstInput = useRef();
   const secondInput = useRef();
@@ -20,48 +22,71 @@ const Login = ({ navigation }) => {
   const sixthInput = useRef();
 
   const [otp, setOtp] = useState({ 1: '', 2: '', 3: '', 4: '', 5: '', 6: '' });
-  const [counter, setCounter] = useState(60)
-  const [otpResend, setOtpResend] = useState(false)
+  const [counter, setCounter] = useState(60);
+  const [otpResend, setOtpResend] = useState(false);
 
   useEffect(() => {
-    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000)
+    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
     return () => clearInterval(timer);
-  }, [counter])
+  }, [counter]);
 
-
-  const sendOtp = ({ mobileNumber }) => {
+  const sendOtp = async (mobileNumber) => {
     const config = {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-type": "application/json"
       }
     };
-    const body = {
-      mobile_no: mobileNumber,
-    }
-    console.log("bodyy", body)
-    axios.post(`${baseUrl}login/`, body, config)
+
+    await axios.post(`${baseUrl}SendOTP?sMobile=${mobileNumber}`, config)
       .then((res) => {
+        setMobileNumber(mobileNumber); // Store the mobile number
+        Alert.alert(
+          'OTP Sent',
+          `Your OTP is ${res.data.Result.OTP}`,
+          [
+            { text: 'OK', onPress: () => setShowOtpModal(true) }
+          ],
+          { cancelable: false }
+        );
       })
       .catch(err => {
+      });
+  };
+
+  const verifyOtp = async () => {
+    const fullOtp = Object.values(otp).join("")
+    if (fullOtp.length == 6) {
+      if (mobileNumber) {
+        const config = {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Content-type": "application/json"
+          }
+        };
+        console.log("mobile", mobileNumber)
+        await axios.get(`${baseUrl}HotelLogin?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
+          .then((res) => {
+            const data = res.data.Result
+            AsyncStorage.setItem("hotelmgmt", JSON.stringify(data))
+            navigation.navigate("BottomNavigator")
+            setShowOtpModal(false)
+          })
+          .catch((err) => {
+          })
       }
-      )
+    }
+
   }
 
 
   return (
-    <View
-      style={styles.container} >
-
-
+    <View style={styles.container}>
       <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
-
       <View style={styles.body}>
-
         <View style={{ flex: 0.8, justifyContent: "flex-start" }} onPress={() => navigation.navigate("Signup")}>
           <Image source={Logo1} style={{ height: 80, width: 80, marginLeft: 20, marginTop: 20 }} resizeMode='contain' />
         </View>
-
 
         <View style={styles.logoContainer2}>
           <Logo2 />
@@ -74,8 +99,7 @@ const Login = ({ navigation }) => {
               mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य है').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
             })}
             onSubmit={(values) => {
-              // sendOtp(values)
-              setShowOtpModal(true)
+              sendOtp(values.mobileNumber);
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
@@ -107,37 +131,26 @@ const Login = ({ navigation }) => {
             <GoogleLogo />
             <Text style={[styles.button, { color: "#000", fontWeight: "400", marginLeft: 10 }]}>Google</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity>
-            <Text style={[styles.greyText, { marginTop: 5 }]}>Forgot Password</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }} onPress={() => navigation.navigate("Signup")}>
             <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Don't have an account?
               <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> New Hotel Registration</Text>
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={{ flex: 1 }}>
-
-
-          <View style={styles.logoContainer4}>
-            <Image source={Logo4} />
-          </View>
-        </View> */}
       </View>
 
-      {/* - MODAL for OTP SEND START - */}
-      <Modal transparent={true} visible={showOtpModal} animationType='fade' >
-        <Pressable style={styles.modalbgforsuggestbtn} >
-          <Pressable style={styles.modalforsuggestbtn} >
+      <Modal transparent={true} visible={showOtpModal} animationType='fade'>
+        <Pressable style={styles.modalbgforsuggestbtn}>
+          <Pressable style={styles.modalforsuggestbtn}>
             <View style={styles.modalheader}>
-              <View style={{ flex: 1, alignItems: "center" }} >
-                <Text style={{ fontSize: 14, color: "#fff" }} >One Time Password Verification</Text>
+              <View style={{ flex: 1, alignItems: "center" }}>
+                <Text style={{ fontSize: 14, color: "#fff" }}>One Time Password Verification</Text>
               </View>
-              <Pressable onPress={() => setShowOtpModal(false)} >
+              <Pressable onPress={() => setShowOtpModal(false)}>
                 <Cross name="cross" size={22} color="#fff" />
               </Pressable>
             </View>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={styles.content}>We have sent a verification code to</Text>
                 <Text style={[styles.content, { color: "#595970", marginTop: 5 }]}>7854744564</Text>
@@ -197,11 +210,9 @@ const Login = ({ navigation }) => {
                     onChangeText={value => {
                       setOtp({ ...otp, 4: value });
                       value ? fifthInput.current.focus() : thirdInput.current.focus();
-
                     }}
                   />
                 </View>
-
                 <View style={styles.otpBox}>
                   <TextInput
                     style={styles.otpText}
@@ -216,7 +227,6 @@ const Login = ({ navigation }) => {
                     }}
                   />
                 </View>
-
                 <View style={styles.otpBox}>
                   <TextInput
                     style={styles.otpText}
@@ -231,7 +241,6 @@ const Login = ({ navigation }) => {
                     }}
                   />
                 </View>
-
               </View>
 
               <View style={{ flex: 0.6 }}>
@@ -239,13 +248,10 @@ const Login = ({ navigation }) => {
                   counter > 0 ?
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                       <View style={{ flexDirection: "row" }}>
-                        {/* <Watch /> */}
                         <Text style={{ fontSize: 12, color: "#000", marginLeft: 5 }}>Resend SMS in 00:{counter}</Text>
                       </View>
-
                     </View>
                     : otpResend === false ?
-
                       <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 12, color: "#000" }}>Resend OTP</Text>
                       </TouchableOpacity> : null
@@ -253,23 +259,23 @@ const Login = ({ navigation }) => {
               </View>
 
               <View style={{ marginBottom: 15 }}>
-                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 50 }]} onPress={() => navigation.navigate("BottomNavigator", setShowOtpModal(false))}>
+                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 50 }]}
+
+                  onPress={() => verifyOtp()}
+
+                >
                   <Text style={{ fontSize: 12, color: "#fff", letterSpacing: 1, }}>Submit</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </Pressable>
         </Pressable>
-
       </Modal>
-
-
     </View>
-
   );
 }
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
   container: {
@@ -292,7 +298,6 @@ const styles = StyleSheet.create({
   logoContainer1: {
     flex: 1,
     justifyContent: "center",
-
   },
   logoContainer2: {
     flex: 3,
@@ -320,7 +325,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: "#000",
     height: 50,
-
   },
   inputContainer: {
     width: Dimensions.get('window').width,
@@ -349,7 +353,6 @@ const styles = StyleSheet.create({
     color: '#1AA7FF',
     fontWeight: "bold"
   },
-
   otpContainer: {
     flex: 1.5,
     justifyContent: 'center',
@@ -377,8 +380,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     color: "#000",
   },
-
-  // FOR MODAL START
   modalbgforsuggestbtn: {
     flex: 1,
     justifyContent: "center",
@@ -417,8 +418,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     margin: 20,
   },
-  // FOR MODAL END
-
   errorText: {
     color: "#FF4545",
     marginTop: 5,

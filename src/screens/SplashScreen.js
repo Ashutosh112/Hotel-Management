@@ -18,7 +18,7 @@ const SplashScreen = ({ navigation }) => {
     })
 
     const auth = async () => {
-        const value = await AsyncStorage.getItem('hotelm');
+        const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         if (updatedValue) {
             navigation.navigate('BottomNavigator')

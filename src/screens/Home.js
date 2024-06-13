@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, BackHandler } from 'react-native';
 import PlusIcon from "react-native-vector-icons/Entypo"
 import HomeIcon1 from "../assets/images/HomeIcon1.svg"
 import HomeIcon2 from "../assets/images/HomeIcon2.svg"
@@ -9,8 +9,59 @@ import HomeIcon5 from "../assets/images/HomeIcon5.svg"
 import HomeIcon6 from "../assets/images/HomeIcon6.svg"
 import BellIcon from "react-native-vector-icons/FontAwesome"
 import HamburgerLogo from "../assets/images/HamburgerLogo.svg"
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation }) => {
+
+    const [hotelData, setHotelData] = useState(null)
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const backAction = () => {
+                Alert.alert("Exit App", "Do you want to exit the app?", [
+                    {
+                        text: "Cancel",
+                        onPress: () => null,
+                        style: "cancel"
+                    },
+                    { text: "YES", onPress: () => BackHandler.exitApp() }
+                ]);
+                return true;
+            };
+
+            const backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                backAction
+            );
+
+            return () => backHandler.remove();
+        }, [])
+    );
+
+
+    const fetchHotelData = useCallback(async () => {
+        try {
+            const value = await AsyncStorage.getItem('hotelmgmt');
+            if (value) {
+                let updatedValue = JSON.parse(value);
+                setHotelData(prevState => {
+                    // Only update state if the data is different
+                    if (JSON.stringify(prevState) !== JSON.stringify(updatedValue)) {
+                        return updatedValue;
+                    } else {
+                        return prevState;
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching hotel data:', error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchHotelData();
+    }, [fetchHotelData]);
 
     return (
 
@@ -20,8 +71,8 @@ const Home = ({ navigation }) => {
                     <HamburgerLogo />
                 </View>
                 <View style={{ flex: 6 }}>
-                    <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>Hotel Raddison Inn</Text>
-                    <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91 8857425956</Text>
+                    <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}> {hotelData ? hotelData.HotelName : "Loading..."}</Text>
+                    <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91  {hotelData ? hotelData.Contact : "Loading..."}</Text>
                 </View>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}>
                     <BellIcon name="bell" size={22} color="#fff" />
@@ -41,7 +92,7 @@ const Home = ({ navigation }) => {
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("AddGuestInReport")}>
+                {/* <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("AddGuestInReport")}>
                     <View style={{ flex: 1 }}>
                         <HomeIcon6 />
                     </View>
@@ -51,7 +102,7 @@ const Home = ({ navigation }) => {
                     <View style={{ flex: 1.5, alignItems: "center" }}>
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SearchGuest")}>
                     <View style={{ flex: 1 }}>

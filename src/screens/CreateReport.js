@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -8,7 +8,10 @@ import * as Yup from 'yup';
 import PhotoIcon from "../assets/images/photologoicon.png"
 import BackIcon from "react-native-vector-icons/Ionicons"
 import CalendorIcon from "../assets/images/CalenderIcon.png"
-
+import axios from 'axios';
+import { baseUrl } from '../utils/env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const validationSchema = Yup.object().shape({
     checkinDate: Yup.date().required('चेक इन तारीख अनिवार्य'),
@@ -36,20 +39,20 @@ const CreateReport = ({ navigation }) => {
     const [travelReason, setTravelReason] = useState(null);
     const [selectgender, setSelectgender] = useState(null);
     const [guestCount, setGuestCount] = useState(null)
-
-    const data = [
-        { label: 'Darshan', value: '1' },
-        { label: 'Business', value: '2' },
-        { label: 'Normal Visit', value: '3' },
-        { label: 'Appointment', value: '4' },
-        { label: 'Meeting', value: '5' },
-        { label: 'Guest', value: '6' },
+    const [hotelData, setHotelData] = useState(null)
+    const travelReasonData = [
+        { label: 'Darshan', value: 'Darshan' },
+        { label: 'Business', value: 'Business' },
+        { label: 'Normal Visit', value: 'Normal Visit' },
+        { label: 'Appointment', value: 'Appointment' },
+        { label: 'Meeting', value: 'Meeting' },
+        { label: 'Guest', value: 'Guest' },
     ];
 
     const genderData = [
-        { label: 'Male', value: '1' },
-        { label: 'Female', value: '2' },
-        { label: 'Other', value: '3' },
+        { label: 'Male', value: 'Male' },
+        { label: 'Female', value: 'Female' },
+        { label: 'Other', value: 'Other' },
     ];
 
     const totalNoofGuest = [
@@ -88,13 +91,87 @@ const CreateReport = ({ navigation }) => {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled the file selection');
             } else {
-                console.log(err);
+                console.log(err)
             }
         }
     };
+    useEffect(() => {
+        const fetchHotelData = async () => {
+            try {
+                const value = await AsyncStorage.getItem('hotelmgmt');
+                if (value !== null) {
+                    let updatedValue = JSON.parse(value);
+                    setHotelData(updatedValue);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchHotelData();
+    }, []); // Empty dependency array to run only once
+
+    const sendFormData = async (values) => {
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json"
+            }
+        };
+        let body = {
+            idGuestMaster: 0,
+            idHotel: hotelData?.idHotelMaster,
+            contactNo: values.mobileNumber,
+            checkInDate: values.checkinDate,
+            checkOutDate: values.checkoutDate,
+            description: "None",
+            bActive: true,
+            guestName: values.firstName + values.lastName,
+            identificationNo: values.idNumber,
+            identificationType: values.idType,
+            address: values.address,
+            isDeleted: false,
+            details: [
+                {
+                    idGuest: 0,
+                    sName: "sfsf",
+                    identificationNo: "1316311",
+                    identificationType: "demo",
+                    image: null,
+                    gender: "gender",
+                    filePass: null,
+                    lastName: "dfdf",
+                    image2: null
+                },
+            ],
+            addionalGuest: values.guestCount,
+            hotelName: hotelData?.HotelName,
+            guestLastName: "patil",
+            gender: values.gender,
+            travelReson: values.travelReason,
+            city: values.city,
+            pIncode: values.pin,
+            filePass: "7d465d03",
+            image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
+            image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
+        }
+        console.log("BODYYYYYY---", body)
+        await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
+            .then((res) => {
+                console.log("rsssss", res.data)
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: res.data.Message
+                });
+
+            })
+            .catch(err => {
+                console.log("errr", err)
+            });
+    };
 
     return (
-
         <Formik
             initialValues={{
                 checkinDate: '',
@@ -115,8 +192,8 @@ const CreateReport = ({ navigation }) => {
             }}
             validationSchema={validationSchema}
             onSubmit={values => {
-                console.log(values);
-                navigation.navigate("Login");
+                console.log("VALUES", values);
+                sendFormData(values)
             }}
         >
             {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
@@ -148,13 +225,13 @@ const CreateReport = ({ navigation }) => {
                                 placeholder='अंतिम नाम*'
                                 style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
 
-                                onChangeText={handleChange('firstName')}
-                                onBlur={handleBlur('firstName')}
-                                value={values.firstName}
+                                onChangeText={handleChange('lastName')}
+                                onBlur={handleBlur('lastName')}
+                                value={values.lastName}
                             />
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.firstName && errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
+                            {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
                             {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
                         </View>
 
@@ -282,7 +359,7 @@ const CreateReport = ({ navigation }) => {
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             inputSearchStyle={styles.inputSearchStyle}
-                            data={data}
+                            data={travelReasonData}
                             maxHeight={300}
                             labelField="label"
                             valueField="value"
@@ -399,7 +476,78 @@ const CreateReport = ({ navigation }) => {
                             {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Back</Text>}
                         </View>
 
-                        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                        {/* Guest Form Start */}
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 30 }}>
+                            <Text style={{ width: "100%", paddingHorizontal: 20, fontSize: 20, color: "#000" }}>Guest 01</Text>
+                        </View>
+                        <View style={[styles.inputContainer, { marginTop: 10 }]}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <TextInput
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='प्रथम नाम*'
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
+                                <TextInput
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='अंतिम नाम*'
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
+                            </View>
+                            <View style={{ flexDirection: "row", width: "85%", marginTop: 10 }}>
+                                <Text style={[styles.lableText, { width: "100%" }]}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <Dropdown
+                                style={[styles.input, { marginTop: 8 }]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={genderData}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                placeholder="जेंडर*"
+                            />
+                            <View style={{ flexDirection: "row", width: "85%", marginTop: 10 }}>
+                                <Text style={[styles.lableText, { width: "100%" }]}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='आईडी प्रकार*'
+                                style={[styles.input, { marginTop: 8 }]}
+                            />
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={[styles.lableText, { width: "100%" }]}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='आईडी नंबर*'
+                                style={[styles.input, { marginTop: 8 }]} />
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={[styles.lableText, { width: "100%" }]}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {/* {values.guestIdFront.length > 0 ? (
+                                <TouchableOpacity
+                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdFrontFile(setFieldValue)}>
+                                    <Text>Image Uploaded</Text>
+                                </TouchableOpacity>
+                            ) : ( */}
+                                <TouchableOpacity
+                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdFrontFile(setFieldValue)}>
+                                    <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                </TouchableOpacity>
+                                {/* )} */}
+                                <TouchableOpacity>
+                                    {/* <Image source={PhotoIcon} style={{ height: 25, width: 25 }} /> */}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        {/* Guest Form End */}
+                        <TouchableOpacity style={styles.buttonContainer}
+                            onPress={handleSubmit}
+                        >
                             <Text style={styles.button}>Save</Text>
                         </TouchableOpacity>
                     </View>
@@ -431,6 +579,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         justifyContent: "center",
         alignItems: "center",
+
     },
     buttonContainer: {
         borderRadius: 20,

@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 import PhotoIcon from "../assets/images/photologoicon.png"
 import BackIcon from "react-native-vector-icons/Ionicons"
 
-
 const validationSchema = Yup.object().shape({
 
     firstName: Yup.string().required('प्रथम नाम अनिवार्य'),
@@ -15,8 +14,8 @@ const validationSchema = Yup.object().shape({
     gender: Yup.string().required('जेंडर अनिवार्य'),
     idType: Yup.string().required('आईडी प्रकार अनिवार्य'),
     idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
-    idFront: Yup.array().min(1, 'आईडी का Front अनिवार्य'),
-    idBack: Yup.array().min(1, 'आईडी का Back अनिवार्य'),
+    guestIdFront: Yup.array().min(1, 'आईडी का Front अनिवार्य'),
+    guestIdBack: Yup.array().min(1, 'आईडी का Back अनिवार्य'),
 });
 
 const AddGuestInReport = ({ navigation }) => {
@@ -29,13 +28,13 @@ const AddGuestInReport = ({ navigation }) => {
         { label: 'Other', value: '3' },
     ];
 
-    const selectIdFrontFile = async (setFieldValue) => {
+    const selectGuestIdFrontFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false,
             });
-            setFieldValue('idFront', doc);
+            setFieldValue('guestIdFront', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled the file selection');
@@ -45,13 +44,13 @@ const AddGuestInReport = ({ navigation }) => {
         }
     };
 
-    const selectIdBackFile = async (setFieldValue) => {
+    const selectGuestIdBackFile = async (setFieldValue) => {
         try {
             const doc = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
                 allowMultiSelection: false,
             });
-            setFieldValue('idBack', doc);
+            setFieldValue('guestIdBack', doc);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled the file selection');
@@ -65,21 +64,13 @@ const AddGuestInReport = ({ navigation }) => {
 
         <Formik
             initialValues={{
-                checkinDate: '',
-                checkoutDate: '',
-                guestCount: '',
                 firstName: '',
                 lastName: '',
                 gender: '',
-                mobileNumber: '',
-                travelReason: '',
-                address: '',
-                city: '',
-                pin: '',
                 idType: '',
                 idNumber: '',
-                idFront: [],
-                idBack: [],
+                guestIdFront: [],
+                guestIdBack: [],
             }}
             validationSchema={validationSchema}
             onSubmit={values => {
@@ -184,26 +175,26 @@ const AddGuestInReport = ({ navigation }) => {
                             <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {values.idFront.length > 0 ? (
+                            {values.guestIdFront.length > 0 ? (
                                 <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
+                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdFrontFile(setFieldValue)}>
                                     <Text>Image Uploaded</Text>
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
+                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdFrontFile(setFieldValue)}>
                                     <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                 </TouchableOpacity>
                             )}
 
-                            {values.idBack.length > 0 ? (
+                            {values.guestIdBack.length > 0 ? (
                                 <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
+                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdBackFile(setFieldValue)}>
                                     <Text>Image Uploaded</Text>
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
+                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdBackFile(setFieldValue)}>
                                     <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                 </TouchableOpacity>
 
@@ -211,8 +202,8 @@ const AddGuestInReport = ({ navigation }) => {
 
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Front</Text>}
-                            {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Back</Text>}
+                            {touched.guestIdFront && errors.guestIdFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.guestIdFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Front</Text>}
+                            {touched.guestIdBack && errors.guestIdBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.guestIdBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Back</Text>}
                         </View>
 
                         <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
