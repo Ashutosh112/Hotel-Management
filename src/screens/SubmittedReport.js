@@ -386,3 +386,103 @@ const styles = StyleSheet.create({
 });
 
 
+
+
+
+
+
+
+
+
+
+
+
+// where if Noofguest is one then the form will show constant but it it select Noofguest 2 then a guest form is increase by one. I want if guest form will increase then in api response the data of guest will send.
+// example-
+//    const sendFormData = async (values) => {
+//         const config = {
+//             headers: {
+//                 "Access-Control-Allow-Origin": "*",
+//                 "Content-type": "application/json"
+//             }
+//         };
+//         let body = {
+//             idGuestMaster: 0,
+//             idHotel: hotelData?.idHotelMaster,
+//             contactNo: values.mobileNumber,
+//             checkInDate: values.checkinDate,
+//             checkOutDate: values.checkoutDate,
+//             description: "None",
+//             bActive: true,
+//             guestName: values.firstName + values.lastName,
+//             identificationNo: values.idNumber,
+//             identificationType: values.idType,
+//             address: values.address,
+//             isDeleted: false,
+//             details: [
+//                 {
+//                     idGuest: 0,
+//                     sName: values.guestFirstName,
+//                     identificationNo: "1316311",
+//                     identificationType: "demo",
+//                     image: null,
+//                     gender: "gender",
+//                     filePass: null,
+//                     lastName: values.guestLastName,
+//                     image2: null
+//                 },
+//             ],
+//             addionalGuest: values.guestCount,
+//             hotelName: hotelData?.HotelName,
+//             guestLastName: "patil",
+//             gender: values.gender,
+//             travelReson: values.travelReason,
+//             city: values.city,
+//             pIncode: values.pin,
+//             filePass: "7d465d03",
+//             image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
+//             image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
+//         };
+//         console.log("BODYYYYYY---", body);
+//         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
+//             .then((res) => {
+//                 console.log("rsssss", res.data);
+//                 Toast.show({
+//                     type: 'success',
+//                     text1: 'Success',
+//                     text2: res.data.Message
+//                 });
+//             })
+//             .catch(err => {
+//                 console.log("errr", err);
+//             });
+//     };
+
+// in this above api if guest is only one then details field will go none for all keys but if guest is increase then-
+//   details: [
+//                 {
+//                     idGuest: 1,
+//                     sName: guestFirstName,
+//                     identificationNo: "IdNumber",
+//                     identificationType: "IdType",
+//                     image: null,
+//                     gender: "Gender",
+//                     filePass: null,
+//                     lastName: guestLastName,
+//                     image2: null
+//                 },
+//             ],
+// this will pass in api if guest is 2 then-
+//   details: [
+//                 {
+//                     idGuest: 0,
+//                     sName: values.guestFirstName,
+//                     identificationNo: "1316311",
+//                     identificationType: "demo",
+//                     image: null,
+//                     gender: "gender",
+//                     filePass: null,
+//                     lastName: values.guestLastName,
+//                     image2: null
+//                 },
+//             ],

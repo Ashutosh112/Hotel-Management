@@ -5,9 +5,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import PhotoIcon from "../assets/images/photologoicon.png"
-import BackIcon from "react-native-vector-icons/Ionicons"
-import CalendorIcon from "../assets/images/CalenderIcon.png"
+import PhotoIcon from "../assets/images/photologoicon.png";
+import BackIcon from "react-native-vector-icons/Ionicons";
+import CalendorIcon from "../assets/images/CalenderIcon.png";
 import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -38,8 +38,9 @@ const CreateReport = ({ navigation }) => {
     const [open2, setOpen2] = useState(false);
     const [travelReason, setTravelReason] = useState(null);
     const [selectgender, setSelectgender] = useState(null);
-    const [guestCount, setGuestCount] = useState(null)
-    const [hotelData, setHotelData] = useState(null)
+    const [guestCount, setGuestCount] = useState(1); // Default to 1
+    const [hotelData, setHotelData] = useState(null);
+
     const travelReasonData = [
         { label: 'Darshan', value: 'Darshan' },
         { label: 'Business', value: 'Business' },
@@ -62,6 +63,10 @@ const CreateReport = ({ navigation }) => {
         { label: '4', value: '4' },
         { label: '5', value: '5' },
         { label: '6', value: '6' },
+        { label: '7', value: '7' },
+        { label: '8', value: '8' },
+        { label: '9', value: '9' },
+        { label: '10', value: '10' },
     ];
 
     const selectIdFrontFile = async (setFieldValue) => {
@@ -91,10 +96,11 @@ const CreateReport = ({ navigation }) => {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled the file selection');
             } else {
-                console.log(err)
+                console.log(err);
             }
         }
     };
+
     useEffect(() => {
         const fetchHotelData = async () => {
             try {
@@ -134,13 +140,13 @@ const CreateReport = ({ navigation }) => {
             details: [
                 {
                     idGuest: 0,
-                    sName: "sfsf",
+                    sName: values.guestFirstName,
                     identificationNo: "1316311",
                     identificationType: "demo",
                     image: null,
                     gender: "gender",
                     filePass: null,
-                    lastName: "dfdf",
+                    lastName: values.guestLastName,
                     image2: null
                 },
             ],
@@ -154,20 +160,19 @@ const CreateReport = ({ navigation }) => {
             filePass: "7d465d03",
             image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
             image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
-        }
-        console.log("BODYYYYYY---", body)
+        };
+        console.log("BODYYYYYY---", body);
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then((res) => {
-                console.log("rsssss", res.data)
+                console.log("rsssss", res.data);
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
                     text2: res.data.Message
                 });
-
             })
             .catch(err => {
-                console.log("errr", err)
+                console.log("errr", err);
             });
     };
 
@@ -193,9 +198,8 @@ const CreateReport = ({ navigation }) => {
             validationSchema={validationSchema}
             onSubmit={values => {
                 console.log("VALUES", values);
-                sendFormData(values)
-            }}
-        >
+                sendFormData(values);
+            }} >
             {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
                 <ScrollView style={styles.container}>
                     <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
@@ -203,7 +207,6 @@ const CreateReport = ({ navigation }) => {
                             <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
                         </TouchableOpacity>
                         <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>प्राथमिक अतिथि की जानकारी</Text>
-
                     </View>
                     <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
                     <View style={styles.inputContainer}>
@@ -224,20 +227,15 @@ const CreateReport = ({ navigation }) => {
                                 placeholderTextColor='darkgrey'
                                 placeholder='अंतिम नाम*'
                                 style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-
                                 onChangeText={handleChange('lastName')}
                                 onBlur={handleBlur('lastName')}
                                 value={values.lastName}
                             />
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+                            {touched.firstName && errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
                             {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
                         </View>
-
-
-
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>चेक इन तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             <Text style={styles.lableText}>चेक आउट तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
@@ -255,8 +253,7 @@ const CreateReport = ({ navigation }) => {
                                 }}
                                 onCancel={() => {
                                     setOpen(false);
-                                }}
-                            />
+                                }} />
                             <TouchableOpacity style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15, }]}
                                 onPress={() => setOpen(true)}>
                                 <Text>{checkinDate ? checkinDate.toLocaleDateString() : "चेक इन तारीख*"}</Text>
@@ -274,20 +271,17 @@ const CreateReport = ({ navigation }) => {
                                 }}
                                 onCancel={() => {
                                     setOpen2(false);
-                                }}
-                            />
+                                }} />
                             <TouchableOpacity style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                                 onPress={() => setOpen2(true)}>
                                 <Text>{checkoutDate ? checkoutDate.toLocaleDateString() : "चेक आउट तारीख*"}</Text>
                                 <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
-
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                             {touched.checkinDate && errors.checkinDate ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.checkinDate}</Text> : null}
                             {touched.checkoutDate && errors.checkoutDate ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.checkoutDate}</Text> : null}
                         </View>
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>मोबाइल नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -299,18 +293,13 @@ const CreateReport = ({ navigation }) => {
                             style={[styles.input, { marginTop: 8 }]}
                             onChangeText={handleChange('mobileNumber')}
                             onBlur={handleBlur('mobileNumber')}
-                            value={values.mobileNumber}
-                        />
+                            value={values.mobileNumber} />
                         {touched.mobileNumber && errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
-
-
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             <Text style={styles.lableText}>गेस्ट की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-
                             <Dropdown
                                 style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
                                 placeholderStyle={styles.placeholderStyle}
@@ -325,10 +314,7 @@ const CreateReport = ({ navigation }) => {
                                 onChange={item => {
                                     setSelectgender(item.value);
                                     setFieldValue('gender', item.value);
-                                }}
-                            />
-
-
+                                }} />
                             <Dropdown
                                 style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
                                 placeholderStyle={styles.placeholderStyle}
@@ -343,14 +329,12 @@ const CreateReport = ({ navigation }) => {
                                 onChange={item => {
                                     setGuestCount(item.value);
                                     setFieldValue('guestCount', item.value);
-                                }}
-                            />
+                                }} />
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                             {touched.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.gender}</Text> : null}
                             {touched.guestCount && errors.guestCount ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.guestCount}</Text> : null}
                         </View>
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>यात्रा का उद्देश्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -368,11 +352,8 @@ const CreateReport = ({ navigation }) => {
                             onChange={item => {
                                 setTravelReason(item.value);
                                 setFieldValue('travelReason', item.value);
-                            }}
-                        />
+                            }} />
                         {touched.travelReason && errors.travelReason ? <Text style={styles.errorText}>{errors.travelReason}</Text> : null}
-
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>पता<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -382,10 +363,8 @@ const CreateReport = ({ navigation }) => {
                             style={[styles.input, { marginTop: 8 }]}
                             onChangeText={handleChange('address')}
                             onBlur={handleBlur('address')}
-                            value={values.address}
-                        />
+                            value={values.address} />
                         {touched.address && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -398,7 +377,6 @@ const CreateReport = ({ navigation }) => {
                             value={values.city}
                         />
                         {touched.city && errors.city ? <Text style={styles.errorText}>{errors.city}</Text> : null}
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>पिन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -412,8 +390,6 @@ const CreateReport = ({ navigation }) => {
                             keyboardType='number-pad'
                         />
                         {touched.pin && errors.pin ? <Text style={styles.errorText}>{errors.pin}</Text> : null}
-
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -423,11 +399,8 @@ const CreateReport = ({ navigation }) => {
                             style={[styles.input, { marginTop: 8 }]}
                             onChangeText={handleChange('idType')}
                             onBlur={handleBlur('idType')}
-                            value={values.idType}
-                        />
+                            value={values.idType} />
                         {touched.idType && errors.idType ? <Text style={styles.errorText}>{errors.idType}</Text> : null}
-
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -440,7 +413,6 @@ const CreateReport = ({ navigation }) => {
                             value={values.idNumber}
                         />
                         {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
-
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                             <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                         </View>
@@ -456,7 +428,6 @@ const CreateReport = ({ navigation }) => {
                                     <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                 </TouchableOpacity>
                             )}
-
                             {values.idBack.length > 0 ? (
                                 <TouchableOpacity
                                     style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
@@ -467,87 +438,102 @@ const CreateReport = ({ navigation }) => {
                                     style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
                                     <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                 </TouchableOpacity>
-
                             )}
-
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                             {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Front</Text>}
                             {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Back</Text>}
                         </View>
 
-                        {/* Guest Form Start */}
-                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 30 }}>
-                            <Text style={{ width: "100%", paddingHorizontal: 20, fontSize: 20, color: "#000" }}>Guest 01</Text>
-                        </View>
-                        <View style={[styles.inputContainer, { marginTop: 10 }]}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                        {/* Render additional guest forms */}
+                        {[...Array(guestCount - 1)].map((_, index) => (
+                            <View key={index} style={styles.inputContainer}>
+                                <Text style={{ fontSize: 20, color: "#000", marginBottom: 10 }}>Guest {index + 2}</Text>
+                                <View style={[styles.inputContainer, { marginTop: 10 }]}>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                        <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <TextInput
+                                            placeholderTextColor='darkgrey'
+                                            placeholder='प्रथम नाम*'
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                            onChangeText={handleChange(`guestFirstName${index + 1}`)}
+                                            onBlur={handleBlur(`guestFirstName${index + 1}`)}
+                                            value={values[`guestFirstName${index + 1}`]} />
+                                        <TextInput
+                                            placeholderTextColor='darkgrey'
+                                            placeholder='अंतिम नाम*'
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                            onChangeText={handleChange(`guestLastName${index + 1}`)}
+                                            onBlur={handleBlur(`guestLastName${index + 1}`)}
+                                            value={values[`guestLastName${index + 1}`]} />
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        {touched[`guestFirstName${index + 1}`] && errors[`guestFirstName${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestFirstName${index + 1}`]}</Text> : null}
+                                        {touched[`guestLastName${index + 1}`] && errors[`guestLastName${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestLastName${index + 1}`]}</Text> : null}
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                        <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                        <Text style={styles.lableText}>आईडी प्रकार*<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <Dropdown
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                            placeholderStyle={styles.placeholderStyle}
+                                            selectedTextStyle={styles.selectedTextStyle}
+                                            inputSearchStyle={styles.inputSearchStyle}
+                                            data={genderData}
+                                            maxHeight={300}
+                                            labelField="label"
+                                            valueField="value"
+                                            placeholder="जेंडर*"
+                                            value={selectgender}
+                                            onChange={item => {
+                                                setSelectgender(item.value);
+                                                setFieldValue(`guestGender${index + 1}`, item.value);
+                                            }} />
+                                        <TextInput
+                                            placeholderTextColor='darkgrey'
+                                            placeholder='आईडी प्रकार*'
+                                            style={[styles.input, { marginTop: 8, width: "45%", }]}
+                                            onChangeText={handleChange(`guestIdType${index + 1}`)}
+                                            onBlur={handleBlur(`guestIdType${index + 1}`)}
+                                            value={values[`guestIdType${index + 1}`]} />
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                        <Text style={[styles.lableText, { width: "100%" }]}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <TextInput
+                                        placeholderTextColor='darkgrey'
+                                        placeholder='आईडी नंबर*'
+                                        style={[styles.input, { marginTop: 8 }]}
+                                        onChangeText={handleChange(`guestIdNumber${index + 1}`)}
+                                        onBlur={handleBlur(`guestIdNumber${index + 1}`)}
+                                        value={values[`guestIdNumber${index + 1}`]}
+                                    />
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                        <Text style={[styles.lableText, { width: "100%" }]}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        {values[`guestIdFront${index + 1}`]?.length > 0 ? (
+                                            <TouchableOpacity
+                                                style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}>
+                                                <Text>Image Uploaded</Text>
+                                            </TouchableOpacity>
+                                        ) : (
+                                            <TouchableOpacity
+                                                style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}>
+                                                <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                </View>
                             </View>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                <TextInput
-                                    placeholderTextColor='darkgrey'
-                                    placeholder='प्रथम नाम*'
-                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
-                                <TextInput
-                                    placeholderTextColor='darkgrey'
-                                    placeholder='अंतिम नाम*'
-                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
-                            </View>
-                            <View style={{ flexDirection: "row", width: "85%", marginTop: 10 }}>
-                                <Text style={[styles.lableText, { width: "100%" }]}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            </View>
-                            <Dropdown
-                                style={[styles.input, { marginTop: 8 }]}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                data={genderData}
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder="जेंडर*"
-                            />
-                            <View style={{ flexDirection: "row", width: "85%", marginTop: 10 }}>
-                                <Text style={[styles.lableText, { width: "100%" }]}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            </View>
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='आईडी प्रकार*'
-                                style={[styles.input, { marginTop: 8 }]}
-                            />
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                <Text style={[styles.lableText, { width: "100%" }]}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            </View>
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='आईडी नंबर*'
-                                style={[styles.input, { marginTop: 8 }]} />
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                <Text style={[styles.lableText, { width: "100%" }]}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            </View>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                {/* {values.guestIdFront.length > 0 ? (
-                                <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdFrontFile(setFieldValue)}>
-                                    <Text>Image Uploaded</Text>
-                                </TouchableOpacity>
-                            ) : ( */}
-                                <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectGuestIdFrontFile(setFieldValue)}>
-                                    <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                </TouchableOpacity>
-                                {/* )} */}
-                                <TouchableOpacity>
-                                    {/* <Image source={PhotoIcon} style={{ height: 25, width: 25 }} /> */}
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        {/* Guest Form End */}
-                        <TouchableOpacity style={styles.buttonContainer}
-                            onPress={handleSubmit}
-                        >
+                        ))}
+                        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
                             <Text style={styles.button}>Save</Text>
                         </TouchableOpacity>
                     </View>
