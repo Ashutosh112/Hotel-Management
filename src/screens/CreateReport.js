@@ -30,26 +30,26 @@ const validationSchema = Yup.object().shape({
     idFront: Yup.array().min(1, 'आईडी का Front अनिवार्य'),
     idBack: Yup.array().min(1, 'आईडी का Back अनिवार्य'),
     // Validation for additional guests
-    guestFirstName1: Yup.string().when('guestCount', {
-        is: val => val > 1,
-        then: Yup.string().required('Required')
-    }),
-    guestLastName1: Yup.string().when('guestCount', {
-        is: val => val > 1,
-        then: Yup.string().required('Required')
-    }),
-    guestGender1: Yup.string().when('guestCount', {
-        is: val => val > 1,
-        then: Yup.string().required('Required')
-    }),
-    guestIdType1: Yup.string().when('guestCount', {
-        is: val => val > 1,
-        then: Yup.string().required('Required')
-    }),
-    guestIdNumber1: Yup.string().when('guestCount', {
-        is: val => val > 1,
-        then: Yup.string().required('Required')
-    })
+    // guestFirstName1: Yup.string().when('guestCount', {
+    //     is: val => val > 1,
+    //     then: Yup.string().required('Required')
+    // }),
+    // guestLastName1: Yup.string().when('guestCount', {
+    //     is: val => val > 1,
+    //     then: Yup.string().required('Required')
+    // }),
+    // guestGender1: Yup.string().when('guestCount', {
+    //     is: val => val > 1,
+    //     then: Yup.string().required('Required')
+    // }),
+    // guestIdType1: Yup.string().when('guestCount', {
+    //     is: val => val > 1,
+    //     then: Yup.string().required('Required')
+    // }),
+    // guestIdNumber1: Yup.string().when('guestCount', {
+    //     is: val => val > 1,
+    //     then: Yup.string().required('Required')
+    // })
 });
 
 const CreateReport = ({ navigation }) => {
@@ -138,81 +138,6 @@ const CreateReport = ({ navigation }) => {
         fetchHotelData();
     }, []); // Empty dependency array to run only once
 
-    // const sendFormData = async (values) => {
-
-    //     const config = {
-    //         headers: {
-    //             "Access-Control-Allow-Origin": "*",
-    //             "Content-type": "application/json"
-    //         }
-    //     };
-
-    //     // Collect additional guest details dynamically
-    //     let details = [];
-    //     for (let i = 1; i < values.guestCount; i++) {
-    //         // Assuming you have an array of image data for each guest
-    //         let image1 = values[`guestImage1${i}`]; // Replace with your actual field name for guest image 1
-    //         let image2 = values[`guestImage2${i}`]; // Replace with your actual field name for guest image 2
-
-    //         // Base64 encode the images if needed
-    //         // For example, if image1 is a file, you can encode it like this:
-    //         // const image1Base64 = await convertImageToBase64(image1);
-
-    //         details.push({
-    //             idGuest: 0,
-    //             sName: values[`guestFirstName${i}`],
-    //             identificationNo: values[`guestIdNumber${i}`],
-    //             identificationType: values[`guestIdType${i}`],
-    //             image: image1, // Replace with actual image data
-    //             gender: values[`guestGender${i}`],
-    //             filePass: null,
-    //             lastName: values[`guestLastName${i}`],
-    //             image2: image2 // Replace with actual image data
-    //         });
-    //     }
-
-
-    //     let body = {
-    //         idGuestMaster: 0,
-    //         idHotel: hotelData?.idHotelMaster,
-    //         contactNo: values.mobileNumber,
-    //         checkInDate: values.checkinDate,
-    //         checkOutDate: values.checkoutDate,
-    //         description: "None",
-    //         bActive: true,
-    //         guestName: values.firstName + values.lastName,
-    //         identificationNo: values.idNumber,
-    //         identificationType: values.idType,
-    //         address: values.address,
-    //         isDeleted: false,
-    //         details: details,
-    //         addionalGuest: values.guestCount - 1,
-    //         hotelName: hotelData?.HotelName,
-    //         guestLastName: "patil",
-    //         gender: values.gender,
-    //         travelReson: values.travelReason,
-    //         city: values.city,
-    //         pIncode: values.pin,
-    //         filePass: "7d465d03",
-    //         image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
-    //         image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
-    //     };
-    //     console.log("BODYYYYYY---", body);
-    //     await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
-    //         .then((res) => {
-    //             console.log("rsssss", res.data);
-    //             Toast.show({
-    //                 type: 'success',
-    //                 text1: 'Success',
-    //                 text2: res.data.Message
-    //             });
-    //         })
-    //         .catch(err => {
-    //             console.log("errr", err);
-    //         });
-    // };
-
-
     const sendFormData = (values) => {
         const config = {
             headers: {
@@ -223,7 +148,7 @@ const CreateReport = ({ navigation }) => {
 
         // Collect additional guest details dynamically
         let details = [];
-        for (let i = 1; i <= values.guestCount; i++) {
+        for (let i = 1; i < values.guestCount; i++) {
             let image1Base64 = ""; // Placeholder for base64 encoded image 1
             let image2Base64 = ""; // Placeholder for base64 encoded image 2
 
@@ -260,7 +185,7 @@ const CreateReport = ({ navigation }) => {
             checkOutDate: values.checkoutDate,
             description: "None",
             bActive: true,
-            guestName: values.firstName + values.lastName,
+            guestName: values.firstName, // Concatenate firstName and lastName
             identificationNo: values.idNumber,
             identificationType: values.idType,
             address: values.address,
@@ -268,14 +193,14 @@ const CreateReport = ({ navigation }) => {
             details: details,
             addionalGuest: values.guestCount - 1,
             hotelName: hotelData?.HotelName,
-            guestLastName: "patil",
+            guestLastName: values.lastName,
             gender: values.gender,
             travelReson: values.travelReason,
             city: values.city,
             pIncode: values.pin,
             filePass: "7d465d03", // Example filePass value
-            image1: values.image1, // Replace with actual image 1 filename or identifier
-            image2: values.image2 // Replace with actual image 2 filename or identifier
+            image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg", // Replace with actual image 1 filename or identifier
+            image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg" // Replace with actual image 2 filename or identifier
         };
 
         console.log("Request Body:", body);
@@ -302,13 +227,101 @@ const CreateReport = ({ navigation }) => {
             });
     };
 
+    // const sendFormData = (values) => {
+    //     const config = {
+    //         headers: {
+    //             "Access-Control-Allow-Origin": "*",
+    //             "Content-type": "application/json"
+    //         }
+    //     };
+
+    //     // Collect additional guest details dynamically
+    //     let details = [];
+    //     for (let i = 1; i <= values.guestCount; i++) {
+    //         let image1Base64 = ""; // Placeholder for base64 encoded image 1
+    //         let image2Base64 = ""; // Placeholder for base64 encoded image 2
+
+    //         // Check if guestImage1 and guestImage2 exist in values
+    //         if (values[`guestImage1${i}`]) {
+    //             // Assuming values[`guestImage1${i}`] contains the base64 encoded string
+    //             image1Base64 = values[`guestImage1${i}`];
+    //         }
+
+    //         if (values[`guestImage2${i}`]) {
+    //             // Assuming values[`guestImage2${i}`] contains the base64 encoded string
+    //             image2Base64 = values[`guestImage2${i}`];
+    //         }
+
+    //         details.push({
+    //             idGuest: 0,
+    //             sName: values[`guestFirstName${i}`],
+    //             identificationNo: values[`guestIdNumber${i}`],
+    //             identificationType: values[`guestIdType${i}`],
+    //             image: image1Base64, // Assign base64 encoded image 1
+    //             gender: values[`guestGender${i}`],
+    //             filePass: null,
+    //             lastName: values[`guestLastName${i}`],
+    //             image2: image2Base64 // Assign base64 encoded image 2
+    //         });
+    //     }
+
+    //     // Prepare the request body
+    //     let body = {
+    //         idGuestMaster: 0,
+    //         idHotel: hotelData?.idHotelMaster,
+    //         contactNo: values.mobileNumber,
+    //         checkInDate: values.checkinDate,
+    //         checkOutDate: values.checkoutDate,
+    //         description: "None",
+    //         bActive: true,
+    //         guestName: values.firstName + values.lastName,
+    //         identificationNo: values.idNumber,
+    //         identificationType: values.idType,
+    //         address: values.address,
+    //         isDeleted: false,
+    //         details: details,
+    //         addionalGuest: values.guestCount - 1,
+    //         hotelName: hotelData?.HotelName,
+    //         guestLastName: "patil",
+    //         gender: values.gender,
+    //         travelReson: values.travelReason,
+    //         city: values.city,
+    //         pIncode: values.pin,
+    //         filePass: "7d465d03", // Example filePass value
+    //         image1: values.image1, // Replace with actual image 1 filename or identifier
+    //         image2: values.image2 // Replace with actual image 2 filename or identifier
+    //     };
+
+    //     console.log("Request Body:", body);
+
+    //     // Make the API call using Axios
+    //     axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
+    //         .then(response => {
+    //             // Handle response
+    //             console.log("Response:", response.data);
+    //             Toast.show({
+    //                 type: 'success',
+    //                 text1: 'Success',
+    //                 text2: response.data.Message
+    //             });
+    //         })
+    //         .catch(error => {
+    //             console.error('Error sending form data:', error);
+    //             // Handle error, show error message or log
+    //             Toast.show({
+    //                 type: 'error',
+    //                 text1: 'Error',
+    //                 text2: 'Failed to send form data'
+    //             });
+    //         });
+    // };
 
     return (
         <Formik
             initialValues={{
                 checkinDate: '',
                 checkoutDate: '',
-                guestCount: '',
+                guestCount: 1,
                 firstName: '',
                 lastName: '',
                 gender: '',
@@ -695,29 +708,7 @@ const CreateReport = ({ navigation }) => {
                                         </TouchableOpacity>
                                     )}
 
-                                    {/* <TouchableOpacity
-                                        onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}
-                                        style={{ borderWidth: 1, marginBottom: 10, padding: 10, alignItems: 'center', justifyContent: 'center' }}
-                                    >
-                                        <Text>Upload ID Front Image</Text>
-                                        {values[`guestIdFront${index + 1}`] ? (
-                                            <Text>Image Uploaded</Text>
-                                        ) : (
-                                            <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                        )}
-                                    </TouchableOpacity>
 
-                                    <TouchableOpacity
-                                        onPress={() => selectIdBackFile(setFieldValue, `guestIdBack${index + 1}`)}
-                                        style={{ borderWidth: 1, marginBottom: 10, padding: 10, alignItems: 'center', justifyContent: 'center' }}
-                                    >
-                                        <Text>Upload ID Back Image</Text>
-                                        {values[`guestIdBack${index + 1}`] ? (
-                                            <Text>Image Uploaded</Text>
-                                        ) : (
-                                            <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                        )}
-                                    </TouchableOpacity> */}
                                 </View>
 
 
@@ -800,5 +791,11 @@ const styles = StyleSheet.create({
         marginTop: 10
     }
 });
+
+
+
+
+
+
 
 

@@ -65,7 +65,7 @@ const Login = ({ navigation }) => {
           }
         };
         console.log("mobile", mobileNumber)
-        await axios.get(`${baseUrl}HotelLogin?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
+        await axios.post(`${baseUrl}HotelLogin?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
           .then((res) => {
             const data = res.data.Result
             AsyncStorage.setItem("hotelmgmt", JSON.stringify(data))
@@ -73,6 +73,7 @@ const Login = ({ navigation }) => {
             setShowOtpModal(false)
           })
           .catch((err) => {
+            console.log("errr", err)
           })
       }
     }

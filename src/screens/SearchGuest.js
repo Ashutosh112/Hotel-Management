@@ -120,97 +120,32 @@
 
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
-import DatePicker from 'react-native-date-picker';
-import { Dropdown } from 'react-native-element-dropdown';
-import DocumentPicker from 'react-native-document-picker';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import PhotoIcon from "../assets/images/photologoicon.png"
 import BackIcon from "react-native-vector-icons/Ionicons"
-import CalendorIcon from "../assets/images/CalenderIcon.png"
+import axios from 'axios';
+import { baseUrl } from '../utils/env';
 
-
-const validationSchema = Yup.object().shape({
-    checkinDate: Yup.date().required('चेक इन तारीख अनिवार्य'),
-    checkoutDate: Yup.date().required('चेक आउट तारीख अनिवार्य'),
-    guestCount: Yup.number().required('गेस्ट की कुल संख्या अनिवार्य').positive().integer(),
-    firstName: Yup.string().required('प्रथम नाम अनिवार्य'),
-    lastName: Yup.string().required('अंतिम नाम अनिवार्य'),
-    gender: Yup.string().required('जेंडर अनिवार्य'),
-    mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
-    travelReason: Yup.string().required('यात्रा का उद्देश्य अनिवार्य'),
-    address: Yup.string().required('पता अनिवार्य'),
-    city: Yup.string().required('शहर अनिवार्य'),
-    pin: Yup.string().required('पिन अनिवार्य').matches(/^[0-9]{6}$/, 'पिन 6 अंकों का होना चाहिए'),
-    idType: Yup.string().required('आईडी प्रकार अनिवार्य'),
-    idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
-    idFront: Yup.array().min(1, 'आईडी का Front अनिवार्य'),
-    idBack: Yup.array().min(1, 'आईडी का Back अनिवार्य'),
-});
 
 const SearchGuest = ({ navigation }) => {
-    const [checkinDate, setCheckinDate] = useState(null);
-    const [checkoutDate, setCheckoutDate] = useState(null);
-    const [open, setOpen] = useState(false);
-    const [open2, setOpen2] = useState(false);
-    const [travelReason, setTravelReason] = useState(null);
-    const [selectgender, setSelectgender] = useState(null);
-    const [guestCount, setGuestCount] = useState(null)
 
-    const data = [
-        { label: 'Darshan', value: '1' },
-        { label: 'Business', value: '2' },
-        { label: 'Normal Visit', value: '3' },
-        { label: 'Appointment', value: '4' },
-        { label: 'Meeting', value: '5' },
-        { label: 'Guest', value: '6' },
-    ];
+    const [mobileNumber, setMobileNumber] = useState("")
+    const [name, setName] = useState("")
+    const [idNumber, setIdNumber] = useState("")
+    const [Aadhar, setAadhar] = useState("")
 
-    const genderData = [
-        { label: 'Male', value: '1' },
-        { label: 'Female', value: '2' },
-        { label: 'Other', value: '3' },
-    ];
-
-    const totalNoofGuest = [
-        { label: '1', value: '1' },
-        { label: '2', value: '2' },
-        { label: '3', value: '3' },
-        { label: '4', value: '4' },
-        { label: '5', value: '5' },
-        { label: '6', value: '6' },
-    ];
-
-    const selectIdFrontFile = async (setFieldValue) => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false,
-            });
-            setFieldValue('idFront', doc);
-        } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
-                console.log('User cancelled the file selection');
-            } else {
-                console.log(err);
+    const searchGuest = async () => {
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json"
             }
-        }
-    };
-
-    const selectIdBackFile = async (setFieldValue) => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false,
+        };
+        await axios.post(`${baseUrl}GuestList?HotelId=${idNumber}&GuestName=${name}`, config)
+            .then((res) => {
+                console.log("resss", res.data)
+            })
+            .catch(err => {
+                console.log("Errorr----", err)
             });
-            setFieldValue('idBack', doc);
-        } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
-                console.log('User cancelled the file selection');
-            } else {
-                console.log(err);
-            }
-        }
     };
 
     return (
@@ -228,21 +163,52 @@ const SearchGuest = ({ navigation }) => {
             <View style={styles.inputContainer}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>नाम</Text>
-                    <Text style={styles.lableText}>अंतिम नाम</Text>
+                    <Text style={styles.lableText}>मोबाइल नंबर</Text>
 
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <TextInput
+                        value={name} onChangeText={(value) => { setName(value) }}
                         placeholderTextColor='darkgrey'
-                        placeholder='नाम*'
+                        placeholder='नाम'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
                     <TextInput
+                        value={mobileNumber} onChangeText={(value) => { setMobileNumber(value) }}
+
                         placeholderTextColor='darkgrey'
-                        placeholder='मोबाइल नंबर*'
+                        placeholder='मोबाइल नंबर'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
                 </View>
+                {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>आईडी नंबर</Text>
+                </View>
+                <TextInput
+                    maxLength={10}
+                    keyboardType='number-pad'
+                    placeholderTextColor='darkgrey'
+                    placeholder='आईडी नंबर'
+                    style={[styles.input, { marginTop: 8 }]}
+                    value={idNumber} onChangeText={(value) => { setIdNumber(value) }}
 
-                <TouchableOpacity style={styles.buttonContainer} >
+                /> */}
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                    <Text style={styles.lableText}>आधार नंबर</Text>
+                    <Text style={styles.lableText}>आईडी नंबर</Text>
+
+                </View>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                    <TextInput
+                        value={Aadhar} onChangeText={(value) => { setAadhar(value) }}
+                        placeholderTextColor='darkgrey'
+                        placeholder='आधार नंबर'
+                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
+                    <TextInput
+                        value={idNumber} onChangeText={(value) => { setIdNumber(value) }}
+                        placeholderTextColor='darkgrey'
+                        placeholder='आईडी नंबर'
+                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
+                </View>
+                <TouchableOpacity style={styles.buttonContainer} onPress={() => searchGuest()}>
                     <Text style={styles.button}>Search</Text>
                 </TouchableOpacity>
             </View>
