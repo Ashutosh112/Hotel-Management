@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const Login = ({ navigation }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -71,15 +72,18 @@ const Login = ({ navigation }) => {
             AsyncStorage.setItem("hotelmgmt", JSON.stringify(data))
             navigation.navigate("BottomNavigator")
             setShowOtpModal(false)
+            Toast.show({
+              type: 'success',
+              text1: 'Success',
+              text2: "Login Successfull!"
+            });
           })
           .catch((err) => {
             console.log("errr", err)
           })
       }
     }
-
   }
-
 
   return (
     <View style={styles.container}>

@@ -121,7 +121,7 @@ const Home = ({ navigation }) => {
                         <HomeIcon3 />
                     </View>
                     <View style={{ flex: 6 }}>
-                        <Text style={styles.text}>प्रस्तुत रिपोर्ट</Text>
+                        <Text style={styles.text}>सब्मीटेड रिपोर्ट</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
@@ -133,7 +133,7 @@ const Home = ({ navigation }) => {
                         <HomeIcon4 />
                     </View>
                     <View style={{ flex: 6 }}>
-                        <Text style={styles.text}>लंबित रिपोर्ट</Text>
+                        <Text style={styles.text}>पेंडिंग रिपोर्ट</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />

@@ -165,110 +165,74 @@
 
 
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Dimensions, ScrollView, Image, Modal, Pressable } from 'react-native';
 import DatePicker from 'react-native-date-picker';
-import { Dropdown } from 'react-native-element-dropdown';
-import DocumentPicker from 'react-native-document-picker';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import PhotoIcon from "../assets/images/photologoicon.png"
 import BackIcon from "react-native-vector-icons/Ionicons"
-import CalendorIcon from "../assets/images/CalenderIcon.png"
+import InfoIcon from "react-native-vector-icons/Feather"
+import { baseUrl } from '../utils/env';
+import moment from 'moment';
+import Logo from "../assets/images/submittedReport.png"
 
-
-const validationSchema = Yup.object().shape({
-    checkinDate: Yup.date().required('चेक इन तारीख अनिवार्य'),
-    checkoutDate: Yup.date().required('चेक आउट तारीख अनिवार्य'),
-    guestCount: Yup.number().required('गेस्ट की कुल संख्या अनिवार्य').positive().integer(),
-    firstName: Yup.string().required('प्रथम नाम अनिवार्य'),
-    lastName: Yup.string().required('अंतिम नाम अनिवार्य'),
-    gender: Yup.string().required('जेंडर अनिवार्य'),
-    mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
-    travelReason: Yup.string().required('यात्रा का उद्देश्य अनिवार्य'),
-    address: Yup.string().required('पता अनिवार्य'),
-    city: Yup.string().required('शहर अनिवार्य'),
-    pin: Yup.string().required('पिन अनिवार्य').matches(/^[0-9]{6}$/, 'पिन 6 अंकों का होना चाहिए'),
-    idType: Yup.string().required('आईडी प्रकार अनिवार्य'),
-    idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
-    idFront: Yup.array().min(1, 'आईडी का Front अनिवार्य'),
-    idBack: Yup.array().min(1, 'आईडी का Back अनिवार्य'),
-});
 
 const SubmittedReport = ({ navigation }) => {
     const [checkinDate, setCheckinDate] = useState(null);
     const [checkoutDate, setCheckoutDate] = useState(null);
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
-    const [travelReason, setTravelReason] = useState(null);
-    const [selectgender, setSelectgender] = useState(null);
-    const [guestCount, setGuestCount] = useState(null)
+    const [data, setData] = useState([])
+    const [openModal, setOpenModal] = useState(false)
 
-    const data = [
-        { label: 'Darshan', value: '1' },
-        { label: 'Business', value: '2' },
-        { label: 'Normal Visit', value: '3' },
-        { label: 'Appointment', value: '4' },
-        { label: 'Meeting', value: '5' },
-        { label: 'Guest', value: '6' },
-    ];
 
-    const genderData = [
-        { label: 'Male', value: '1' },
-        { label: 'Female', value: '2' },
-        { label: 'Other', value: '3' },
-    ];
-
-    const totalNoofGuest = [
-        { label: '1', value: '1' },
-        { label: '2', value: '2' },
-        { label: '3', value: '3' },
-        { label: '4', value: '4' },
-        { label: '5', value: '5' },
-        { label: '6', value: '6' },
-    ];
-
-    const selectIdFrontFile = async (setFieldValue) => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false,
-            });
-            setFieldValue('idFront', doc);
-        } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
-                console.log('User cancelled the file selection');
-            } else {
-                console.log(err);
+    const submittedReportApi = async () => {
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `${updatedValue.Token}`
             }
-        }
+        };
+        await axios.post(`${baseUrl}AllSubmitedGuestByHotelId?HotelId=${updatedValue.idHotelMaster}&fromDate=${moment(checkinDate).format("DD/MMM/YYYY")}&toDate=${moment(checkoutDate).format("DD/MMM/YYYY")}`, {}, config)
+            .then((res) => {
+                console.log(">>>>>>>>>>>", res.data.Result);
+                setData(res.data.Result)
+
+            })
+            .catch(err => {
+                console.log("Error", err);
+            });
     };
 
-    const selectIdBackFile = async (setFieldValue) => {
-        try {
-            const doc = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-                allowMultiSelection: false,
-            });
-            setFieldValue('idBack', doc);
-        } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
-                console.log('User cancelled the file selection');
-            } else {
-                console.log(err);
-            }
+    useEffect(() => {
+        if (checkinDate && checkoutDate) {
+            submittedReportApi();
         }
-    };
+    }, [checkinDate, checkoutDate]);
 
     return (
 
 
         <ScrollView style={styles.container}>
-            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
-                </TouchableOpacity>
-                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>प्रस्तुत रिपोर्ट</Text>
+
+            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between" }}>
+                <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
+
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                    </TouchableOpacity>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>सब्मीटेड रिपोर्ट</Text>
+                </View>
+
+                <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
+
+                    <TouchableOpacity onPress={() => setOpenModal(true)}>
+                        <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
+                    </TouchableOpacity>
+                </View>
 
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
@@ -293,7 +257,7 @@ const SubmittedReport = ({ navigation }) => {
                         }}
                     />
                     <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setOpen(true)}>
-                        <Text>{checkinDate ? checkinDate.toLocaleDateString() : "दिनांक से*"}</Text>
+                        <Text>{checkinDate ? moment(checkinDate).format("DD/MMM/YYYY") : "दिनांक से*"}</Text>
                     </TouchableOpacity>
 
 
@@ -311,11 +275,63 @@ const SubmittedReport = ({ navigation }) => {
                         }}
                     />
                     <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setOpen2(true)}>
-                        <Text>{checkoutDate ? checkoutDate.toLocaleDateString() : "दिनांक तक*"}</Text>
+                        <Text>{checkoutDate ? moment(checkoutDate).format("DD/MMM/YYYY") : "दिनांक तक*"}</Text>
                     </TouchableOpacity>
                 </View>
 
             </View>
+            {data.map((item, index) => (
+                <View key={index} style={{
+                    flex: 1,
+                    backgroundColor: "white",
+                    flexDirection: "row",
+                    paddingHorizontal: 15,
+                    marginHorizontal: 20,
+                    height: 100,
+                    borderRadius: 10,
+                    elevation: 2,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: 10,
+                }}>
+                    <View style={{ flex: 0.8 }} >
+                        <Image source={Logo} style={{ height: 45, width: 45 }} resizeMode="contain" />
+                    </View>
+                    <View style={{ flex: 3 }}>
+                        <View style={{ flex: 2, justifyContent: "center" }}>
+                            <Text style={styles.text}>सबमिट की तारीख : {item.SubmitDate}</Text>
+                            <Text style={styles.text}>कुल अतिथि	 : {item.AddionalGuest}</Text>
+                        </View>
+                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate("SubmittedReportDetails", { checkInD: checkinDate, checkOutD: checkoutDate })} style={{ flex: 1, borderWidth: 0.5, borderColor: "#024063", backgroundColor: "#024063", borderRadius: 5, justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7 }}>Detail</Text>
+                    </TouchableOpacity>
+                </View>
+            ))}
+
+            {/* Open modal for Logout start */}
+            <Modal transparent={true}
+                animationType={'fade'}
+                hardwareAccelerated={true}
+                visible={openModal}>
+
+                <Pressable style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+                    <View style={styles.modalView}>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <Text style={styles.modalText}>पुलिस स्टेशन में सबमिट की गई रिपोर्ट.</Text>
+                            <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
+                            <Text style={styles.modalText}>इस पोर्टल पर आप एक महीने तक की पुरानी रिपोर्ट देख सकते हैं। अपने रिकॉर्ड के लिए आप समय-समय पर रिपोर्ट डाउनलोड कर के रख सकते हैं।</Text>
+                            <Pressable
+                                style={{ backgroundColor: "#024063", paddingHorizontal: 40, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 10, marginVertical: 10 }}
+                                onPress={() => { setOpenModal(false) }}
+                            >
+                                <Text style={styles.textStyle}>ठीक</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Pressable>
+            </Modal>
+            {/* Open modal for Logout end */}
         </ScrollView>
     );
 };
@@ -324,7 +340,7 @@ export default SubmittedReport;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: "#F5F5F8",
         flex: 1,
     },
     input: {
@@ -342,6 +358,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         justifyContent: "center",
         alignItems: "center",
+        marginBottom: 20
     },
     buttonContainer: {
         borderRadius: 20,
@@ -382,7 +399,35 @@ const styles = StyleSheet.create({
         marginLeft: 0,
         width: "45%",
         marginTop: 10
-    }
+    },
+    text: {
+        fontSize: 13,
+        fontWeight: "400",
+        color: "#36454F",
+        marginTop: 5
+    },
+    modalView: {
+        // flex: 1,
+        height: Dimensions.get("window").height / 2.6,
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 15,
+        paddingHorizontal: 40,
+        paddingVertical: 0,
+        alignItems: "center",
+        justifyContent: "center"
+
+    },
+    textStyle: {
+        color: "white",
+        textAlign: "center",
+    },
+    modalText: {
+        textAlign: "center",
+        color: "black",
+        fontSize: 14,
+        marginVertical: 10
+    },
 });
 
 

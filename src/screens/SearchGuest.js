@@ -1,129 +1,10 @@
-// import React, { useState } from 'react';
-// import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView } from 'react-native';
-// import { Formik } from 'formik';
-// import * as Yup from 'yup';
-
-// const validationSchema = Yup.object().shape({
-//     name: Yup.string().required('नाम अनिवार्य'),
-//     mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
-//     idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
-// });
-
-// const SearchGuest = ({ navigation }) => {
-//     return (
-//         <Formik
-//             initialValues={{
-//                 name: '',
-//                 mobileNumber: '',
-//                 idNumber: '',
-//             }}
-//             validationSchema={validationSchema}
-//             onSubmit={values => {
-//                 console.log(values);
-
-//             }}
-//         >
-//             {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-//                 <ScrollView style={styles.container}>
-//                     <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
-//                     <View style={styles.inputContainer}>
-//                         <TextInput
-//                             placeholderTextColor='darkgrey'
-//                             placeholder='नाम*'
-//                             style={[styles.input, { marginTop: 0 }]}
-//                             onChangeText={handleChange('name')}
-//                             onBlur={handleBlur('name')}
-//                             value={values.name}
-//                         />
-//                         {touched.name && errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
-
-//                         <TextInput
-//                             placeholderTextColor='darkgrey'
-//                             placeholder='मोबाइल नंबर*'
-//                             style={styles.input}
-//                             keyboardType='number-pad'
-//                             onChangeText={handleChange('mobileNumber')}
-//                             onBlur={handleBlur('mobileNumber')}
-//                             value={values.mobileNumber}
-//                         />
-//                         {touched.mobileNumber && errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
-
-//                         <TextInput
-//                             placeholderTextColor='darkgrey'
-//                             placeholder='आईडी नंबर*'
-//                             style={styles.input}
-//                             onChangeText={handleChange('idNumber')}
-//                             onBlur={handleBlur('idNumber')}
-//                             value={values.idNumber}
-//                         />
-//                         {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
-
-//                         <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-//                             <Text style={styles.button}>Search</Text>
-//                         </TouchableOpacity>
-//                     </View>
-//                 </ScrollView>
-//             )}
-//         </Formik>
-//     );
-// };
-
-// export default SearchGuest;
-
-// const styles = StyleSheet.create({
-//     container: {
-//         backgroundColor: '#fff',
-//         flex: 1,
-//     },
-//     input: {
-//         width: Dimensions.get('window').width - 60,
-//         backgroundColor: '#fff',
-//         borderWidth: 1,
-//         borderColor: '#E3E2E2',
-//         borderRadius: 10,
-//         paddingHorizontal: 20,
-//         color: "#000",
-//         height: 50,
-//         marginTop: 20,
-//     },
-//     inputContainer: {
-//         marginTop: 20,
-//         justifyContent: "center",
-//         alignItems: "center",
-//     },
-//     buttonContainer: {
-//         borderRadius: 10,
-//         marginTop: 16,
-//         width: Dimensions.get('window').width - 60,
-//         height: 50,
-//         marginBottom: 20,
-//         justifyContent: "center",
-//         alignItems: "center",
-//         backgroundColor: '#2AAA8A',
-//     },
-//     button: {
-//         fontSize: 18,
-//         textAlign: 'center',
-//         color: '#fff',
-//         fontWeight: "bold",
-//     },
-//     errorText: {
-//         color: "#FF4545",
-//         marginTop: 5,
-//         width: "100%",
-//         marginLeft: 70,
-//         fontSize: 12
-//     },
-// });
-
-
-
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
 import BackIcon from "react-native-vector-icons/Ionicons"
 import axios from 'axios';
 import { baseUrl } from '../utils/env';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import GuestLogo from "../assets/images/guests.png"
 
 const SearchGuest = ({ navigation }) => {
 
@@ -131,17 +12,21 @@ const SearchGuest = ({ navigation }) => {
     const [name, setName] = useState("")
     const [idNumber, setIdNumber] = useState("")
     const [Aadhar, setAadhar] = useState("")
+    const [guestData, setGuestData] = useState([])
 
     const searchGuest = async () => {
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
-                "Content-type": "application/json"
+                "Content-type": "application/json",
+                "Authorization": `${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}GuestList?HotelId=${idNumber}&GuestName=${name}`, config)
+        await axios.post(`${baseUrl}SearchGuest?HotelId=${idNumber}&GuestName=${name}`, {}, config)
             .then((res) => {
-                console.log("resss", res.data)
+                setGuestData(res.data.Result)
             })
             .catch(err => {
                 console.log("Errorr----", err)
@@ -163,7 +48,7 @@ const SearchGuest = ({ navigation }) => {
             <View style={styles.inputContainer}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>नाम</Text>
-                    <Text style={styles.lableText}>मोबाइल नंबर</Text>
+                    <Text style={styles.lableText}>होटल आईडी</Text>
 
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
@@ -172,28 +57,22 @@ const SearchGuest = ({ navigation }) => {
                         placeholderTextColor='darkgrey'
                         placeholder='नाम'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
-                    <TextInput
+                    {/* <TextInput
                         value={mobileNumber} onChangeText={(value) => { setMobileNumber(value) }}
 
                         placeholderTextColor='darkgrey'
                         placeholder='मोबाइल नंबर'
+                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} /> */}
+                    <TextInput
+                        value={idNumber} onChangeText={(value) => { setIdNumber(value) }}
+                        placeholderTextColor='darkgrey'
+                        placeholder='होटल आईडी'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
                 </View>
-                {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>आईडी नंबर</Text>
-                </View>
-                <TextInput
-                    maxLength={10}
-                    keyboardType='number-pad'
-                    placeholderTextColor='darkgrey'
-                    placeholder='आईडी नंबर'
-                    style={[styles.input, { marginTop: 8 }]}
-                    value={idNumber} onChangeText={(value) => { setIdNumber(value) }}
 
-                /> */}
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>आधार नंबर</Text>
-                    <Text style={styles.lableText}>आईडी नंबर</Text>
+                    <Text style={styles.lableText}>होटल आईडी</Text>
 
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
@@ -202,16 +81,42 @@ const SearchGuest = ({ navigation }) => {
                         placeholderTextColor='darkgrey'
                         placeholder='आधार नंबर'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
-                    <TextInput
-                        value={idNumber} onChangeText={(value) => { setIdNumber(value) }}
-                        placeholderTextColor='darkgrey'
-                        placeholder='आईडी नंबर'
-                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]} />
-                </View>
+             
+                </View> */}
                 <TouchableOpacity style={styles.buttonContainer} onPress={() => searchGuest()}>
                     <Text style={styles.button}>Search</Text>
                 </TouchableOpacity>
             </View>
+
+            {guestData.map((item, index) => (
+                <View key={index} style={{
+                    flex: 1,
+                    backgroundColor: "white",
+                    flexDirection: "row",
+                    paddingHorizontal: 15,
+                    marginHorizontal: 20,
+                    height: 100,
+                    borderRadius: 10,
+                    elevation: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: 10
+                }}>
+                    <View style={{ flex: 1 }} >
+                        <Image source={GuestLogo} style={{ height: 40, width: 40 }} resizeMode="contain" />
+                    </View>
+                    <View style={{ flex: 3 }}>
+                        <View style={{ flex: 2, justifyContent: "center" }}>
+                            <Text style={[styles.text, { textTransform: "capitalize" }]}>{item.GuestName} {item.GuestLastName}</Text>
+                            <Text style={styles.text}>{item.ContactNo}</Text>
+                            <Text style={styles.text}>{item.CheckInDate} - {item.CheckOutDate}</Text>
+                        </View>
+                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate("SearchGuestDetails", { masterId: item.idGuestMaster })} style={{ flex: 1, borderWidth: 0.5, borderColor: "#024063", backgroundColor: "#024063", borderRadius: 5, justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7 }}>Detail</Text>
+                    </TouchableOpacity>
+                </View>
+            ))}
         </ScrollView>
     );
 };
@@ -220,7 +125,7 @@ export default SearchGuest;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: "#F5F5F8",
         flex: 1,
     },
     input: {
@@ -278,7 +183,13 @@ const styles = StyleSheet.create({
         marginLeft: 0,
         width: "45%",
         marginTop: 10
-    }
+    },
+    text: {
+        fontSize: 13,
+        fontWeight: "400",
+        color: "#36454F",
+        marginTop: 5
+    },
 });
 
 
