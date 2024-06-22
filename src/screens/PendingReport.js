@@ -76,7 +76,7 @@ const PendingReport = ({ navigation }) => {
                 renderItem={({ item, index }) =>
                     <View onPress={() => navigation.navigate("OrderHistory")} style={styles.container} key={index}>
                         <View style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require('../assets/images/pendingReport.png')} style={{ height: 55, width: 55, borderWidth: 1, borderRadius: 55, borderColor: "#fff" }} />
+                            <Image source={require('../assets/images/pendingReport.png')} style={{ height: 45, width: 45, borderWidth: 1, borderRadius: 45, borderColor: "#fff" }} />
                         </View>
 
                         <View style={{ flex: 2, justifyContent: "center" }}>
@@ -131,7 +131,8 @@ const styles = StyleSheet.create({
         margin: 5,
         height: 80,
         borderRadius: 10,
-
+        elevation: 2,
+        marginHorizontal: 15
 
     },
     text1: {
