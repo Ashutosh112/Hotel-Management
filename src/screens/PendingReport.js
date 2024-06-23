@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, FlatList, Text, Pressable, Dimensions, View, Image, TouchableOpacity, TextInput, Modal } from "react-native";
+import { StyleSheet, FlatList, Text, Pressable, Dimensions, View, Image, TouchableOpacity, TextInput, Modal, SafeAreaView } from "react-native";
 import BackIcon from "react-native-vector-icons/Ionicons"
 import InfoIcon from "react-native-vector-icons/Feather"
 
@@ -10,17 +10,6 @@ import { baseUrl } from "../utils/env";
 const PendingReport = ({ navigation }) => {
 
     const [openModal, setOpenModal] = useState(false)
-
-
-    const data = [
-        { id: 1, label: 'Darshan', value: '1' },
-        { id: 2, label: 'Business', value: '2' },
-        { id: 3, label: 'Normal Visit', value: '3' },
-        { id: 4, label: 'Appointment', value: '4' },
-        { id: 5, label: 'Meeting', value: '5' },
-        { id: 6, label: 'Guest', value: '6' },
-
-    ];
 
     useEffect(() => {
         pendingList()
@@ -51,7 +40,7 @@ const PendingReport = ({ navigation }) => {
     };
 
     return (
-        <View style={{ backgroundColor: "#F5F5F8" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F8" }}>
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between" }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
 
@@ -67,31 +56,43 @@ const PendingReport = ({ navigation }) => {
                         <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>
-
             </View>
-            <TextInput placeholderTextColor="darkgrey" placeholder='Search' style={styles.input}></TextInput>
+            <TextInput placeholderTextColor="darkgrey" placeholder='Search' style={styles.input} />
             <FlatList
                 data={pendingGuestDetails}
                 keyExtractor={item => item.id}
                 renderItem={({ item, index }) =>
+
                     <View onPress={() => navigation.navigate("OrderHistory")} style={styles.container} key={index}>
-                        <View style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require('../assets/images/pendingReport.png')} style={{ height: 45, width: 45, borderWidth: 1, borderRadius: 45, borderColor: "#fff" }} />
-                        </View>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <View style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}>
+                                <Image source={require('../assets/images/pendingReport.png')} style={{ height: 45, width: 45, borderWidth: 1, borderRadius: 45, borderColor: "#fff" }} />
+                            </View>
 
-                        <View style={{ flex: 2, justifyContent: "center" }}>
-                            <Text style={[styles.text1, { textTransform: 'capitalize' }]}>कुल व्यक्ति संख्या  : {item.AddionalGuest}</Text>
-                            <Text style={styles.text2}>प्रथम नाम</Text>
-                            <Text style={styles.text2}>मोबाइल नंबर
-                            </Text>
+                            <View style={{ flex: 2, justifyContent: "center" }}>
+                                <Text style={[styles.text1, { textTransform: 'capitalize' }]}>दिनांक  : {item.SubmitDate}</Text>
+                                <Text style={styles.text2}>कुल व्यक्ति संख्या  : {item.AddionalGuest}</Text>
+                            </View>
                         </View>
-
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
-                            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 8, borderColor: "#024063", backgroundColor: "#024063", borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails")}>
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", padding: 10, paddingVertical: 8 }}>Show Detail</Text>
-                            </TouchableOpacity>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails")}>
+                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 30, paddingVertical: 7 }}>देखे</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} >
+                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>गेस्ट जोडे</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("ReportSubmitScreen", { SubmitDate: item.SubmitDate })}>
+                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>रिपोर्ट सबमिट</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
+
                 } />
 
             {/* Open modal for Logout start */}
@@ -109,7 +110,7 @@ const PendingReport = ({ navigation }) => {
                             <Text style={styles.modalText}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
                             <Pressable
                                 style={{ backgroundColor: "#024063", paddingHorizontal: 40, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 10, marginVertical: 10 }}
-                                onPress={() => { setOpenModal(false) }}
+                                onPress={() => { setOpenModal(false); }}
                             >
                                 <Text style={styles.textStyle}>ठीक</Text>
                             </Pressable>
@@ -118,7 +119,7 @@ const PendingReport = ({ navigation }) => {
                 </Pressable>
             </Modal>
             {/* Open modal for Logout end */}
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -126,13 +127,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "white",
-        flexDirection: "row",
-        paddingHorizontal: 15,
-        margin: 5,
-        height: 80,
+        paddingHorizontal: 5,
+        height: 130,
         borderRadius: 10,
         elevation: 2,
-        marginHorizontal: 15
+        marginHorizontal: 15,
+        marginBottom: 15
 
     },
     text1: {
