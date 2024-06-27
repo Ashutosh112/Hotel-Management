@@ -5,6 +5,7 @@ import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'
+import Spinner from './Spinner';
 
 const SearchGuestDetails = ({ navigation, route }) => {
 
@@ -16,8 +17,11 @@ const SearchGuestDetails = ({ navigation, route }) => {
 
     const [guestData, setGuestData] = useState([]);
     const [commonData, setCommonData] = useState({})
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const searchGuest = async () => {
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         const config = {
@@ -29,12 +33,12 @@ const SearchGuestDetails = ({ navigation, route }) => {
         };
         await axios.post(`${baseUrl}GuestDetails?idGuestMaster=${masterId}`, {}, config)
             .then((res) => {
-                console.log("Response", res.data.Result);
+                setIsLoading(false)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
             .catch(err => {
-                console.log("Error", err);
+                setIsLoading(false)
             });
     };
 
@@ -42,6 +46,7 @@ const SearchGuestDetails = ({ navigation, route }) => {
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />

@@ -31,12 +31,10 @@ const SubmittedReport = ({ navigation }) => {
         };
         await axios.post(`${baseUrl}AllSubmitedGuestByHotelId?HotelId=${updatedValue.idHotelMaster}&fromDate=${moment(checkinDate).format("DD/MMM/YYYY")}&toDate=${moment(checkoutDate).format("DD/MMM/YYYY")}`, {}, config)
             .then((res) => {
-                console.log(">>>>>>>>>>>", res.data.Result);
                 setData(res.data.Result);
                 setLoading(false);
             })
             .catch(err => {
-                console.log("Error", err);
                 setLoading(false);
             });
     };
@@ -123,7 +121,7 @@ const SubmittedReport = ({ navigation }) => {
                                 <Text style={styles.text}>कुल अतिथि : {item.AddionalGuest}</Text>
                             </View>
                         </View>
-                        <TouchableOpacity onPress={() => navigation.navigate("SubmittedReportDetails", { checkInD: checkinDate, checkOutD: checkoutDate })} style={styles.detailButton}>
+                        <TouchableOpacity onPress={() => navigation.navigate("SubmittedReportDetails", { checkInD: item.SubmitDate, checkOutD: item.SubmitDate })} style={styles.detailButton}>
                             <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7 }}>Detail</Text>
                         </TouchableOpacity>
                     </View>

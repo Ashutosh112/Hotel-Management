@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, Platform } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import DocumentPicker from 'react-native-document-picker';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import PhotoIcon from "../assets/images/photologoicon.png";
@@ -11,6 +10,7 @@ import { baseUrl } from '../utils/env';
 import Toast from 'react-native-toast-message';
 import ImagePicker from 'react-native-image-crop-picker';
 import { androidCameraPermission } from "../../Permissions"
+import Spinner from './Spinner';
 
 const validationSchema = Yup.object().shape({
     firstName: Yup.string().required('प्रथम नाम अनिवार्य'),
@@ -22,14 +22,11 @@ const validationSchema = Yup.object().shape({
     contactNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
     address: Yup.string().required('होटल का पता अनिवार्य'),
     city: Yup.string().required('शहर अनिवार्य'),
-    // pin: Yup.string().required('पिन अनिवार्य').matches(/^[0-9]{6}$/, 'पिन 6 अंकों का होना चाहिए'),
     state: Yup.string().required('राज्य अनिवार्य'),
     policeStation: Yup.string().required('थाना का नाम अनिवार्य'),
     area: Yup.string().required('क्षेत्र अनिवार्य'),
     emailID: Yup.string().required('होटल की ईमेल आईडी अनिवार्य'),
     website: Yup.string().required('होटल की वेबसाइट अनिवार्य'),
-    // idType: Yup.string().required('आईडी प्रकार अनिवार्य'),
-    // idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
     idFront: Yup.array().min(1, 'होटल का गुमस्ता अनिवार्य'),
     idBack: Yup.array().min(1, 'मालिक का आधार अनिवार्य'),
 });
@@ -45,6 +42,7 @@ const Signup = ({ navigation }) => {
     const [policeStationValue, setPoliceStationValue] = useState(null)
     const [propertyTypeData, setPropertyTypeData] = useState([])
     const [propertyTypeValue, setPropertyTypeValue] = useState(null)
+    const [isLoading, setIsLoading] = useState(false);
 
 
     useEffect(() => {
@@ -86,35 +84,8 @@ const Signup = ({ navigation }) => {
     };
 
 
-
-    // const selectIdBackFile = async (setFieldValue) => {
-    //     try {
-    //         const doc = await DocumentPicker.pick({
-    //             type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-    //             allowMultiSelection: false,
-    //         });
-    //         setFieldValue('idBack', doc);
-    //     } catch (err) {
-    //         if (DocumentPicker.isCancel(err)) {
-    //         } else {
-    //             console.log(err);
-    //         }
-    //     }
-    // };
-
-    const handleSignUp = async () => {
-        try {
-            await userSignup(values);
-            handleSubmit(); // Assuming handleSubmit needs to be called after successful signup
-        } catch (error) {
-            console.error("Error in handleSignUp:", error);
-            // Handle error if needed
-        }
-    };
-
-
     const userSignup = (values) => {
-        console.log("valuessss", values)
+        setIsLoading(true)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -135,18 +106,19 @@ const Signup = ({ navigation }) => {
             idCity: values.city,
             idZone: values.area,
             propertyType: values.propertyType,
-            fileGumasta: values.idFront[0]?.data, // Set the base64 string for fileGumasta
-            fileAdhar: values.idBack[0]?.data,
+            // fileGumasta: values.idFront[0]?.data, // Set the base64 string for fileGumasta
+            // fileAdhar: values.idBack[0]?.data,
+            fileGumasta: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
+            fileAdhar: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg",
             contactPersonMobile: values.mobileNumber,
             website: values.website,
-            filePass: ""
+            filePass: "7d465d03"
         };
 
-        console.log("BODYY>>>", body);
 
         axios.post(`${baseUrl}HotelSignUp`, body, config)
             .then(res => {
-                console.log("response>>>", res.data.Message);
+                setIsLoading(false)
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -159,7 +131,7 @@ const Signup = ({ navigation }) => {
                 }, 1500);
             })
             .catch(err => {
-                console.log("error>>", err.response);
+                setIsLoading(false)
                 Toast.show({
                     type: 'info',
                     text1: 'Info',
@@ -186,7 +158,6 @@ const Signup = ({ navigation }) => {
                 setPropertyTypeData(propertyTypeData)
             })
             .catch(err => {
-                console.log("errr", err)
             });
     };
 
@@ -207,7 +178,6 @@ const Signup = ({ navigation }) => {
                 setStateData(stateData)
             })
             .catch(err => {
-                console.log("errr", err)
             });
     };
 
@@ -227,7 +197,6 @@ const Signup = ({ navigation }) => {
                 setCityData(cityData)
             })
             .catch(err => {
-                console.log("errr", err)
             });
     };
 
@@ -248,7 +217,6 @@ const Signup = ({ navigation }) => {
                 setZoneData(ZoneData)
             })
             .catch(err => {
-                console.log("errr", err)
             });
     };
 
@@ -268,11 +236,12 @@ const Signup = ({ navigation }) => {
                 setPoliceStationData(policeStationData)
             })
             .catch(err => {
-                console.log("errr", err)
             });
     };
     return (
         <ScrollView style={styles.container}>
+            <Spinner isLoading={isLoading} />
+
             <Formik
                 initialValues={{
                     firstName: '',
@@ -287,6 +256,7 @@ const Signup = ({ navigation }) => {
                     area: '',
                     policeStation: '',
                     emailID: '',
+                    filePass: "", // Example filePass value
                     website: '',
                     idFront: [],
                     idBack: [],
@@ -470,16 +440,7 @@ const Signup = ({ navigation }) => {
                                     }}
 
                                 />
-                                {/* <TextInput
-                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                                    placeholderTextColor='darkgrey'
-                                    placeholder='पिन*'
-                                    onChangeText={handleChange('pin')}
-                                    onBlur={handleBlur('pin')}
-                                    value={values.pin}
-                                    keyboardType='number-pad'
-                                    maxLength={6}
-                                /> */}
+
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                                 {touched.state && errors.state ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.state}</Text> : null}
@@ -597,7 +558,7 @@ const Signup = ({ navigation }) => {
                             {/* Submit Button */}
                             <TouchableOpacity style={styles.buttonContainer}
                                 onPress={() => {
-                                    if (!values.firstName || !values.lastName || !values.hotelName || !values.contactNumber || !values.mobileNumber || !values.website || !values.emailID || !values.propertyType || !values.address || !values.state || !values.city || !values.pin || !values.area || !values.policeStation || values.idFront.length === 0 || values.idBack.length === 0) {
+                                    if (!values.firstName || !values.lastName || !values.hotelName || !values.contactNumber || !values.mobileNumber || !values.website || !values.emailID || !values.propertyType || !values.address || !values.state || !values.city || !values.area || !values.policeStation || values.idFront.length === 0 || values.idBack.length === 0) {
                                         Toast.show({
                                             type: 'error',
                                             text1: 'Warning',

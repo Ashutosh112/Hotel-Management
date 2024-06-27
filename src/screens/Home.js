@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, BackHandler } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, BackHandler, Pressable } from 'react-native';
 import PlusIcon from "react-native-vector-icons/Entypo"
 import HomeIcon1 from "../assets/images/HomeIcon1.svg"
 import HomeIcon2 from "../assets/images/HomeIcon2.svg"
@@ -7,10 +7,11 @@ import HomeIcon3 from "../assets/images/HomeIcon3.svg"
 import HomeIcon4 from "../assets/images/HomeIcon4.svg"
 import HomeIcon5 from "../assets/images/HomeIcon5.svg"
 import HomeIcon6 from "../assets/images/HomeIcon6.svg"
-import BellIcon from "react-native-vector-icons/FontAwesome"
+import UserIcon from "react-native-vector-icons/Octicons"
 import HamburgerLogo from "../assets/images/HamburgerLogo.svg"
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 
 const Home = ({ navigation }) => {
 
@@ -74,9 +75,9 @@ const Home = ({ navigation }) => {
                     <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}> {hotelData ? hotelData.HotelName : "Loading..."}</Text>
                     <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91  {hotelData ? hotelData.Contact : "Loading..."}</Text>
                 </View>
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}>
-                    <BellIcon name="bell" size={22} color="#fff" />
-                </View>
+                <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }} onPress={() => navigation.navigate("Profile")}>
+                    <UserIcon name="feed-person" size={32} color="#fff" />
+                </Pressable>
             </View>
 
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
@@ -92,7 +93,7 @@ const Home = ({ navigation }) => {
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("AddGuestInReport")}>
+                {/* <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("CreateReport")}>
                     <View style={{ flex: 1 }}>
                         <HomeIcon6 />
                     </View>
@@ -104,7 +105,7 @@ const Home = ({ navigation }) => {
                     </View>
                 </TouchableOpacity> */}
 
-                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SearchGuest")}>
+                {/* <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SearchGuest")}>
                     <View style={{ flex: 1 }}>
                         <HomeIcon2 />
                     </View>
@@ -114,7 +115,7 @@ const Home = ({ navigation }) => {
                     <View style={{ flex: 1.5, alignItems: "center" }}>
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SubmittedReport")}>
                     <View style={{ flex: 1 }}>

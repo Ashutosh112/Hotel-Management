@@ -16,6 +16,8 @@ import PendingReportDetails from '../../screens/PendingReportDetails';
 import SearchGuestDetails from '../../screens/SearchGuestDetails';
 import SubmittedReportDetails from '../../screens/SubmittedReportDetails';
 import ReportSubmitScreen from '../../screens/ReportSubmitScreen';
+import AddGuestInPendingReport from '../../screens/AddGuestInPendingReport';
+import Profile from '../../screens/Profile';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +49,8 @@ const StackNavigator = () => {
                     <Stack.Screen name="NoCheckIn" component={NoCheckIn} options={{ headerShown: true, headerTitle: "No Check In" }} />
                     <Stack.Screen name="PendingReportDetails" component={PendingReportDetails} options={{ headerShown: false, headerTitle: "Report Details" }} />
                     <Stack.Screen name="ReportSubmitScreen" component={ReportSubmitScreen} options={{ headerShown: false, headerTitle: "Report Submit" }} />
+                    <Stack.Screen name="AddGuestInPendingReport" component={AddGuestInPendingReport} options={{ headerShown: false, headerTitle: "AddGuest In Pending Report" }} />
+                    <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false, headerTitle: "Profile" }} />
 
 
                 </Stack.Navigator>

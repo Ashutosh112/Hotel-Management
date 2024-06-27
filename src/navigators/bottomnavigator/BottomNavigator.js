@@ -12,6 +12,9 @@ import Home from '../../screens/Home';
 import Profile from '../../screens/Profile';
 import SearchGuest from '../../screens/SearchGuest';
 import AddGuestInReport from '../../screens/AddGuestInReport';
+import CreateReport from '../../screens/CreateReport';
+import PendingReport from '../../screens/PendingReport';
+import PendingIcon from "react-native-vector-icons/MaterialIcons"
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +34,7 @@ const BottomNavigator = ({ navigation }) => {
                     }, headerShown: false
                 }} />
 
-            <Tab.Screen name="AddGuestInReport" component={AddGuestInReport}
+            <Tab.Screen name="AddGuestInReport" component={CreateReport}
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return (
@@ -44,7 +47,7 @@ const BottomNavigator = ({ navigation }) => {
                 }}
             />
 
-            <Tab.Screen name="SearchGuest" component={SearchGuest}
+            {/* <Tab.Screen name="SearchGuest" component={SearchGuest}
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return (
@@ -55,18 +58,16 @@ const BottomNavigator = ({ navigation }) => {
                         )
                     }, headerTitleAlign: "left", headerTintColor: '#000', headerShown: false, tabBarLabel: "Search"
                 }}
-            />
+            /> */}
 
-
-
-            <Tab.Screen name="Profile" component={Profile}
+            <Tab.Screen name="Pending Report" component={PendingReport}
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return (
                             focused ?
-                                <ProfileBlue />
+                                <PendingIcon name="pending-actions" size={22} color='#1AA7FF' />
                                 :
-                                <ProfileGrey />
+                                <PendingIcon name="pending-actions" size={22} color="#484C52" />
                         )
                     }, headerTitleAlign: "left", headerTintColor: '#000', headerShown: false
                 }}

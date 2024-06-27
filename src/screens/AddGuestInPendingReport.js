@@ -34,7 +34,7 @@ const validationSchema = Yup.object().shape({
     idBack: Yup.array().min(1, 'आईडी का Back अनिवार्य'),
 });
 
-const CreateReport = ({ navigation }) => {
+const AddGuestInPendingReport = ({ navigation }) => {
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [travelReason, setTravelReason] = useState('दर्शन');
@@ -294,7 +294,7 @@ const CreateReport = ({ navigation }) => {
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
                         </TouchableOpacity>
-                        <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>प्राथमिक अतिथि की जानकारी</Text>
+                        <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>गेस्ट की जानकारी</Text>
                     </View>
                     <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
                     <View style={styles.inputContainer}>
@@ -709,7 +709,7 @@ const CreateReport = ({ navigation }) => {
     );
 };
 
-export default CreateReport;
+export default AddGuestInPendingReport;
 
 const styles = StyleSheet.create({
     container: {

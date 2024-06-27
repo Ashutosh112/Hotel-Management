@@ -8,6 +8,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Toast from 'react-native-toast-message';
 import Alert from "react-native-vector-icons/Ionicons";
+import Spinner from './Spinner';
 
 const ReportSubmitScreen = ({ navigation, route }) => {
 
@@ -20,6 +21,7 @@ const ReportSubmitScreen = ({ navigation, route }) => {
     const [guestData, setGuestData] = useState("");
     const [commonData, setCommonData] = useState("");
     const [openModal, setOpenModal] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
 
     // Validation schema for Formik
@@ -29,6 +31,7 @@ const ReportSubmitScreen = ({ navigation, route }) => {
     });
 
     const validateDateApi = async () => {
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         const config = {
@@ -40,16 +43,18 @@ const ReportSubmitScreen = ({ navigation, route }) => {
         };
         await axios.post(`${baseUrl}ValidateSubmitDate?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${SubmitDate}`, {}, config)
             .then((res) => {
+                setIsLoading(false)
                 setGuestData(res.data.Message);
                 setCommonData(res.data.Result);
             })
             .catch(err => {
-                console.log("Error", err);
+                setIsLoading(false)
             });
     };
 
 
     const submitReportApi = async (name) => {
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         const config = {
@@ -59,9 +64,9 @@ const ReportSubmitScreen = ({ navigation, route }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-        console.log("name", name)
         await axios.post(`${baseUrl}SubmitGuestData?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${SubmitDate}&SubmitBy=${name}`, {}, config)
             .then((res) => {
+                setIsLoading(false)
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -74,12 +79,13 @@ const ReportSubmitScreen = ({ navigation, route }) => {
                 }, 1500);
             })
             .catch(err => {
-                console.log("Error", err);
+                setIsLoading(false)
             });
     };
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />

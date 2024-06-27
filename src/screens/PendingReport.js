@@ -6,6 +6,7 @@ import BackIcon from "react-native-vector-icons/Ionicons"
 import InfoIcon from "react-native-vector-icons/Feather"
 
 import { baseUrl } from "../utils/env";
+import Spinner from "./Spinner";
 
 const PendingReport = ({ navigation }) => {
 
@@ -17,8 +18,10 @@ const PendingReport = ({ navigation }) => {
 
 
     const [pendingGuestDetails, setPendingGuestDetails] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
 
     const pendingList = async () => {
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         const config = {
@@ -30,20 +33,20 @@ const PendingReport = ({ navigation }) => {
         };
         await axios.post(`${baseUrl}AllPendingGuestList?HotelId=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
-                console.log("response>>>", res.data.Result);
+                setIsLoading(false)
                 setPendingGuestDetails(res.data.Result)
 
             })
             .catch(err => {
-                console.log("Error", err);
+                setIsLoading(false)
             });
     };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F8" }}>
-            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between" }}>
+            <Spinner isLoading={isLoading} />
+            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
-
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
@@ -51,19 +54,17 @@ const PendingReport = ({ navigation }) => {
                 </View>
 
                 <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
-
                     <TouchableOpacity onPress={() => setOpenModal(true)}>
                         <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>
             </View>
-            <TextInput placeholderTextColor="darkgrey" placeholder='Search' style={styles.input} />
+            {/* <TextInput placeholderTextColor="darkgrey" placeholder='Search' style={styles.input} /> */}
             <FlatList
                 data={pendingGuestDetails}
                 keyExtractor={item => item.id}
                 renderItem={({ item, index }) =>
-
-                    <View onPress={() => navigation.navigate("OrderHistory")} style={styles.container} key={index}>
+                    <View style={styles.container} key={index}>
                         <View style={{ flex: 1, flexDirection: "row" }}>
                             <View style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}>
                                 <Image source={require('../assets/images/pendingReport.png')} style={{ height: 45, width: 45, borderWidth: 1, borderRadius: 45, borderColor: "#fff" }} />
@@ -76,12 +77,12 @@ const PendingReport = ({ navigation }) => {
                         </View>
                         <View style={{ flex: 1, flexDirection: "row" }}>
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails")}>
+                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails", { SubmitDate: item.SubmitDate })}>
                                     <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 30, paddingVertical: 7 }}>देखे</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} >
+                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("AddGuestInPendingReport", { SubmitDate: item.SubmitDate })}>
                                     <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>गेस्ट जोडे</Text>
                                 </TouchableOpacity>
                             </View>
@@ -132,7 +133,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 2,
         marginHorizontal: 15,
-        marginBottom: 15
+        // marginBottom: 15,
+        // marginTop: 15,
+        marginVertical: 5
 
     },
     text1: {

@@ -77,16 +77,17 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Pressable } from 'react-native';
 import BackIcon from "react-native-vector-icons/Ionicons";
 import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'
+import Spinner from './Spinner';
 
 const PendingReportDetails = ({ navigation, route }) => {
 
-    // const masterId = route.params.masterId;
+    const SubmitDate = route.params.SubmitDate;
 
     useEffect(() => {
         searchGuest();
@@ -94,10 +95,14 @@ const PendingReportDetails = ({ navigation, route }) => {
 
     const [guestData, setGuestData] = useState([]);
     const [commonData, setCommonData] = useState({})
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const searchGuest = async () => {
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
+        setCommonData(updatedValue)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -105,20 +110,20 @@ const PendingReportDetails = ({ navigation, route }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=06%2F15%2F2024&toDate=06%2F15%2F2024`, {}, config)
+        await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`, {}, config)
             .then((res) => {
-                console.log("???????????", res.data.Result);
-                // setGuestData(res.data.Result);
-                // setCommonData(res.data.Result[0])
+                setIsLoading(false)
+                setGuestData(res.data.Result);
             })
             .catch(err => {
-                console.log("Error", err);
+                setIsLoading(false)
             });
     };
 
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
@@ -129,15 +134,14 @@ const PendingReportDetails = ({ navigation, route }) => {
             <View style={{ height: 90, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 20, marginTop: 20, borderWidth: 1, borderColor: "#1b5372", padding: 10, paddingHorizontal: 20, justifyContent: "space-between" }}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <Text style={{ fontSize: 12, color: "#000" }}>होटल का नाम : {commonData.HotelName}</Text>
-                    <Text style={{ fontSize: 12, color: "#000" }}>मोबाइल नं.  : {commonData.HotelContact}</Text>
+                    <Text style={{ fontSize: 12, color: "#000" }}>कुल व्यक्ति संख्या  : {guestData.length}</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}>चेक इन तारीख : {commonData.CheckInDate}</Text>
-                    <Text style={{ fontSize: 12, color: "#000" }}>कुल व्यक्ति संख्या  : {commonData.AddionalGuest}</Text>
+                    <Text style={{ fontSize: 12, color: "#000" }}>चेक इन तारीख : {SubmitDate}</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}>चेक आउट तारीख : {commonData.CheckOutDate}</Text>
-                    <Text style={{ fontSize: 12, color: "#000" }}>रिपोर्ट सबमिट : {commonData.isSubmitted == true ? "हाँ" : "नहीं"}</Text>
+                    {/* <Text style={{ fontSize: 12, color: "#000" }}>चेक आउट तारीख : {commonData.CheckOutDate}</Text> */}
+                    <Text style={{ fontSize: 12, color: "#000" }}>रिपोर्ट सबमिट : {commonData.isSubmitted == true ? "हाँ" : "रिपोर्ट सबमिट नहीं की गई है।"}</Text>
 
 
                 </View>
@@ -162,17 +166,19 @@ const PendingReportDetails = ({ navigation, route }) => {
                             <Text style={styles.text2}>जेंडर : {item.gender}</Text>
                             <Text style={styles.text2}>मोबाइल नंबर	 : {item.ContactNo}</Text>
                             <Text style={styles.text2}>पता : {item.Address}</Text>
-                            <Text style={styles.text2}>शहर : {item.city}</Text>
+                            <Text style={styles.text2}></Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.text2}>यात्रा का उद्देश्य : {item.TravelReson}</Text>
                             <Text style={styles.text2}>आईडी प्रकार	 : {item.IdentificationType}</Text>
                             <Text style={styles.text2}>आईडी नंबर	 : {item.IdentificationNo}</Text>
-
                             <Text style={styles.text2}></Text>
-
-
                         </View>
+                    </View>
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end", marginBottom: 10, marginHorizontal: 30 }}>
+                        <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5 }} >
+                            <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
+                        </Pressable>
                     </View>
                 </View>
             ))}
@@ -191,11 +197,11 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "white",
         marginHorizontal: 20,
-        height: Dimensions.get("window").height / 2 - 100,
+        // height: Dimensions.get("window").height / 2,
         borderRadius: 10,
         elevation: 2,
-        justifyContent: "center",
-        alignItems: "center",
+        // justifyContent: "center",
+        // alignItems: "center",
         marginBottom: 10,
         marginTop: 10
     },
@@ -219,7 +225,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginHorizontal: 10,
-        marginVertical: 20,
+        marginVertical: 10,
     },
     image: {
         height: 100,

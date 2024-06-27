@@ -10,10 +10,12 @@ import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import Spinner from './Spinner';
 
 const Login = ({ navigation }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const firstInput = useRef();
   const secondInput = useRef();
@@ -32,6 +34,7 @@ const Login = ({ navigation }) => {
   }, [counter]);
 
   const sendOtp = async (mobileNumber) => {
+    setIsLoading(true)
     const config = {
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -41,6 +44,7 @@ const Login = ({ navigation }) => {
 
     await axios.post(`${baseUrl}SendOTP?sMobile=${mobileNumber}`, config)
       .then((res) => {
+        setIsLoading(false)
         setMobileNumber(mobileNumber); // Store the mobile number
         Alert.alert(
           'OTP Sent',
@@ -52,10 +56,12 @@ const Login = ({ navigation }) => {
         );
       })
       .catch(err => {
+        setIsLoading(false)
       });
   };
 
   const verifyOtp = async () => {
+    setIsLoading(true)
     const fullOtp = Object.values(otp).join("")
     if (fullOtp.length == 6) {
       if (mobileNumber) {
@@ -65,9 +71,9 @@ const Login = ({ navigation }) => {
             "Content-type": "application/json"
           }
         };
-        console.log("mobile", mobileNumber)
         await axios.post(`${baseUrl}HotelLogin?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
           .then((res) => {
+            setIsLoading(false)
             const data = res.data.Result
             AsyncStorage.setItem("hotelmgmt", JSON.stringify(data))
             navigation.navigate("BottomNavigator")
@@ -79,7 +85,7 @@ const Login = ({ navigation }) => {
             });
           })
           .catch((err) => {
-            console.log("errr", err)
+            setIsLoading(false)
           })
       }
     }
@@ -87,6 +93,7 @@ const Login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Spinner isLoading={isLoading} />
       <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
       <View style={styles.body}>
         <View style={{ flex: 0.8, justifyContent: "flex-start" }} onPress={() => navigation.navigate("Signup")}>

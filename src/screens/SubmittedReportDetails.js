@@ -1,8 +1,3 @@
-
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
 import BackIcon from "react-native-vector-icons/Ionicons";
@@ -10,6 +5,7 @@ import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'
+import Spinner from './Spinner';
 
 const SubmittedReportDetails = ({ navigation, route }) => {
 
@@ -23,8 +19,10 @@ const SubmittedReportDetails = ({ navigation, route }) => {
     const [guestData, setGuestData] = useState([]);
     const [commonData, setCommonData] = useState({})
     const [hotelName, setHotelName] = useState("")
+    const [isLoading, setIsLoading] = useState(false);
 
     const submittedReportApi = async () => {
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         setHotelName(updatedValue.HotelName)
@@ -35,20 +33,21 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}SubmitedGuestDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${moment(checkInD).format("DD/MMM/YYYY")}&toDate=${moment(checkOutD).format("DD/MMM/YYYY")}`, {}, config)
+        await axios.post(`${baseUrl}SubmitedGuestDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${checkInD}&toDate=${checkInD}`, {}, config)
             .then((res) => {
-                console.log(">>>>>>>>>>>", res.data.Result);
+                setIsLoading(false)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
             .catch(err => {
-                console.log("Error", err);
+                setIsLoading(false)
             });
     };
 
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
@@ -56,14 +55,16 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                 <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी रिपोर्ट</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
-            <View style={{ height: 70, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 20, marginTop: 20, borderWidth: 1, elevation: 2, borderColor: "#1b5372", padding: 10, paddingHorizontal: 20, justifyContent: "space-between" }}>
+            <View style={{ height: 90, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 20, marginTop: 20, borderWidth: 1, elevation: 2, borderColor: "#1b5372", padding: 10, paddingHorizontal: 20, justifyContent: "space-between" }}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <Text style={{ fontSize: 12, color: "#000" }}>होटल का नाम : {hotelName}</Text>
-                    <Text style={{ fontSize: 12, color: "#000" }}>कुल व्यक्ति संख्या  : {commonData.AddionalGuest}</Text>
+                    <Text style={{ fontSize: 12, color: "#000" }}>कुल व्यक्ति संख्या  : {guestData.length}</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}>सबमिट की तारीख : {commonData.CheckInDate}</Text>
-                    <Text style={{ fontSize: 12, color: "#000" }}>द्वारा प्रस्तुत रिपोर्ट : {commonData.SubmitBy}</Text>
+                    <Text style={{ fontSize: 12, color: "#000" }}>सबमिट की तारीख : {checkInD}</Text>
+                </View>
+                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <Text style={{ fontSize: 12, color: "#000" }}>द्वारा प्रस्तुत रिपोर्ट : {commonData.SubmitBy} ({moment(commonData.CreatedDate).format("DD-MMM-YYYY LT")})</Text>
                 </View>
 
             </View>
