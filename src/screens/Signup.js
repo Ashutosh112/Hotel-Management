@@ -270,8 +270,8 @@ const Signup = ({ navigation }) => {
                         <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
                         <View style={{ justifyContent: "center", alignItems: "center", marginTop: 15 }}>
                             <Image source={Logo} style={{ height: 80, width: 80 }} resizeMode='contain' />
-                            <Text style={styles.text}>Hotel Guest Registration</Text>
-                            <Text style={styles.text2}>Register to create account</Text>
+                            <Text style={[styles.text2, { marginTop: 5, fontWeight: "500" }]}>Hotel Guest<Text style={[styles.text2, { marginTop: 5, fontWeight: "400" }]}> Reporting System</Text></Text>
+                            <Text style={styles.text2}>Property Registration Page</Text>
                         </View>
 
                         <View style={styles.inputContainer}>
@@ -614,9 +614,8 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     text2: {
-        color: "grey",
-        fontSize: 16,
-        fontWeight: "400"
+        color: "#666666",
+        fontSize: 18,
     },
     buttonContainer: {
         borderRadius: 20,

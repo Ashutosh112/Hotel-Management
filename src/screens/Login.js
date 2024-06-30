@@ -102,8 +102,8 @@ const Login = ({ navigation }) => {
 
         <View style={styles.logoContainer2}>
           <Logo2 />
-          <Text style={[styles.text2, { marginTop: 5, fontWeight: "700" }]}>Welcome back!</Text>
-          <Text style={styles.text2}>Please login to continue</Text>
+          <Text style={[styles.text2, { marginTop: 5, fontWeight: "500" }]}>Hotel Guest<Text style={[styles.text2, { marginTop: 5, fontWeight: "400" }]}> Reporting System</Text></Text>
+          <Text style={styles.text2}>Hotel Login</Text>
 
           <Formik
             initialValues={{ mobileNumber: '' }}
@@ -132,14 +132,14 @@ const Login = ({ navigation }) => {
                 {errors.mobileNumber && touched.mobileNumber && <Text style={styles.errorText}>{errors.mobileNumber}</Text>}
 
                 <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-                  <Text style={styles.button}>Login</Text>
+                  <Text style={styles.button}>Send OTP</Text>
                 </TouchableOpacity>
               </View>
             )}
           </Formik>
           <Text style={[styles.greyText, { marginTop: 5, color: "grey", fontWeight: "300" }]}>Continue with</Text>
 
-          <TouchableOpacity style={[styles.buttonContainer, { backgroundColor: "#fff", borderWidth: 1, borderColor: '#E3E2E2', flexDirection: "row" }]} >
+          <TouchableOpacity onPress={() => alert("Currently Google login is not available, Please login by Mobile Number")} style={[styles.buttonContainer, { backgroundColor: "#fff", borderWidth: 1, borderColor: '#E3E2E2', flexDirection: "row" }]} >
             <GoogleLogo />
             <Text style={[styles.button, { color: "#000", fontWeight: "400", marginLeft: 10 }]}>Google</Text>
           </TouchableOpacity>
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   text2: {
-    color: "#000",
+    color: "#666666",
     fontSize: 18,
   },
   logoContainer1: {
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1AA7FF'
   },
   button: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
     color: '#fff',
     fontWeight: "500"

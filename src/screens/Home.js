@@ -12,6 +12,9 @@ import HamburgerLogo from "../assets/images/HamburgerLogo.svg"
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
+import ContactUs from "react-native-vector-icons/AntDesign"
+import PrivacyPolicyIcon from "react-native-vector-icons/MaterialIcons"
+
 
 const Home = ({ navigation }) => {
 
@@ -146,7 +149,31 @@ const Home = ({ navigation }) => {
                         <HomeIcon5 />
                     </View>
                     <View style={{ flex: 6 }}>
-                        <Text style={styles.text}>कल कोई चेक इन नहीं हुआ</Text>
+                        <Text style={styles.text}>जीरो चेक इन रिपोर्ट</Text>
+                    </View>
+                    <View style={{ flex: 1.5, alignItems: "center" }}>
+                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("ContactWithUS")}>
+                    <View style={{ flex: 1 }}>
+                        <ContactUs name="contacts" size={24} color='#1AA7FF' />
+                    </View>
+                    <View style={{ flex: 6 }}>
+                        <Text style={styles.text}>हमसे संपर्क करें</Text>
+                    </View>
+                    <View style={{ flex: 1.5, alignItems: "center" }}>
+                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("PrivacyPolicy")}>
+                    <View style={{ flex: 1 }}>
+                        <PrivacyPolicyIcon name="policy" size={24} color='#1AA7FF' />
+                    </View>
+                    <View style={{ flex: 6 }}>
+                        <Text style={styles.text}>महत्वपूर्ण नियम एवं शर्तें</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />

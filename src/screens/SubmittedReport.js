@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Dimensions, ScrollView, Image, Modal, Pressable } from 'react-native';
-import DatePicker from 'react-native-date-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import BackIcon from "react-native-vector-icons/Ionicons";
 import InfoIcon from "react-native-vector-icons/Feather";
 import { baseUrl } from '../utils/env';
@@ -10,10 +10,11 @@ import moment from 'moment';
 import Logo from "../assets/images/submittedReport.png";
 
 const SubmittedReport = ({ navigation }) => {
-    const [checkinDate, setCheckinDate] = useState(null);
-    const [checkoutDate, setCheckoutDate] = useState(null);
-    const [open, setOpen] = useState(false);
-    const [open2, setOpen2] = useState(false);
+    const today = new Date();
+    const [checkinDate, setCheckinDate] = useState(new Date(today.setDate(today.getDate() - 7)));
+    const [checkoutDate, setCheckoutDate] = useState(new Date());
+    const [showCheckinPicker, setShowCheckinPicker] = useState(false);
+    const [showCheckoutPicker, setShowCheckoutPicker] = useState(false);
     const [data, setData] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -45,6 +46,19 @@ const SubmittedReport = ({ navigation }) => {
         }
     }, [checkinDate, checkoutDate]);
 
+    const onChangeCheckinDate = (event, selectedDate) => {
+        setShowCheckinPicker(false);
+        if (selectedDate) {
+            setCheckinDate(selectedDate);
+        }
+    };
+
+    const onChangeCheckoutDate = (event, selectedDate) => {
+        setShowCheckoutPicker(false);
+        if (selectedDate) {
+            setCheckoutDate(selectedDate);
+        }
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -68,44 +82,33 @@ const SubmittedReport = ({ navigation }) => {
                     <Text style={styles.lableText}>दिनांक तक*</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                    <DatePicker
-                        modal
-                        mode='date'
-                        open={open}
-                        date={checkinDate || new Date()}
-                        onConfirm={(date) => {
-                            setOpen(false);
-                            setCheckinDate(date);
-                        }}
-                        onCancel={() => {
-                            setOpen(false);
-                        }}
-                    />
-                    <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setOpen(true)}>
-                        <Text>{checkinDate ? moment(checkinDate).format("DD/MMM/YYYY") : "दिनांक से*"}</Text>
+                    <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setShowCheckinPicker(true)}>
+                        <Text>{checkinDate ? moment(checkinDate).format("DD-MMM-YYYY") : "दिनांक से*"}</Text>
                     </TouchableOpacity>
-                    <DatePicker
-                        modal
-                        mode='date'
-                        open={open2}
-                        date={checkoutDate || new Date()}
-                        onConfirm={(date) => {
-                            setOpen2(false);
-                            setCheckoutDate(date);
-                        }}
-                        onCancel={() => {
-                            setOpen2(false);
-                        }}
-                    />
-                    <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setOpen2(true)}>
-                        <Text>{checkoutDate ? moment(checkoutDate).format("DD/MMM/YYYY") : "दिनांक तक*"}</Text>
+                    <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setShowCheckoutPicker(true)}>
+                        <Text>{checkoutDate ? moment(checkoutDate).format("DD-MMM-YYYY") : "दिनांक तक*"}</Text>
                     </TouchableOpacity>
                 </View>
+                {showCheckinPicker && (
+                    <DateTimePicker
+                        value={checkinDate}
+                        mode="date"
+                        display="default"
+                        onChange={onChangeCheckinDate}
+                    />
+                )}
+                {showCheckoutPicker && (
+                    <DateTimePicker
+                        value={checkoutDate}
+                        mode="date"
+                        display="default"
+                        onChange={onChangeCheckoutDate}
+                    />
+                )}
             </View>
             {!checkinDate || !checkoutDate ? (
                 <Text style={styles.noDataText}>डेटा देखने के लिए दिनांक चुनें</Text>
             ) : loading ? (
-
                 <Text style={styles.noDataText}>Loading...</Text>
             ) : data.length === 0 ? (
                 <Text style={styles.noDataText}>कोई डेटा नहीं!</Text>
@@ -130,14 +133,12 @@ const SubmittedReport = ({ navigation }) => {
             <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
                 <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
                     <View style={styles.modalView}>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Text style={styles.modalText}>पुलिस स्टेशन में सबमिट की गई रिपोर्ट.</Text>
-                            <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
-                            <Text style={styles.modalText}>इस पोर्टल पर आप एक महीने तक की पुरानी रिपोर्ट देख सकते हैं। अपने रिकॉर्ड के लिए आप समय-समय पर रिपोर्ट डाउनलोड कर के रख सकते हैं।</Text>
-                            <Pressable style={styles.modalButton} onPress={() => setOpenModal(false)}>
-                                <Text style={styles.textStyle}>ठीक</Text>
-                            </Pressable>
-                        </View>
+                        <Text style={styles.modalText}>पुलिस स्टेशन में सबमिट की गई रिपोर्ट.</Text>
+                        <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>इस पोर्टल पर आप एक महीने तक की पुरानी रिपोर्ट देख सकते हैं। अपने रिकॉर्ड के लिए आप समय-समय पर रिपोर्ट डाउनलोड कर के रख सकते हैं।</Text>
+                        <Pressable style={styles.modalButton} onPress={() => setOpenModal(false)}>
+                            <Text style={styles.textStyle}>ठीक</Text>
+                        </Pressable>
                     </View>
                 </Pressable>
             </Modal>
@@ -210,29 +211,28 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     text: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: "400",
         color: "#36454F",
         marginTop: 5
     },
     modalView: {
-        height: Dimensions.get("window").height / 2.6,
         margin: 20,
         backgroundColor: "white",
         borderRadius: 15,
-        paddingHorizontal: 40,
-        paddingVertical: 0,
+        padding: 20,
         alignItems: "center",
         justifyContent: "center"
     },
     textStyle: {
         color: "white",
         textAlign: "center",
+        fontSize: 12
     },
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 14,
+        fontSize: 12,
         marginVertical: 10
     },
     itemContainer: {

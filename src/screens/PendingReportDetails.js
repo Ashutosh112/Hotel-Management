@@ -84,6 +84,7 @@ import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'
 import Spinner from './Spinner';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 const PendingReportDetails = ({ navigation, route }) => {
 
@@ -113,6 +114,7 @@ const PendingReportDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("GGGGGG>>>>>", res.data.Result)
                 setGuestData(res.data.Result);
             })
             .catch(err => {
@@ -128,31 +130,31 @@ const PendingReportDetails = ({ navigation, route }) => {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
                 </TouchableOpacity>
-                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी रिपोर्ट</Text>
+                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पेंडिंग रिपोर्ट डिटेल</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
-            <View style={{ height: 90, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 20, marginTop: 20, borderWidth: 1, borderColor: "#1b5372", padding: 10, paddingHorizontal: 20, justifyContent: "space-between" }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}>होटल का नाम : {commonData.HotelName}</Text>
-                    <Text style={{ fontSize: 12, color: "#000" }}>कुल व्यक्ति संख्या  : {guestData.length}</Text>
-                </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}>चेक इन तारीख : {SubmitDate}</Text>
-                </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    {/* <Text style={{ fontSize: 12, color: "#000" }}>चेक आउट तारीख : {commonData.CheckOutDate}</Text> */}
-                    <Text style={{ fontSize: 12, color: "#000" }}>रिपोर्ट सबमिट : {commonData.isSubmitted == true ? "हाँ" : "रिपोर्ट सबमिट नहीं की गई है।"}</Text>
 
-
+            <View style={{ paddingVertical: 10, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 15, marginTop: 20, borderWidth: 1, borderColor: "#1b5372", paddingHorizontal: 15 }}>
+                <View style={{ justifyContent: "space-between" }}>
+                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>होटल का नाम :</Text> {commonData.HotelName}</Text>
+                </View>
+                <View style={{ justifyContent: "space-between", marginTop: 8 }}>
+                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>चेक इन तारीख :</Text> {SubmitDate}</Text>
+                </View>
+                <View style={{ justifyContent: "space-between", marginTop: 8 }}>
+                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>रिपोर्ट सबमिट :</Text> {commonData.isSubmitted == true ? "हाँ" : "रिपोर्ट सबमिट नहीं की गई है।"}</Text>
+                </View>
+                <View style={{ justifyContent: "space-between", marginTop: 8 }}>
+                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>कुल व्यक्ति संख्या :</Text> {guestData.length}</Text>
                 </View>
             </View>
 
             {guestData.map((item, index) => (
                 <View key={index} style={styles.guestContainer}>
                     <View style={styles.guestHeader}>
-                        <Text style={styles.guestHeaderText}>Guest {index + 1}</Text>
+                        <Text style={styles.guestHeaderText}>अतिथि क्र. {index + 1}</Text>
                     </View>
-                    <View style={styles.guestContent}>
+                    <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" />
                         </View>
@@ -162,21 +164,19 @@ const PendingReportDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContent}>
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={[styles.text, { textTransform: "capitalize" }]}>नाम : {item.GuestName} {item.GuestLastName}</Text>
-                            <Text style={styles.text2}>जेंडर : {item.gender}</Text>
-                            <Text style={styles.text2}>मोबाइल नंबर	 : {item.ContactNo}</Text>
-                            <Text style={styles.text2}>पता : {item.Address}</Text>
-                            <Text style={styles.text2}></Text>
+                            <Text style={[styles.text2, { textTransform: "capitalize" }]}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>नाम :</Text> {item.GuestName} {item.GuestLastName}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>जेंडर :</Text> {item.gender}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>मोबाइल नंबर :</Text> {item.ContactNo}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>पता :</Text> {item.Address}</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={styles.text2}>यात्रा का उद्देश्य : {item.TravelReson}</Text>
-                            <Text style={styles.text2}>आईडी प्रकार	 : {item.IdentificationType}</Text>
-                            <Text style={styles.text2}>आईडी नंबर	 : {item.IdentificationNo}</Text>
-                            <Text style={styles.text2}></Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>यात्रा का उद्देश्य :</Text> {item.TravelReson}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>आईडी प्रकार :</Text> {item.IdentificationType}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>आईडी नंबर :</Text> {item.IdentificationNo}</Text>
                         </View>
                     </View>
                     <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end", marginBottom: 10, marginHorizontal: 30 }}>
-                        <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5 }} >
+                        <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5, marginTop: 10 }} >
                             <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
                         </Pressable>
                     </View>
@@ -196,14 +196,13 @@ const styles = StyleSheet.create({
     guestContainer: {
         flex: 1,
         backgroundColor: "white",
-        marginHorizontal: 20,
-        // height: Dimensions.get("window").height / 2,
+        marginHorizontal: 15,
         borderRadius: 10,
         elevation: 2,
-        // justifyContent: "center",
+        justifyContent: "center",
         // alignItems: "center",
         marginBottom: 10,
-        marginTop: 10
+        marginTop: 15
     },
     guestHeader: {
         height: 40,
@@ -227,11 +226,16 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginVertical: 10,
     },
+    guestContentImage: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginHorizontal: 10,
+    },
     image: {
-        height: 100,
-        width: 150,
-        // marginHorizontal: 5,
-        borderRadius: 12,
+        height: verticalScale(120),
+        width: scale(120),
     },
     text: {
         fontSize: 12,

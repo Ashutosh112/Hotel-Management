@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Modal, Pressable } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
@@ -14,6 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import InfoIcon from "react-native-vector-icons/Feather"
+import Alert from "react-native-vector-icons/Ionicons";
 
 
 const validationSchema = Yup.object().shape({
@@ -47,6 +49,9 @@ const CreateReport = ({ navigation }) => {
     const [checkoutDate, setCheckoutDate] = useState(new Date());
     const [showCheckinPicker, setShowCheckinPicker] = useState(false);
     const [showCheckoutPicker, setShowCheckoutPicker] = useState(false);
+    const [openModal, setOpenModal] = useState(false)
+    const [openModal2, setOpenModal2] = useState(false)
+
 
     const onChangeCheckin = (event, selectedDate) => {
         const currentDate = selectedDate || checkinDate;
@@ -211,8 +216,8 @@ const CreateReport = ({ navigation }) => {
             idGuestMaster: updatedValue.idHotelMaster,
             idHotel: hotelData?.idHotelMaster,
             contactNo: values.mobileNumber,
-            checkInDate: values.checkinDate,
-            checkOutDate: values.checkoutDate,
+            checkInDate: moment(values.checkinDate).format("DD-MMM-YYYY"),
+            checkOutDate: moment(values.checkoutDate).format("DD-MMM-YYYY"),
             description: "None",
             bActive: true,
             guestName: values.firstName,
@@ -236,10 +241,10 @@ const CreateReport = ({ navigation }) => {
             city: values.city,
             pIncode: values.pin,
             filePass: "7d465d03", // Example filePass value
-            image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg", // Replace with actual image 1 filename or identifier
-            image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg" // Replace with actual image 2 filename or identifier
+            image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
+            image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
         };
-
+        console.log(">>>>>>>>>>>>>>>", body)
         axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 navigation.navigate("BottomNavigator")
@@ -259,76 +264,87 @@ const CreateReport = ({ navigation }) => {
             });
     };
     return (
-        <Formik
-            initialValues={{
-                checkinDate: '',
-                checkoutDate: '',
-                guestCount: 1,
-                firstName: '',
-                lastName: '',
-                gender: '',
-                mobileNumber: '',
-                travelReason: 'दर्शन',
-                address: '',
-                city: '',
-                pin: '',
-                idType: 'आधार कार्ड',
-                idNumber: '',
-                idFront: [],
-                idBack: [],
-                // Initial values for additional guests
-                guestFirstName1: '',
-                guestLastName1: '',
-                guestGender1: '',
-                guestIdType1: '',
-                guestIdNumber1: '',
-                // Add more fields as needed
-            }}
-            validationSchema={validationSchema}
-            onSubmit={values => {
-                sendFormData(values, hotelData);
-            }} >
-            {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
-                <ScrollView style={styles.container}>
-                    <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
-                        </TouchableOpacity>
-                        <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>प्राथमिक अतिथि की जानकारी</Text>
-                    </View>
-                    <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
-                    <View style={styles.inputContainer}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+        <>
+
+            <Formik
+                initialValues={{
+                    checkinDate: new Date(), // Default to today's date
+                    checkoutDate: new Date(), // Default to today's date
+                    guestCount: 1,
+                    firstName: '',
+                    lastName: '',
+                    gender: '',
+                    mobileNumber: '',
+                    travelReason: 'दर्शन',
+                    address: '',
+                    city: '',
+                    pin: '',
+                    idType: 'आधार कार्ड',
+                    idNumber: '',
+                    idFront: [],
+                    idBack: [],
+                    // Initial values for additional guests
+                    guestFirstName1: '',
+                    guestLastName1: '',
+                    guestGender1: '',
+                    guestIdType1: '',
+                    guestIdNumber1: '',
+                    // Add more fields as needed
+                }}
+                validationSchema={validationSchema}
+                onSubmit={values => {
+                    sendFormData(values, hotelData);
+                }} >
+                {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
+                    <ScrollView style={styles.container}>
+
+                        <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                            <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
+                                <TouchableOpacity onPress={() => navigation.goBack()}>
+                                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                                </TouchableOpacity>
+                                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>प्राथमिक अतिथि की जानकारी</Text>
+                            </View>
+
+                            <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
+                                <TouchableOpacity onPress={() => setOpenModal(true)}>
+                                    <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='प्रथम नाम*'
-                                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-                                onChangeText={handleChange('firstName')}
-                                onBlur={handleBlur('firstName')}
-                                value={values.firstName}
-                            />
-                            <TextInput
-                                placeholderTextColor='darkgrey'
-                                placeholder='अंतिम नाम*'
-                                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-                                onChangeText={handleChange('lastName')}
-                                onBlur={handleBlur('lastName')}
-                                value={values.lastName}
-                            />
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.firstName && errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
-                            {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>चेक इन तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            <Text style={styles.lableText}>चेक आउट तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                        <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
+                        <View style={styles.inputContainer}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <TextInput
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='प्रथम नाम*'
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                    onChangeText={handleChange('firstName')}
+                                    onBlur={handleBlur('firstName')}
+                                    value={values.firstName}
+                                />
+                                <TextInput
+                                    placeholderTextColor='darkgrey'
+                                    placeholder='अंतिम नाम*'
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                    onChangeText={handleChange('lastName')}
+                                    onBlur={handleBlur('lastName')}
+                                    value={values.lastName}
+                                />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.firstName && errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
+                                {touched.lastName && errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>चेक इन तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>चेक आउट तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                             <DatePicker
                                 modal
                                 mode='date'
@@ -367,345 +383,391 @@ const CreateReport = ({ navigation }) => {
                             </TouchableOpacity>
                         </View> */}
 
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            <TouchableOpacity
-                                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
-                                onPress={() => setShowCheckinPicker(true)}>
-                                <Text>{checkinDate ? moment(checkinDate).format("DD-MM-YYYY") : "चेक इन तारीख*"}</Text>
-                                <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
-                            </TouchableOpacity>
-
-                            {showCheckinPicker && (
-                                <DateTimePicker
-                                    value={checkinDate}
-                                    mode="date"
-                                    display="default"
-                                    onChange={onChangeCheckin}
-                                    minimumDate={new Date()}
-                                />
-                            )}
-
-                            <TouchableOpacity
-                                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
-                                onPress={() => setShowCheckoutPicker(true)}>
-                                <Text>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
-                                <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
-                            </TouchableOpacity>
-
-                            {showCheckoutPicker && (
-                                <DateTimePicker
-                                    value={checkoutDate}
-                                    mode="date"
-                                    display="default"
-                                    onChange={onChangeCheckout}
-                                    minimumDate={new Date()}
-                                />
-                            )}
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.checkinDate && errors.checkinDate ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.checkinDate}</Text> : null}
-                            {touched.checkoutDate && errors.checkoutDate ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.checkoutDate}</Text> : null}
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>मोबाइल नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <TextInput
-                            maxLength={10}
-                            keyboardType='number-pad'
-                            placeholderTextColor='darkgrey'
-                            placeholder='मोबाइल नंबर*'
-                            style={[styles.input, { marginTop: 8 }]}
-                            onChangeText={handleChange('mobileNumber')}
-                            onBlur={handleBlur('mobileNumber')}
-                            value={values.mobileNumber} />
-                        {touched.mobileNumber && errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            <Text style={styles.lableText}>गेस्ट की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            <Dropdown
-                                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                itemTextStyle={styles.selectedTextStyle}
-                                data={genderData}
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder="जेंडर*"
-                                value={selectgender}
-                                onChange={item => {
-                                    setSelectgender(item.value);
-                                    setFieldValue('gender', item.value);
-                                }} />
-                            <Dropdown
-                                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                itemTextStyle={styles.selectedTextStyle}
-                                data={totalNoofGuest}
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder='कुल गेस्ट संख्या*'
-                                value={guestCount}
-                                onChange={item => {
-                                    setGuestCount(item.value);
-                                    setFieldValue('guestCount', item.value);
-                                }} />
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.gender}</Text> : null}
-                            {touched.guestCount && errors.guestCount ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.guestCount}</Text> : null}
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>यात्रा का उद्देश्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <Dropdown
-                            style={[styles.input, { marginTop: 8 }]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            itemTextStyle={styles.selectedTextStyle}
-                            data={travelReasonData}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder="यात्रा का उद्देश्य*"
-                            value={travelReason}
-                            onChange={item => {
-                                setTravelReason(item.value);
-                                setFieldValue('travelReason', item.value);
-                            }} />
-                        {touched.travelReason && errors.travelReason ? <Text style={styles.errorText}>{errors.travelReason}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>पता<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <TextInput
-                            placeholderTextColor='darkgrey'
-                            placeholder='पता*'
-                            style={[styles.input, { marginTop: 8 }]}
-                            onChangeText={handleChange('address')}
-                            onBlur={handleBlur('address')}
-                            value={values.address} />
-                        {touched.address && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <TextInput
-                            placeholderTextColor='darkgrey'
-                            placeholder='शहर*'
-                            style={[styles.input, { marginTop: 8 }]}
-                            onChangeText={handleChange('city')}
-                            onBlur={handleBlur('city')}
-                            value={values.city}
-                        />
-                        {touched.city && errors.city ? <Text style={styles.errorText}>{errors.city}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>पिन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <TextInput
-                            placeholderTextColor='darkgrey'
-                            placeholder='पिन*'
-                            style={[styles.input, { marginTop: 8 }]}
-                            onChangeText={handleChange('pin')}
-                            onBlur={handleBlur('pin')}
-                            value={values.pin}
-                            keyboardType='number-pad'
-                        />
-                        {touched.pin && errors.pin ? <Text style={styles.errorText}>{errors.pin}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <Dropdown
-                            style={[styles.input, { marginTop: 8 }]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            data={idTypeData}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder="आईडी प्रकार*"
-                            value={idSelect}
-                            onChange={item => {
-                                setIdSelect(item.value);
-                                setFieldValue('idType', item.value);
-                            }} />
-                        {touched.idType && errors.idType ? <Text style={styles.errorText}>{errors.idType}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <TextInput
-                            placeholderTextColor='darkgrey'
-                            placeholder='आईडी नंबर*'
-                            style={[styles.input, { marginTop: 8 }]}
-                            onChangeText={handleChange('idNumber')}
-                            onBlur={handleBlur('idNumber')}
-                            value={values.idNumber}
-                        />
-                        {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                            <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {values.idFront.length > 0 ? (
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                                 <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
-                                    <Text>Image Uploaded</Text>
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
+                                    onPress={() => setShowCheckinPicker(true)}>
+                                    <Text>{checkinDate ? moment(checkinDate).format("DD-MM-YYYY") : "चेक इन तारीख*"}</Text>
+                                    <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                                 </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
-                                    <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                </TouchableOpacity>
-                            )}
-                            {values.idBack.length > 0 ? (
-                                <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
-                                    <Text>Image Uploaded</Text>
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity
-                                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
-                                    <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Front</Text>}
-                            {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Back</Text>}
-                        </View>
 
-                        {/* Render additional guest forms */}
-                        {[...Array(Math.max(values.guestCount - 1, 0))].map((_, index) => (
-                            <View key={index} style={styles.inputContainer}>
-                                <Text style={{ fontSize: 20, color: "#000", marginBottom: 10 }}>Guest {index + 2}</Text>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                    <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='प्रथम नाम*'
-                                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-                                        onChangeText={handleChange(`guestFirstName${index + 1}`)}
-                                        onBlur={handleBlur(`guestFirstName${index + 1}`)}
-                                        value={values[`guestFirstName${index + 1}`]} />
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='अंतिम नाम*'
-                                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-                                        onChangeText={handleChange(`guestLastName${index + 1}`)}
-                                        onBlur={handleBlur(`guestLastName${index + 1}`)}
-                                        value={values[`guestLastName${index + 1}`]} />
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    {touched[`guestFirstName${index + 1}`] && errors[`guestFirstName${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestFirstName${index + 1}`]}</Text> : null}
-                                    {touched[`guestLastName${index + 1}`] && errors[`guestLastName${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestLastName${index + 1}`]}</Text> : null}
-                                </View>
-
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                    <Text style={styles.lableText}>लिंग<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                    <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    <Dropdown
-                                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-
-                                        placeholderStyle={{ color: 'darkgrey' }}
-                                        selectedTextStyle={{ color: '#000', fontSize: 14 }}
-                                        data={[{ label: 'Male', value: 'Male' }, { label: 'Female', value: 'Female' }]}
-                                        labelField="label"
-                                        valueField="value"
-                                        placeholder='लिंग*'
-                                        value={values[`guestGender${index + 1}`]}
-                                        onChange={item => {
-                                            setFieldValue(`guestGender${index + 1}`, item.value);
-                                        }}
+                                {showCheckinPicker && (
+                                    <DateTimePicker
+                                        value={checkinDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={onChangeCheckin}
+                                        minimumDate={new Date()}
                                     />
-                                    <Dropdown
-                                        style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                )}
 
-                                        placeholderStyle={{ color: 'darkgrey' }}
-                                        selectedTextStyle={{ color: '#000', fontSize: 14 }}
-                                        data={[{ label: 'Passport', value: 'Passport' }, { label: 'Aadhar', value: 'Aadhar' }, { label: 'Voter ID', value: 'Voter ID' }]}
-                                        labelField="label"
-                                        valueField="value"
-                                        placeholder='आईडी प्रकार*'
-                                        value={values[`guestIdType${index + 1}`]}
-                                        onChange={item => {
-                                            setFieldValue(`guestIdType${index + 1}`, item.value);
-                                        }}
+                                <TouchableOpacity
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
+                                    onPress={() => setShowCheckoutPicker(true)}>
+                                    <Text>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
+                                    <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
+                                </TouchableOpacity>
+
+                                {showCheckoutPicker && (
+                                    <DateTimePicker
+                                        value={checkoutDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={onChangeCheckout}
+                                        minimumDate={new Date()}
                                     />
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    {touched[`guestGender${index + 1}`] && errors[`guestGender${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestGender${index + 1}`]}</Text> : null}
-                                    {touched[`guestIdType${index + 1}`] && errors[`guestIdType${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestIdType${index + 1}`]}</Text> : null}
-                                </View>
-
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                    <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    <TextInput
-                                        placeholderTextColor='darkgrey'
-                                        placeholder='आईडी नंबर*'
-                                        style={[styles.input, { width: "100%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-                                        onChangeText={handleChange(`guestIdNumber${index + 1}`)}
-                                        onBlur={handleBlur(`guestIdNumber${index + 1}`)}
-                                        value={values[`guestIdNumber${index + 1}`]} />
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    {touched[`guestIdNumber${index + 1}`] && errors[`guestIdNumber${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "100%", }]}>{errors[`guestIdNumber${index + 1}`]}</Text> : null}
-                                </View>
-
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                    <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                    {values[`guestImage1${index + 1}`]?.length > 0 ? (
-                                        <TouchableOpacity
-                                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
-                                            onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}>
-                                            <Text>Image Uploaded</Text>
-                                        </TouchableOpacity>
-                                    ) : (
-                                        <TouchableOpacity
-                                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
-                                            onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}>
-                                            <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                        </TouchableOpacity>
-                                    )}
-
-                                    {values[`guestImage2${index + 1}`]?.length > 0 ? (
-                                        <TouchableOpacity
-                                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
-                                            onPress={() => selectIdBackFile(setFieldValue, `guestIdBack${index + 1}`)}>
-                                            <Text>Image Uploaded</Text>
-                                        </TouchableOpacity>
-                                    ) : (
-                                        <TouchableOpacity
-                                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
-                                            onPress={() => selectIdBackFile(setFieldValue, `guestIdBack${index + 1}`)}>
-                                            <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
-                                        </TouchableOpacity>
-                                    )}
-                                </View>
+                                )}
                             </View>
-                        ))}
-                        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-                            <Text style={styles.button}>Save</Text>
-                        </TouchableOpacity>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.checkinDate && errors.checkinDate ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.checkinDate}</Text> : null}
+                                {touched.checkoutDate && errors.checkoutDate ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.checkoutDate}</Text> : null}
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>मोबाइल नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                maxLength={10}
+                                keyboardType='number-pad'
+                                placeholderTextColor='darkgrey'
+                                placeholder='मोबाइल नंबर*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('mobileNumber')}
+                                onBlur={handleBlur('mobileNumber')}
+                                value={values.mobileNumber} />
+                            {touched.mobileNumber && errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>गेस्ट की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                <Dropdown
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    itemTextStyle={styles.selectedTextStyle}
+                                    data={genderData}
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder="जेंडर*"
+                                    value={selectgender}
+                                    onChange={item => {
+                                        setSelectgender(item.value);
+                                        setFieldValue('gender', item.value);
+                                    }} />
+                                <Dropdown
+                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    itemTextStyle={styles.selectedTextStyle}
+                                    data={totalNoofGuest}
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder='कुल गेस्ट संख्या*'
+                                    value={guestCount}
+                                    onChange={item => {
+                                        setGuestCount(item.value);
+                                        setFieldValue('guestCount', item.value);
+                                    }} />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.gender}</Text> : null}
+                                {touched.guestCount && errors.guestCount ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.guestCount}</Text> : null}
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>यात्रा का उद्देश्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <Dropdown
+                                style={[styles.input, { marginTop: 8 }]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                itemTextStyle={styles.selectedTextStyle}
+                                data={travelReasonData}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                placeholder="यात्रा का उद्देश्य*"
+                                value={travelReason}
+                                onChange={item => {
+                                    setTravelReason(item.value);
+                                    setFieldValue('travelReason', item.value);
+                                }} />
+                            {touched.travelReason && errors.travelReason ? <Text style={styles.errorText}>{errors.travelReason}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>पता<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='पता*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('address')}
+                                onBlur={handleBlur('address')}
+                                value={values.address} />
+                            {touched.address && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='शहर*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('city')}
+                                onBlur={handleBlur('city')}
+                                value={values.city}
+                            />
+                            {touched.city && errors.city ? <Text style={styles.errorText}>{errors.city}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>पिन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='पिन*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('pin')}
+                                onBlur={handleBlur('pin')}
+                                value={values.pin}
+                                keyboardType='number-pad'
+                                maxLength={6}
+                            />
+                            {touched.pin && errors.pin ? <Text style={styles.errorText}>{errors.pin}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <Dropdown
+                                style={[styles.input, { marginTop: 8 }]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={idTypeData}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                placeholder="आईडी प्रकार*"
+                                value={idSelect}
+                                onChange={item => {
+                                    setIdSelect(item.value);
+                                    setFieldValue('idType', item.value);
+                                }} />
+                            {touched.idType && errors.idType ? <Text style={styles.errorText}>{errors.idType}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                placeholderTextColor='darkgrey'
+                                placeholder='आईडी नंबर*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('idNumber')}
+                                onBlur={handleBlur('idNumber')}
+                                value={values.idNumber}
+                            />
+                            {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {values.idFront.length > 0 ? (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
+                                        <Text>Image Uploaded</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdFrontFile(setFieldValue)}>
+                                        <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                    </TouchableOpacity>
+                                )}
+                                {values.idBack.length > 0 ? (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
+                                        <Text>Image Uploaded</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => selectIdBackFile(setFieldValue)}>
+                                        <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Front</Text>}
+                                {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>आईडी का Back</Text>}
+                            </View>
+
+                            {/* Render additional guest forms */}
+                            {[...Array(Math.max(values.guestCount - 1, 0))].map((_, index) => (
+                                <View key={index} style={styles.inputContainer}>
+                                    <Text style={{ fontSize: 20, color: "#000", marginBottom: 10 }}>Guest {index + 2}</Text>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                        <Text style={styles.lableText}>अंतिम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <TextInput
+                                            placeholderTextColor='darkgrey'
+                                            placeholder='प्रथम नाम*'
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                            onChangeText={handleChange(`guestFirstName${index + 1}`)}
+                                            onBlur={handleBlur(`guestFirstName${index + 1}`)}
+                                            value={values[`guestFirstName${index + 1}`]} />
+                                        <TextInput
+                                            placeholderTextColor='darkgrey'
+                                            placeholder='अंतिम नाम*'
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                            onChangeText={handleChange(`guestLastName${index + 1}`)}
+                                            onBlur={handleBlur(`guestLastName${index + 1}`)}
+                                            value={values[`guestLastName${index + 1}`]} />
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        {touched[`guestFirstName${index + 1}`] && errors[`guestFirstName${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestFirstName${index + 1}`]}</Text> : null}
+                                        {touched[`guestLastName${index + 1}`] && errors[`guestLastName${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestLastName${index + 1}`]}</Text> : null}
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                        <Text style={styles.lableText}>लिंग<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                        <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <Dropdown
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+
+                                            placeholderStyle={{ color: 'darkgrey' }}
+                                            selectedTextStyle={{ color: '#000', fontSize: 14 }}
+                                            data={[{ label: 'Male', value: 'Male' }, { label: 'Female', value: 'Female' }]}
+                                            labelField="label"
+                                            valueField="value"
+                                            placeholder='लिंग*'
+                                            value={values[`guestGender${index + 1}`]}
+                                            onChange={item => {
+                                                setFieldValue(`guestGender${index + 1}`, item.value);
+                                            }}
+                                        />
+                                        <Dropdown
+                                            style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+
+                                            placeholderStyle={{ color: 'darkgrey' }}
+                                            selectedTextStyle={{ color: '#000', fontSize: 14 }}
+                                            data={[{ label: 'Passport', value: 'Passport' }, { label: 'Aadhar', value: 'Aadhar' }, { label: 'Voter ID', value: 'Voter ID' }]}
+                                            labelField="label"
+                                            valueField="value"
+                                            placeholder='आईडी प्रकार*'
+                                            value={values[`guestIdType${index + 1}`]}
+                                            onChange={item => {
+                                                setFieldValue(`guestIdType${index + 1}`, item.value);
+                                            }}
+                                        />
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        {touched[`guestGender${index + 1}`] && errors[`guestGender${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestGender${index + 1}`]}</Text> : null}
+                                        {touched[`guestIdType${index + 1}`] && errors[`guestIdType${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors[`guestIdType${index + 1}`]}</Text> : null}
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                        <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        <TextInput
+                                            placeholderTextColor='darkgrey'
+                                            placeholder='आईडी नंबर*'
+                                            style={[styles.input, { width: "100%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                                            onChangeText={handleChange(`guestIdNumber${index + 1}`)}
+                                            onBlur={handleBlur(`guestIdNumber${index + 1}`)}
+                                            value={values[`guestIdNumber${index + 1}`]} />
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        {touched[`guestIdNumber${index + 1}`] && errors[`guestIdNumber${index + 1}`] ? <Text style={[styles.errorText, { marginLeft: 0, width: "100%", }]}>{errors[`guestIdNumber${index + 1}`]}</Text> : null}
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                        <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                        {values[`guestImage1${index + 1}`]?.length > 0 ? (
+                                            <TouchableOpacity
+                                                style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                                onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}>
+                                                <Text>Image Uploaded</Text>
+                                            </TouchableOpacity>
+                                        ) : (
+                                            <TouchableOpacity
+                                                style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                                onPress={() => selectIdFrontFile(setFieldValue, `guestIdFront${index + 1}`)}>
+                                                <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                            </TouchableOpacity>
+                                        )}
+
+                                        {values[`guestImage2${index + 1}`]?.length > 0 ? (
+                                            <TouchableOpacity
+                                                style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                                onPress={() => selectIdBackFile(setFieldValue, `guestIdBack${index + 1}`)}>
+                                                <Text>Image Uploaded</Text>
+                                            </TouchableOpacity>
+                                        ) : (
+                                            <TouchableOpacity
+                                                style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                                onPress={() => selectIdBackFile(setFieldValue, `guestIdBack${index + 1}`)}>
+                                                <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                </View>
+                            ))}
+                            <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                                <Text style={styles.button}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal2}>
+                            <Pressable style={styles.modalOverlay} onPress={() => setOpenModal2(false)}>
+                                <View style={styles.modalView}>
+                                    <Alert size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+
+                                    <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>गेस्ट की एंट्री सेव हो गयी है | आप अन्य गेस्ट की जानकारी ऐड कर सकते है या पेंडिंग रिपोर्ट पे जेक इस रिपोर्ट को सबमिट कर सकते है</Text>
+                                    <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
+                                        <Pressable style={styles.modalButton} onPress={() => navigation.navigate("BottomNavigator")}>
+                                            <Text style={styles.textStyle}>ठीक</Text>
+                                        </Pressable>
+                                        <Pressable style={styles.modalButton}>
+                                            <Text style={styles.textStyle}>अन्य गेस्ट जोडे</Text>
+                                        </Pressable>
+                                    </View>
+                                    <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
+                                        <Pressable style={styles.modalButton}>
+                                            <Text style={styles.textStyle}>रिपोर्ट सबमिट करे</Text>
+                                        </Pressable>
+                                        <Pressable style={styles.modalButton}>
+                                            <Text style={styles.textStyle}>रिपोर्ट देखे</Text>
+                                        </Pressable>
+                                    </View>
+                                </View>
+                            </Pressable>
+                        </Modal>
+                    </ScrollView>
+                )
+                }
+            </Formik >
+            <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
+                <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
+                    <View style={styles.modalView}>
+                        <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>अतिथि की जानकारी दर्ज करें</Text>
+                        <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>1. इस फॉर्म के माध्यम से आप गेस्ट की एंट्री सेव कर रहे हैं। इसे थाने में भेजने के लिए कृपया पेंडिंग रिपोर्ट में जाकर इस रिपोर्ट को सबमिट करें।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>2. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today)और कल(Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>4. 5MB से अधिक की इमेज अपलोड नहीं हो पाएगी। कृपया इमेज का साइज कम करके अपलोड करें।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>4. होटलों की जिम्मेदारी है कि वे वेबसाइट के माध्यम से सबमिट की गई सभी अतिथि जानकारी की सटीकता और वैधता सुनिश्चित करें। इसमें अतिथि के नाम, मोबाइल नंबर, और आधार विवरण की पुष्टि शामिल है।</Text>
+
+                        <Pressable style={styles.modalButton} onPress={() => setOpenModal(false)}>
+                            <Text style={styles.textStyle}>ठीक</Text>
+                        </Pressable>
                     </View>
-                </ScrollView>
-            )
-            }
-        </Formik >
+                </Pressable>
+            </Modal>
+        </>
+
     );
 };
 
@@ -774,7 +836,41 @@ const styles = StyleSheet.create({
         marginLeft: 0,
         width: "45%",
         marginTop: 10
-    }
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 15,
+        padding: 20,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    textStyle: {
+        color: "white",
+        textAlign: "center",
+        fontSize: 12
+    },
+    modalText: {
+        textAlign: "center",
+        color: "black",
+        fontSize: 12,
+        marginVertical: 10
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#00000060'
+    },
+    modalButton: {
+        backgroundColor: "#024063",
+        paddingHorizontal: 40,
+        paddingVertical: 12,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 10,
+        marginVertical: 10
+    },
 });
 
 

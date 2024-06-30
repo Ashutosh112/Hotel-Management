@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, ScrollView, Dimensions, Modal, Pressable } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import CheckBox from '@react-native-community/checkbox';
+import BackIcon from "react-native-vector-icons/Ionicons"
+import InfoIcon from "react-native-vector-icons/Feather"
 
 const NoCheckIn = ({ navigation }) => {
+
+    const [openModal, setOpenModal] = useState(false)
 
     const validationSchema = Yup.object().shape({
         reporterName: Yup.string()
@@ -16,8 +20,21 @@ const NoCheckIn = ({ navigation }) => {
     return (
         <ScrollView style={styles.container}>
             <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
+            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                    </TouchableOpacity>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>जीरो चेक इन रिपोर्ट</Text>
+                </View>
 
-            <Text style={{ fontSize: 16, color: "#000", marginTop: 20, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
+                <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
+                    <TouchableOpacity onPress={() => setOpenModal(true)}>
+                        <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+            <Text style={{ fontSize: 16, color: "#000", marginTop: 10, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
 
             <Formik
                 initialValues={{ reporterName: '', agreeToTerms: false }}
@@ -61,6 +78,20 @@ const NoCheckIn = ({ navigation }) => {
                     </View>
                 )}
             </Formik>
+            <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
+                <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
+                    <View style={styles.modalView}>
+                        <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>जीरो चेक इन रिपोर्ट</Text>
+                        <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>1. अगर कल आपकी प्रॉपर्टी में कोई चेक इन नहीं हुआ है, तो आप यहाँ से जीरो चेक इन रिपोर्ट को पुलिस स्टेशन में सबमिट कर सकते हैं।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>2. अगर आप कल की चेक इन रिपोर्ट पहले ही सबमिट कर चुके हैं, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify" }]}>3. अगर पेंडिंग रिपोर्ट सेक्शन में कल की तारीख की कोई चेक इन रिपोर्ट है, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
+                        <Pressable style={styles.modalButton} onPress={() => setOpenModal(false)}>
+                            <Text style={styles.textStyle}>ठीक</Text>
+                        </Pressable>
+                    </View>
+                </Pressable>
+            </Modal>
         </ScrollView>
     );
 };
@@ -109,5 +140,38 @@ const styles = StyleSheet.create({
         width: "100%",
         marginLeft: 70,
         fontSize: 12
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 15,
+        padding: 20,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    textStyle: {
+        color: "white",
+        textAlign: "center",
+    },
+    modalText: {
+        textAlign: "center",
+        color: "black",
+        fontSize: 14,
+        marginVertical: 10
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#00000060'
+    },
+    modalButton: {
+        backgroundColor: "#024063",
+        paddingHorizontal: 40,
+        paddingVertical: 12,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 10,
+        marginVertical: 10
     },
 });

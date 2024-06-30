@@ -18,6 +18,9 @@ import SubmittedReportDetails from '../../screens/SubmittedReportDetails';
 import ReportSubmitScreen from '../../screens/ReportSubmitScreen';
 import AddGuestInPendingReport from '../../screens/AddGuestInPendingReport';
 import Profile from '../../screens/Profile';
+import ContactWithUs from '../../screens/ContactWithUs';
+import PrivacyPolicy from '../../screens/PrivacyPolicy';
+import PrivacyPolicyDetail from '../../screens/PrivacyPolicyDetail';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,11 +49,14 @@ const StackNavigator = () => {
                     <Stack.Screen name="SubmittedReport" component={SubmittedReport} options={{ headerShown: false, headerTitle: "Submitted Report" }} />
                     <Stack.Screen name="SubmittedReportDetails" component={SubmittedReportDetails} options={{ headerShown: false, headerTitle: "Submitted Report" }} />
                     <Stack.Screen name="PendingReport" component={PendingReport} options={{ headerShown: false, headerTitle: "Pending Reports" }} />
-                    <Stack.Screen name="NoCheckIn" component={NoCheckIn} options={{ headerShown: true, headerTitle: "No Check In" }} />
+                    <Stack.Screen name="NoCheckIn" component={NoCheckIn} options={{ headerShown: false, headerTitle: "No Check In" }} />
                     <Stack.Screen name="PendingReportDetails" component={PendingReportDetails} options={{ headerShown: false, headerTitle: "Report Details" }} />
                     <Stack.Screen name="ReportSubmitScreen" component={ReportSubmitScreen} options={{ headerShown: false, headerTitle: "Report Submit" }} />
                     <Stack.Screen name="AddGuestInPendingReport" component={AddGuestInPendingReport} options={{ headerShown: false, headerTitle: "AddGuest In Pending Report" }} />
                     <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false, headerTitle: "Profile" }} />
+                    <Stack.Screen name="ContactWithUS" component={ContactWithUs} options={{ headerShown: false, headerTitle: "Contact With Us" }} />
+                    <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false, headerTitle: "Privacy Policy" }} />
+                    <Stack.Screen name="PrivacyPolicyDetail" component={PrivacyPolicyDetail} options={{ headerShown: false, headerTitle: "Privacy Policy Detail" }} />
 
 
                 </Stack.Navigator>

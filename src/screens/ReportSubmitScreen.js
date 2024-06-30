@@ -142,44 +142,40 @@ const ReportSubmitScreen = ({ navigation, route }) => {
                             </View>
                         }
 
-                        {/* Open modal for Logout start */}
-                        <Modal transparent={true}
-                            animationType={'fade'}
-                            hardwareAccelerated={true}
-                            visible={openModal}>
-
-                            <Pressable onPress={() => { setOpenModal(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+                        {/* Open modal for SUBMI REPORT start */}
+                        <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
+                            <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
                                 <View style={styles.modalView}>
-                                    <View style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
                                         <Alert size={50} name="alert-circle-outline" color='#024063' />
+                                    </View>
 
-                                    </View>
-                                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                        <Text style={styles.modalText}>आप {SubmitDate} के लिए गेस्ट रिपोर्ट को सबमिट कर रहे है| एक बार रिपोर्ट सबमिट होने के बाद आप उसमे किसी भी तरह का चेंज नहीं कर सकते है और नहीं {SubmitDate} के लिए आप फिर से रिपोर्ट सबमिट कर पाएंगे |</Text>
-                                    </View>
-                                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                        <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row" }}>
-                                            <Pressable
-                                                style={{ backgroundColor: "#024063", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 10 }}
-                                                onPress={handleSubmit} >
-                                                <Text style={styles.textStyle}>सब्मिट करे</Text>
-                                            </Pressable>
-                                            <Pressable
-                                                style={{ backgroundColor: "#000", paddingHorizontal: 50, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 10, marginLeft: 40 }}
-                                                onPress={() => { setOpenModal(false) }} >
-                                                <Text style={styles.textStyle}>रद्द</Text>
-                                            </Pressable>
-                                        </View>
+                                    <Text style={styles.modalText}>आप {SubmitDate} के लिए गेस्ट रिपोर्ट को सबमिट कर रहे है| एक बार रिपोर्ट सबमिट होने के बाद आप उसमे किसी भी तरह का चेंज नहीं कर सकते है और नहीं {SubmitDate} के लिए आप फिर से रिपोर्ट सबमिट कर पाएंगे |</Text>
+                                    <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
+                                    <Text style={[styles.modalText, { textAlign: "justify" }]}>1. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
+                                    <Text style={[styles.modalText, { textAlign: "justify" }]}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
+
+                                    <View style={{ width: "100%", justifyContent: "space-around", flexDirection: "row" }}>
+                                        <Pressable
+                                            style={{ backgroundColor: "#024063", paddingHorizontal: 30, paddingVertical: 12, borderRadius: 10, marginTop: 30 }}
+                                            onPress={handleSubmit} >
+                                            <Text style={styles.textStyle}>सब्मिट करे</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            style={{ backgroundColor: "#000", paddingHorizontal: 50, paddingVertical: 12, borderRadius: 10, marginTop: 30 }}
+                                            onPress={() => { setOpenModal(false) }} >
+                                            <Text style={styles.textStyle}>रद्द</Text>
+                                        </Pressable>
                                     </View>
                                 </View>
                             </Pressable>
                         </Modal>
-                        {/* Open modal for Logout end */}
+                        {/* Open modal for SUBMI REPORT end */}
                     </>
 
                 )}
             </Formik>
-        </ScrollView>
+        </ScrollView >
     );
 };
 
@@ -295,15 +291,12 @@ const styles = StyleSheet.create({
         fontWeight: "500",
     },
     modalView: {
-        height: 320,
-        margin: 15,
+        margin: 20,
         backgroundColor: "white",
-        borderRadius: 20,
-        paddingHorizontal: 40,
-        paddingVertical: 15,
-        alignItems: "center",
-        shadowColor: "#000",
-
+        borderRadius: 15,
+        padding: 20,
+        // alignItems: "center",
+        // justifyContent: "center"
     },
     textStyle: {
         color: "white",
@@ -312,7 +305,15 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 15,
+        fontSize: 14,
+        marginVertical: 10
     },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#00000060'
+    },
+
 });
 

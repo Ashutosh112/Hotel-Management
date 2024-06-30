@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     text: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: "400",
         color: "#36454F",
         marginTop: 5
