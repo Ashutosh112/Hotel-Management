@@ -108,7 +108,7 @@ const Home = ({ navigation }) => {
                     </View>
                 </TouchableOpacity> */}
 
-                {/* <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SearchGuest")}>
+                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SearchGuest")}>
                     <View style={{ flex: 1 }}>
                         <HomeIcon2 />
                     </View>
@@ -118,7 +118,7 @@ const Home = ({ navigation }) => {
                     <View style={{ flex: 1.5, alignItems: "center" }}>
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
 
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SubmittedReport")}>
                     <View style={{ flex: 1 }}>
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     text: {
-        fontSize: 16,
+        fontSize: 14,
         color: "#000",
         fontWeight: "400"
     }
