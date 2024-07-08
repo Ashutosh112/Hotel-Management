@@ -17,13 +17,13 @@ const Profile = ({ navigation }) => {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
                 let updatedValue = JSON.parse(value);
+                console.log("updateddddd", updatedValue)
                 setProfileDetails(updatedValue);
             }
         };
 
         fetchData();
     }, []);
-
 
 
     return (
@@ -101,15 +101,13 @@ const Profile = ({ navigation }) => {
                     // value={profileDetails.HotelName || ''}
                     style={[styles.input, { marginTop: 8 }]} />
 
-                <View style={{ flexDirection: "row", width: "85%", justifyContent: "space-between", alignItems: "center" }}>
+                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
 
                     <TouchableOpacity style={[styles.buttonContainer, { backgroundColor: "#000" }]} onPress={() => setOpenModal(true)}>
                         <Text style={styles.button}>Logout</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.buttonContainer} >
-                        <Text style={styles.button}>Save</Text>
-                    </TouchableOpacity>
+
                 </View>
             </View>
 
@@ -170,7 +168,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
         marginTop: 20,
     },
     inputContainer: {
@@ -181,7 +179,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         borderRadius: 15,
         marginTop: 16,
-        width: "45%",
+        width: Dimensions.get('window').width - 60,
         height: 50,
         marginBottom: 20,
         justifyContent: "center",

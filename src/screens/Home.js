@@ -71,20 +71,20 @@ const Home = ({ navigation }) => {
 
         <View style={styles.container}>
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, justifyContent: "space-between", alignItems: "center", paddingHorizontal: 15 }}>
-                <View style={{ flex: 1 }}>
-                    <HamburgerLogo />
-                </View>
+                <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "flex-start" }} onPress={() => navigation.navigate("Profile")}>
+                    <UserIcon name="feed-person" size={32} color="#fff" />
+                </Pressable>
                 <View style={{ flex: 6 }}>
                     <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}> {hotelData ? hotelData.HotelName : "Loading..."}</Text>
                     <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91  {hotelData ? hotelData.Contact : "Loading..."}</Text>
                 </View>
-                <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }} onPress={() => navigation.navigate("Profile")}>
+                {/* <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }} onPress={() => navigation.navigate("Profile")}>
                     <UserIcon name="feed-person" size={32} color="#fff" />
-                </Pressable>
+                </Pressable> */}
             </View>
 
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
-            <View style={styles.inputContainer}>
+            <ScrollView style={styles.inputContainer}>
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("CreateReport")}>
                     <View style={{ flex: 1 }}>
                         <HomeIcon1 />
@@ -179,7 +179,7 @@ const Home = ({ navigation }) => {
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         </View>
 
 
@@ -192,6 +192,8 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
     },
     input: {
         flexDirection: "row",
@@ -201,7 +203,7 @@ const styles = StyleSheet.create({
         borderColor: '#E3E2E2',
         borderRadius: 15,
         color: "#000",
-        height: 60,
+        height: 55,
         marginTop: 20,
         justifyContent: "center",
         alignItems: "center",
@@ -209,8 +211,8 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         marginTop: 20,
-        justifyContent: "center",
-        alignItems: "center",
+        // justifyContent: "center",
+        // alignItems: "center",
     },
     text: {
         fontSize: 14,

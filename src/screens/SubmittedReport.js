@@ -67,13 +67,17 @@ const SubmittedReport = ({ navigation }) => {
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>सब्मीटेड रिपोर्ट</Text>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पुलिस स्टेशन में सबमिट की गई रिपोर्ट</Text>
                 </View>
-                <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
+                {/* <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
                     <TouchableOpacity onPress={() => setOpenModal(true)}>
                         <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
                     </TouchableOpacity>
-                </View>
+                </View> */}
+            </View>
+            <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
+                <Text style={[styles.modalText, { fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>इस पोर्टल पर आप एक महीने तक की पुरानी रिपोर्ट देख सकते हैं। अपने रिकॉर्ड के लिए आप समय-समय पर रिपोर्ट डाउनलोड कर के रख सकते हैं।</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
             <View style={styles.inputContainer}>
@@ -233,7 +237,8 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: "black",
         fontSize: 12,
-        marginVertical: 10
+        marginVertical: 10,
+        fontWeight: "500"
     },
     itemContainer: {
         flex: 1,

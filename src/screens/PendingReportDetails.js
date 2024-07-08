@@ -122,6 +122,17 @@ const PendingReportDetails = ({ navigation, route }) => {
             });
     };
 
+    const isDateOlderThanTodayAndYesterday = (date) => {
+        const today = moment().startOf('day');
+        const yesterday = moment().subtract(1, 'days').startOf('day');
+
+        let submitDate = moment(date, "DD MMM YYYY", true); // Adjust format according to actual data format
+
+        if (!submitDate.isValid()) {
+            return false; // Handle invalid date format case
+        }
+        return submitDate.isBefore(yesterday);
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -176,9 +187,18 @@ const PendingReportDetails = ({ navigation, route }) => {
                         </View>
                     </View>
                     <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end", marginBottom: 10, marginHorizontal: 30 }}>
-                        <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5, marginTop: 10 }} >
-                            <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
-                        </Pressable>
+
+
+                        {isDateOlderThanTodayAndYesterday(SubmitDate) ? (
+                            <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5, marginTop: 10 }} >
+                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
+                            </Pressable>
+                        ) : (
+                            <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, marginTop: 10 }} >
+                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
+                            </Pressable>
+
+                        )}
                     </View>
                 </View>
             ))}

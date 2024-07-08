@@ -28,13 +28,19 @@ const NoCheckIn = ({ navigation }) => {
                     <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>जीरो चेक इन रिपोर्ट</Text>
                 </View>
 
-                <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
+                {/* <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
                     <TouchableOpacity onPress={() => setOpenModal(true)}>
                         <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </View>
-            <Text style={{ fontSize: 16, color: "#000", marginTop: 10, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
+            <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
+                <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>1. अगर कल आपकी प्रॉपर्टी में कोई चेक इन नहीं हुआ है, तो आप यहाँ से जीरो चेक इन रिपोर्ट को पुलिस स्टेशन में सबमिट कर सकते हैं।</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>2. अगर आप कल की चेक इन रिपोर्ट पहले ही सबमिट कर चुके हैं, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>3. अगर पेंडिंग रिपोर्ट सेक्शन में कल की तारीख की कोई चेक इन रिपोर्ट है, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
+            </View>
+            <Text style={{ fontSize: 16, color: "#000", marginTop: 20, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
 
             <Formik
                 initialValues={{ reporterName: '', agreeToTerms: false }}
@@ -156,8 +162,9 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 14,
-        marginVertical: 10
+        fontSize: 12,
+        marginVertical: 10,
+        fontWeight: "500"
     },
     modalOverlay: {
         flex: 1,

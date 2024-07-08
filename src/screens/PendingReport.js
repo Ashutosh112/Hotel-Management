@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, FlatList, Text, Pressable, Dimensions, View, Image, TouchableOpacity, TextInput, Modal, SafeAreaView } from "react-native";
 import BackIcon from "react-native-vector-icons/Ionicons"
 import InfoIcon from "react-native-vector-icons/Feather"
-
 import { baseUrl } from "../utils/env";
 import Spinner from "./Spinner";
+import moment from "moment";
 
 const PendingReport = ({ navigation }) => {
 
@@ -43,24 +43,67 @@ const PendingReport = ({ navigation }) => {
     };
 
 
-    return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F8" }}>
-            <Spinner isLoading={isLoading} />
-            <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
+    const isDateOlderThanTodayAndYesterday = (date) => {
+        const today = moment().startOf('day');
+        const yesterday = moment().subtract(1, 'days').startOf('day');
+
+        let submitDate = moment(date, "DD MMM YYYY", true); // Adjust format according to actual data format
+
+        if (!submitDate.isValid()) {
+            return false; // Handle invalid date format case
+        }
+        return submitDate.isBefore(yesterday);
+    };
+
+
+    const HeaderComponent = () => (
+        <>
+            <View style={{
+                flexDirection: "row",
+                height: 100,
+                width: Dimensions.get('window').width,
+                backgroundColor: "#024063",
+                borderBottomRightRadius: 15,
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 10
+            }}>
+                <View style={{
+                    flex: 1,
+                    justifyContent: "flex-start",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingRight: 15 // Add padding to ensure text doesn't go out
+                }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पेंडिंग रिपोर्ट</Text>
-                </View>
-
-                <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
-                    <TouchableOpacity onPress={() => setOpenModal(true)}>
-                        <InfoIcon name="info" size={24} color="#fff" style={{ marginRight: 15 }} />
-                    </TouchableOpacity>
+                    <Text style={{
+                        marginLeft: 10,
+                        fontSize: 14,
+                        fontWeight: "400",
+                        color: "#fff",
+                        flexShrink: 1, // Ensure the text shrinks if necessary
+                        flexWrap: 'wrap', // Allow the text to wrap within the container
+                        textAlign: "justify"
+                    }}>
+                        अभी तक पुलिस स्टेशन में सबमिट नहीं हुई पेंडिंग चेक-इन रिपोर्ट
+                    </Text>
                 </View>
             </View>
+            <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
+                <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>1. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
+            </View>
+        </>
+    );
+
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F8" }}>
+            <Spinner isLoading={isLoading} />
             <FlatList
+                ListHeaderComponent={HeaderComponent}
                 data={pendingGuestDetails}
                 keyExtractor={item => item.id}
                 renderItem={({ item, index }) =>
@@ -77,27 +120,26 @@ const PendingReport = ({ navigation }) => {
                         </View>
                         <View style={{ flex: 1, flexDirection: "row" }}>
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("PendingReportDetails", { SubmitDate: item.SubmitDate })}>
-                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 30, paddingVertical: 7 }}>देखे</Text>
+                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, elevation: 1.2 }} onPress={() => navigation.navigate("PendingReportDetails", { SubmitDate: item.SubmitDate })}>
+                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>जानकारी देखें</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                {/* {
-                                    item.SubmitDate =< todayDate ?
-                                    <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("AddGuestInPendingReport", { SubmitDate: item.SubmitDate })}>
-                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>गेस्ट जोडे</Text>
-                                </TouchableOpacity>
-                                : */}
-
-                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("AddGuestInPendingReport", { SubmitDate: item.SubmitDate })}>
-                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>गेस्ट जोडे</Text>
-                                </TouchableOpacity>
-                                {/* } */}
+                                {isDateOlderThanTodayAndYesterday(item.SubmitDate) ? (
+                                    <TouchableOpacity style={styles.disabledButton} disabled>
+                                        <Text style={styles.disabledButtonText}>गेस्ट जोडे</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity style={styles.activeButton} onPress={() => navigation.navigate("AddGuestInPendingReport", { SubmitDate: item.SubmitDate })}>
+                                        <Text style={styles.buttonText}>गेस्ट जोडे</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
+
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                                 {
                                     item.isSubmitted == false ?
-                                        <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5 }} onPress={() => navigation.navigate("ReportSubmitScreen", { SubmitDate: item.SubmitDate })}>
+                                        <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, elevation: 1.2 }} onPress={() => navigation.navigate("ReportSubmitScreen", { SubmitDate: item.SubmitDate })}>
                                             <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>रिपोर्ट सबमिट</Text>
                                         </TouchableOpacity>
                                         :
@@ -111,7 +153,7 @@ const PendingReport = ({ navigation }) => {
 
                 } />
 
-            <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
+            {/* <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
                 <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
                     <View style={styles.modalView}>
                         <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>अभी तक पुलिस स्टेशन में सबमिट नहीं हुई पेंडिंग चेक-इन रिपोर्ट</Text>
@@ -124,7 +166,7 @@ const PendingReport = ({ navigation }) => {
                         </Pressable>
                     </View>
                 </Pressable>
-            </Modal>
+            </Modal> */}
         </SafeAreaView>
     );
 };
@@ -138,8 +180,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 2,
         marginHorizontal: 15,
-        // marginBottom: 15,
-        // marginTop: 15,
         marginVertical: 5
 
     },
@@ -182,8 +222,9 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 14,
-        marginVertical: 10
+        fontSize: 12,
+        marginVertical: 10,
+        fontWeight: "500"
     },
     modalOverlay: {
         flex: 1,
@@ -200,6 +241,41 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginVertical: 10
     },
+    activeButton: {
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 4,
+        borderColor: '#1AA7FF',
+        backgroundColor: '#1AA7FF',
+        borderWidth: 1.5,
+        elevation: 1.2
+
+    },
+    disabledButton: {
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 4,
+        borderColor: '#EEEEEE',
+        backgroundColor: '#EEEEEE',
+        borderWidth: 1.5,
+        elevation: 1.2
+    },
+    buttonText: {
+        textAlign: "center",
+        fontSize: 12,
+        fontWeight: "400",
+        color: "#fff",
+        paddingHorizontal: 20,
+        paddingVertical: 7,
+    },
+    disabledButtonText: {
+        textAlign: "center",
+        fontSize: 12,
+        fontWeight: "400",
+        color: "grey",
+        paddingHorizontal: 20,
+        paddingVertical: 7,
+    }
 });
 
 export default PendingReport;

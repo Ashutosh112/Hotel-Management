@@ -6,19 +6,29 @@ import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GuestLogo from "../assets/images/guests.png";
 import Spinner from './Spinner';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
 
 const SearchGuest = ({ navigation }) => {
     const [guestData, setGuestData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchPerformed, setSearchPerformed] = useState(false);
 
-    const searchGuest = async (values) => {
+    const [name, setName] = useState('')
+    const [mobile, setMobile] = useState('')
+    const [idNumber, setIdNumber] = useState('')
+
+    const searchGuest = async () => {
         setIsLoading(true);
         setSearchPerformed(true);
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
+
+        // Extract the first name from the full name input
+        const firstName = name.split(' ')[0] || '';
+
+        // If mobile or idNumber is empty, set them to empty strings
+        const mobileNumber = mobile.trim() === '' ? '' : mobile;
+        const idNumberValue = idNumber.trim() === '' ? '' : idNumber;
+
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -26,7 +36,7 @@ const SearchGuest = ({ navigation }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${values.name}`, {}, config)
+        await axios.post(`${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${firstName}&AadharNo=${idNumberValue}&sMobile=${mobileNumber}`, {}, config)
             .then((res) => {
                 setIsLoading(false);
                 setGuestData(res.data.Result);
@@ -36,9 +46,6 @@ const SearchGuest = ({ navigation }) => {
             });
     };
 
-    const validationSchema = Yup.object().shape({
-        name: Yup.string().required('Name is required')
-    });
 
     return (
         <ScrollView style={styles.container}>
@@ -50,35 +57,57 @@ const SearchGuest = ({ navigation }) => {
                 <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>सर्च गेस्ट</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
-            <Formik
-                initialValues={{ name: '' }}
-                validationSchema={validationSchema}
-                onSubmit={(values) => searchGuest(values)}
-            >
-                {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-                    <View style={styles.inputContainer}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "80%" }}>
-                            <Text style={styles.lableText}>नाम</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                            <TextInput
-                                value={values.name}
-                                onChangeText={handleChange('name')}
-                                onBlur={handleBlur('name')}
-                                placeholderTextColor='darkgrey'
-                                placeholder='नाम'
-                                style={[styles.input, { width: "100%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
-                            />
-                        </View>
-                        {touched.name && errors.name && (
-                            <Text style={{ color: "#FF4545", fontSize: 12, width: "80%", marginTop: 3 }}>{errors.name}</Text>
-                        )}
-                        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-                            <Text style={styles.button}>Search</Text>
-                        </TouchableOpacity>
+
+            <View style={styles.inputContainer}>
+                <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "80%" }}>
+                        <Text style={styles.lableText}>नाम</Text>
                     </View>
-                )}
-            </Formik>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                        <TextInput
+                            value={name}
+                            onChangeText={(value) => { setName(value) }}
+                            placeholderTextColor='darkgrey'
+                            placeholder='नाम'
+                            style={[styles.input, { width: "100%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                        />
+                    </View>
+
+                </View>
+
+                <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "80%" }}>
+                        <Text style={styles.lableText}>मोबाइल नंबर</Text>
+                    </View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                        <TextInput
+                            value={mobile}
+                            onChangeText={(value) => { setMobile(value) }} keyboardType='number-pad'
+                            placeholderTextColor='darkgrey'
+                            placeholder='मोबाइल नंबर'
+                            style={[styles.input, { width: "100%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                        />
+                    </View>
+                </View>
+
+                <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "80%" }}>
+                        <Text style={styles.lableText}>आईडी नंबर</Text>
+                    </View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                        <TextInput
+                            value={idNumber}
+                            onChangeText={(value) => { setIdNumber(value) }}
+                            placeholderTextColor='darkgrey'
+                            placeholder='आईडी नंबर'
+                            style={[styles.input, { width: "100%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
+                        />
+                    </View>
+                </View>
+                <TouchableOpacity style={styles.buttonContainer} onPress={() => searchGuest()}>
+                    <Text style={styles.button}>Search</Text>
+                </TouchableOpacity>
+            </View>
 
             {
                 searchPerformed && guestData.length === 0 ? (
@@ -122,7 +151,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 43,
         marginTop: 20,
     },
     inputContainer: {
