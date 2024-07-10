@@ -41,10 +41,10 @@ const Login = ({ navigation }) => {
         "Content-type": "application/json"
       }
     };
-
-    await axios.post(`${baseUrl}SendOTP?sMobile=${mobileNumber}`, config)
+    await axios.post(`${baseUrl}SendOTPLogin?sMobile=${mobileNumber}`, config)
       .then((res) => {
         setIsLoading(false)
+        console.log("Login", res.data)
         setMobileNumber(mobileNumber); // Store the mobile number
         Alert.alert(
           'OTP Sent',
@@ -57,6 +57,8 @@ const Login = ({ navigation }) => {
       })
       .catch(err => {
         setIsLoading(false)
+        console.log("errr", err)
+
       });
   };
 

@@ -952,6 +952,26 @@ import AlertIcon from "react-native-vector-icons/Ionicons";
 import CheckBox from '@react-native-community/checkbox';
 
 
+const idTypeErrorMessages = {
+    "आधार कार्ड": 'कृपया अपना आधार कार्ड संख्या जांचें',
+    "ड्राइविंग लाइसेंस": 'कृपया अपना ड्राइविंग लाइसेंस संख्या जांचें',
+    "पासपोर्ट": 'कृपया अपना पासपोर्ट संख्या जांचें',
+    "वोटर आईडी कार्ड": 'कृपया अपना वोटर आईडी संख्या जांचें',
+    "पैन कार्ड": 'कृपया अपना पैन कार्ड संख्या जांचें',
+    "राशन कार्ड": 'कृपया अपना राशन कार्ड संख्या जांचें',
+    "default": 'Invalid ID number'
+};
+
+const idTypePatterns = {
+    "आधार कार्ड": /^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/,
+    "ड्राइविंग लाइसेंस": /^(([A-Z]{2}[0-9]{2})( )|([A-Z]{2}-[0-9]{2}))((19|20)[0-9][0-9])[0-9]{7}$/,
+    "पासपोर्ट": /^(?!^0+$)[a-zA-Z0-9]{3,20}$/,
+    "वोटर आईडी कार्ड": /^[A-Z]{3}[0-9]{7}$/,
+    "पैन कार्ड": /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+    "राशन कार्ड": /^([a-zA-Z0-9]){8,12}\s*$/,
+    "default": /^(?=.*\d).{5,}$/
+};
+
 const validationSchema = Yup.object().shape({
     checkinDate: Yup.date().required('चेक इन तारीख अनिवार्य'),
     checkoutDate: Yup.date().required('चेक आउट तारीख अनिवार्य'),
@@ -965,7 +985,11 @@ const validationSchema = Yup.object().shape({
     city: Yup.string().required('शहर अनिवार्य'),
     pin: Yup.string().required('पिन अनिवार्य').matches(/^[0-9]{6}$/, 'पिन 6 अंकों का होना चाहिए'),
     idType: Yup.string().required('आईडी प्रकार अनिवार्य'),
-    idNumber: Yup.string().required('आईडी नंबर अनिवार्य'),
+    idNumber: Yup.string().when('idType', (idType, schema) => {
+        const pattern = idTypePatterns[idType] || idTypePatterns["default"];
+        const errorMessage = idTypeErrorMessages[idType] || idTypeErrorMessages["default"];
+        return schema.matches(pattern, errorMessage).required(' कृपया पहचान संख्या दर्ज करें।');
+    }),
     idFront: Yup.array().min(1, 'आईडी का Front अपलोड करें। केवल .jpg, .JPG, .jpeg, .png और .PNG छवि प्रारूपों की अनुमति है। फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए... '),
     idBack: Yup.array().min(1, 'आईडी का Back अपलोड करें। केवल .jpg, .JPG, .jpeg, .png और .PNG छवि प्रारूपों की अनुमति है। फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए... '),
     categories: Yup.array()
@@ -981,6 +1005,8 @@ const validationSchema = Yup.object().shape({
 
 const CreateReport = ({ navigation }) => {
 
+
+
     const [travelReason, setTravelReason] = useState('दर्शन');
     const [selectgender, setSelectgender] = useState(null);
     const [guestCount, setGuestCount] = useState('1'); // Default to 1
@@ -989,18 +1015,17 @@ const CreateReport = ({ navigation }) => {
     const [openModal2, setOpenModal2] = useState(false)
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
-
     const [checkoutDate, setCheckoutDate] = useState(new Date());
     const [showCheckoutPicker, setShowCheckoutPicker] = useState(false);
-
+    const [statusCode, setStatusCode] = useState({})
 
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
     // Format dates
-    const todayFormatted = `Today (${moment(today).format("DD-MM-YYYY")})`;
-    const yesterdayFormatted = `Yesterday (${moment(yesterday).format("DD-MM-YYYY")})`;
+    const todayFormatted = `Today (${moment(today).format("DD/MM/YYYY")})`;
+    const yesterdayFormatted = `Yesterday (${moment(yesterday).format("DD/MM/YYYY")})`;
 
     // Create the date options
     const dateOptions = [
@@ -1026,6 +1051,7 @@ const CreateReport = ({ navigation }) => {
 
     useEffect(() => {
         hotelRoomCategory()
+        submitValidateDate()
     }, [])
 
 
@@ -1135,6 +1161,28 @@ const CreateReport = ({ navigation }) => {
         fetchHotelData();
     }, []); // Empty dependency array to run only once
 
+    const submitValidateDate = async () => {
+        // setIsLoading(true);
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `${updatedValue.Token}`
+            }
+        };
+        console.log("dateeeee+++++", yesterday)
+        await axios.post(`${baseUrl}ValidateSubmitDate?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(yesterday).format("10/MMM/YYYY")}`, {}, config)
+            .then((res) => {
+                // setIsLoading(false);
+                console.log("submitValidateDate----", res.data)
+            })
+            .catch(err => {
+                // setIsLoading(false);
+            });
+    };
+
     const sendFormData = async (values) => {
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
@@ -1164,11 +1212,11 @@ const CreateReport = ({ navigation }) => {
 
         // Prepare the request body
         let body = {
-            idGuestMaster: updatedValue.idHotelMaster,
+            // idGuestMaster: updatedValue.idHotelMaster,
             idHotel: hotelData?.idHotelMaster,
             contactNo: values.mobileNumber,
-            checkInDate: moment(values.checkinDate).format("DD-MMM-YYYY"),
-            checkOutDate: moment(values.checkoutDate).format("DD-MMM-YYYY"),
+            checkInDate: moment(values.checkinDate).format("DD/MMM/YYYY"),
+            checkOutDate: moment(values.checkoutDate).format("DD/MMM/YYYY"),
             description: "None",
             bActive: true,
             guestName: values.firstName,
@@ -1195,14 +1243,10 @@ const CreateReport = ({ navigation }) => {
             image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
         };
         console.log(">>>>>>>>>>>>>>>", body)
-        axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
+        await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
-                // navigation.navigate("BottomNavigator")
-                // Toast.show({
-                //     type: 'success',
-                //     text1: 'Success',
-                //     text2: response.data.Message
-                // });
+                console.log("RESPONSE----", response.data)
+                setStatusCode(response.data)
                 setOpenModal2(true)
             })
             .catch(error => {
@@ -1230,6 +1274,7 @@ const CreateReport = ({ navigation }) => {
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 // setIsLoading(false);
+                console.log("resss", res.data)
                 setCategories(res.data.Result);
             })
             .catch(err => {
@@ -1531,14 +1576,20 @@ const CreateReport = ({ navigation }) => {
                             />
                             {touched.idNumber && errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
 
-                            <View style={{ width: "90%", marginTop: 10 }}>
-                                <Text style={{
-                                    fontSize: 12,
-                                    color: "#000",
-                                    marginVertical: 10,
-                                    fontWeight: "500"
-                                }}>अतिथि को दिए हुए कमरे की श्रेणी चुनें।<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            </View>
+                            {
+                                categories.length > 1 ?
+                                    <View style={{ width: "90%", marginTop: 10 }}>
+                                        <Text style={{
+                                            fontSize: 12,
+                                            color: "#000",
+                                            marginVertical: 10,
+                                            fontWeight: "500"
+                                        }}>अतिथि को दिए हुए कमरे की श्रेणी चुनें।<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                    </View>
+                                    :
+                                    null
+                            }
+
                             {categories.map((category, index) => (
                                 <View key={index} style={{ flexDirection: "row" }}>
                                     <View style={{ flex: 1, flexDirection: "row", justifyContent: "flex-start", alignItems: "center", marginHorizontal: 25, marginVertical: 2 }}>
@@ -1718,11 +1769,39 @@ const CreateReport = ({ navigation }) => {
                             <Pressable style={styles.modalOverlay} onPress={() => setOpenModal2(false)}>
                                 <View style={styles.modalView}>
                                     <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
-                                    <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>गेस्ट की एंट्री सेव हो गयी है | आप अन्य गेस्ट की जानकारी ऐड कर सकते है या पेंडिंग रिपोर्ट पे जेक इस रिपोर्ट को सबमिट कर सकते है</Text>
+                                    {
+                                        statusCode.StatusCode == -1 ?
+
+                                            <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>{statusCode.Message}</Text>
+                                            :
+                                            statusCode.StatusCode == 0 ?
+                                                <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>गेस्ट की एंट्री सेव हो गयी है | आप अन्य गेस्ट की जानकारी ऐड कर सकते है या पेंडिंग रिपोर्ट पे जेक इस रिपोर्ट को सबमिट कर सकते है</Text>
+                                                :
+                                                statusCode.StatusCode == 1 ?
+                                                    <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>{statusCode.Message}</Text>
+                                                    :
+                                                    null
+
+                                    }
                                     <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
-                                        <Pressable style={styles.modalButton} onPress={() => navigation.navigate("BottomNavigator")}>
-                                            <Text style={styles.textStyle}>ठीक</Text>
-                                        </Pressable>
+                                        {
+                                            statusCode.StatusCode == -1 ?
+
+                                                <Pressable style={styles.modalButton} onPress={() => setOpenModal2(false)}>
+                                                    <Text style={styles.textStyle}>ठीक</Text>
+                                                </Pressable> :
+                                                statusCode.StatusCode == 0 ?
+                                                    <Pressable style={styles.modalButton} onPress={() => navigation.navigate('BottomNavigator')}>
+                                                        <Text style={styles.textStyle}>ठीक</Text>
+                                                    </Pressable> :
+                                                    statusCode.StatusCode == 1 ?
+                                                        <Pressable style={styles.modalButton} onPress={() => setOpenModal2(false)}>
+                                                            <Text style={styles.textStyle}>ठीक</Text>
+                                                        </Pressable> :
+                                                        null
+
+                                        }
+
                                         {/* <Pressable style={styles.modalButton}>
                                             <Text style={styles.textStyle}>अन्य गेस्ट जोडे</Text>
                                         </Pressable> */}
