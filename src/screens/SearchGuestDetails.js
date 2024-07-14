@@ -41,6 +41,7 @@ const SearchGuestDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}GuestDetails?idGuestMaster=${masterId}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("Responseeee", res.data.Result)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
@@ -81,7 +82,10 @@ const SearchGuestDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" />
+                            {/* <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" /> */}
+                            <Image source={{ uri: `data:image/jpeg;base64,${commonData.Image1}` }} style={styles.image} resizeMode="contain" />
+
+
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Image source={require("../assets/images/aadhar_back.jpeg")} style={styles.image} resizeMode="contain" />

@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensi
 import BackIcon from "react-native-vector-icons/Ionicons"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Alert from "react-native-vector-icons/Ionicons";
+import { baseUrl } from '../utils/env';
+import axios from 'axios';
+import Spinner from './Spinner';
 
 
 
@@ -10,6 +13,11 @@ const Profile = ({ navigation }) => {
 
     const [profileDetails, setProfileDetails] = useState({})
     const [openModal, setOpenModal] = useState(false)
+    const [roomCategory, setRoomCategory] = useState('')
+    const [roomPrice, setRoomPrice] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+    const [categoryDetails, CategoryDetails] = useState([])
+
 
 
     useEffect(() => {
@@ -17,17 +25,78 @@ const Profile = ({ navigation }) => {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
                 let updatedValue = JSON.parse(value);
-                console.log("updateddddd", updatedValue)
                 setProfileDetails(updatedValue);
             }
         };
 
         fetchData();
+        getCategory()
     }, []);
+
+
+    const addCategorie = async () => {
+        setIsLoading(true)
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        console.log("updatedValue", updatedValue)
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `${updatedValue.Token}`
+            }
+        };
+        const body = {
+            idHotelRoomCategory: 0,
+            idHotel: updatedValue.idHotelMaster,
+            categoryName: roomCategory,
+            iPrice: roomPrice,
+            noOfRoom: 1,
+            bChecked: true
+        }
+        console.log("body", body)
+        await axios.post(`${baseUrl}InsertCategory`, body, config)
+            .then((res) => {
+                setIsLoading(false)
+                console.log("success", res.data)
+            })
+            .catch(err => {
+                setIsLoading(false)
+                console.log("errr", err)
+            });
+    };
+
+
+    const getCategory = async () => {
+        setIsLoading(true)
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        console.log("updatedValue", updatedValue)
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `${updatedValue.Token}`
+            }
+        };
+
+        await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
+            .then((res) => {
+                setIsLoading(false)
+                CategoryDetails(res.data.Result)
+
+            })
+            .catch(err => {
+                setIsLoading(false)
+                console.log("errr", err)
+            });
+    };
 
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner isLoading={isLoading} />
+
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, justifyContent: "space-between", alignItems: "center", paddingHorizontal: 15 }}>
                 <View style={{ flex: 6, flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -35,9 +104,10 @@ const Profile = ({ navigation }) => {
                     </TouchableOpacity>
                     <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>होटल प्रोफ़ाइल</Text>
                 </View>
-                <View style={{ flex: 2, justifyContent: "center", alignItems: "flex-end" }}>
-                    <Image source={require('../assets/images/profileLogo.png')} style={{ height: 40, width: 40, borderWidth: 1, borderRadius: 40, borderColor: "#fff" }} />
-                </View>
+                <TouchableOpacity style={{ flex: 2, justifyContent: "center", alignItems: "flex-end" }} onPress={() => setOpenModal(true)}>
+                    {/* <Image source={require('../assets/images/profileLogo.png')} style={{ height: 40, width: 40, borderWidth: 1, borderRadius: 40, borderColor: "#fff" }} /> */}
+                    <Text style={{ fontSize: 16, fontWeight: "500", color: "#fff" }}>Logout</Text>
+                </TouchableOpacity>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
             <View style={styles.inputContainer}>
@@ -100,14 +170,53 @@ const Profile = ({ navigation }) => {
                     editable={false}
                     // value={profileDetails.HotelName || ''}
                     style={[styles.input, { marginTop: 8 }]} />
+                <View style={{ height: 1, backgroundColor: "#024063", width: '90%', marginVertical: 20 }} />
 
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                <View style={{ width: "90%", justifyContent: "center", paddingVertical: 10, elevation: 2, backgroundColor: "white", borderRadius: 10, paddingHorizontal: 15 }}>
+                    <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>S. No. </Text>
+                        <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>कमरे की श्रेणी </Text>
+                        <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>मूल्य </Text>
+                    </View>
+                    {categoryDetails.length < 1 ?
+                        <View style={{ justifyContent: "center", alignItems: "center", marginTop: 10 }}>
+                            <Text style={{ fontSize: 12, fontWeight: "500", color: "grey" }}>No Record</Text>
+                        </View>
+                        : categoryDetails.map((item, index) => (
+                            <View key={index} style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center", marginTop: 10 }}>
+                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}> {index + 1}</Text>
+                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}>{item.CategoryName}</Text>
+                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}> {item.iPrice}</Text>
+                            </View>
+                        ))}
+                </View>
 
-                    <TouchableOpacity style={[styles.buttonContainer, { backgroundColor: "#000" }]} onPress={() => setOpenModal(true)}>
-                        <Text style={styles.button}>Logout</Text>
+                <View style={{ height: 1, backgroundColor: "#024063", width: '90%', marginVertical: 20 }} />
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                    <Text style={[styles.lableText, { marginTop: 0, fontWeight: "500" }]}>कमरे की श्रेणी<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    value={roomCategory}
+                    placeholder='कमरे की श्रेणी*'
+                    onChangeText={(value) => { setRoomCategory(value) }}
+                    style={[styles.input2, { marginTop: 8 }]} />
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 15 }}>
+                    <Text style={[styles.lableText, { marginTop: 0, fontWeight: "500" }]}>मूल्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    value={roomPrice}
+                    placeholder='मूल्य*'
+                    onChangeText={(value) => { setRoomPrice(value) }}
+                    style={[styles.input2, { marginTop: 8 }]} />
+
+                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }} >
+                    <TouchableOpacity style={styles.buttonContainer} onPress={() => addCategorie()}>
+                        <Text style={styles.button}>Save</Text>
                     </TouchableOpacity>
-
-
                 </View>
             </View>
 
@@ -163,6 +272,18 @@ const styles = StyleSheet.create({
     input: {
         width: Dimensions.get('window').width - 60,
         backgroundColor: '#EEEEEE',
+        borderWidth: 1,
+        borderColor: '#E3E2E2',
+        borderRadius: 10,
+        paddingHorizontal: 20,
+        color: "#000",
+        height: 45,
+        marginTop: 20,
+    },
+
+    input2: {
+        width: Dimensions.get('window').width - 60,
+        backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
         borderRadius: 10,

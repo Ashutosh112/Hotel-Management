@@ -36,9 +36,11 @@ const SearchGuest = ({ navigation }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
+        console.log("bodyyyyy", `${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${firstName}&AadharNo=${idNumberValue}&sMobile=${mobileNumber}`)
         await axios.post(`${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${firstName}&AadharNo=${idNumberValue}&sMobile=${mobileNumber}`, {}, config)
             .then((res) => {
                 setIsLoading(false);
+                console.log("reeee", res.data.Result)
                 setGuestData(res.data.Result);
             })
             .catch(err => {
@@ -115,7 +117,7 @@ const SearchGuest = ({ navigation }) => {
                 ) : (
                     guestData.map((item, index) => (
                         <View key={index} style={styles.guestCard}>
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 0.8 }}>
                                 <Image source={GuestLogo} style={{ height: 40, width: 40 }} resizeMode="contain" />
                             </View>
                             <View style={{ flex: 3 }}>
@@ -123,10 +125,11 @@ const SearchGuest = ({ navigation }) => {
                                     <Text style={[styles.text, { textTransform: "capitalize" }]}>{item.GuestName} {item.GuestLastName}</Text>
                                     <Text style={styles.text}>{item.ContactNo}</Text>
                                     <Text style={styles.text}>{item.CheckInDate} - {item.CheckOutDate}</Text>
+                                    <Text style={styles.text}>{item.Address}</Text>
                                 </View>
                             </View>
                             <TouchableOpacity onPress={() => navigation.navigate("SearchGuestDetails", { masterId: item.idGuestMaster })} style={styles.detailButton}>
-                                <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7 }}>Detail</Text>
+                                <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7 }}>जानकारी देखें</Text>
                             </TouchableOpacity>
                         </View>
                     ))
@@ -218,12 +221,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingHorizontal: 15,
         marginHorizontal: 20,
-        height: 100,
+        // height: 100,
         borderRadius: 10,
         elevation: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 10
+        marginBottom: 10,
+        paddingVertical: 10
     },
     detailButton: {
         flex: 1,
@@ -232,6 +236,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#024063",
         borderRadius: 5,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        paddingHorizontal: 5
     }
 });
