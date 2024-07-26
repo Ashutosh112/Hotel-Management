@@ -41,7 +41,7 @@ const SearchGuestDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}GuestDetails?idGuestMaster=${masterId}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("Responseeee", res.data.Result)
+                console.log("??????????????", res.data)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
@@ -49,6 +49,9 @@ const SearchGuestDetails = ({ navigation, route }) => {
                 setIsLoading(false)
             });
     };
+
+
+
 
     return (
         <ScrollView style={styles.container}>
@@ -77,15 +80,14 @@ const SearchGuestDetails = ({ navigation, route }) => {
 
             {guestData.map((item, index) => (
                 <View key={index} style={styles.guestContainer}>
+                    {console.log("imageeeee", item.Image1)}
                     <View style={styles.guestHeader}>
                         <Text style={styles.guestHeaderText}>अतिथि क्र. {index + 1}</Text>
                     </View>
                     <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            {/* <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" /> */}
-                            <Image source={{ uri: `data:image/jpeg;base64,${commonData.Image1}` }} style={styles.image} resizeMode="contain" />
-
-
+                            <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" />
+                            {/* <Image source={{ uri: item.Image1 }} style={styles.image} resizeMode="contain" /> */}
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Image source={require("../assets/images/aadhar_back.jpeg")} style={styles.image} resizeMode="contain" />

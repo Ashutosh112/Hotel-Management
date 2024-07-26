@@ -38,7 +38,6 @@ const Profile = ({ navigation }) => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
-        console.log("updatedValue", updatedValue)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -71,7 +70,6 @@ const Profile = ({ navigation }) => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
-        console.log("updatedValue", updatedValue)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -79,7 +77,6 @@ const Profile = ({ navigation }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 setIsLoading(false)

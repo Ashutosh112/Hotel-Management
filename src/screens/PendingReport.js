@@ -34,10 +34,12 @@ const PendingReport = ({ navigation }) => {
         await axios.post(`${baseUrl}AllPendingGuestList?HotelId=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("resss", res.data.Result)
                 setPendingGuestDetails(res.data.Result)
 
             })
             .catch(err => {
+                console.log("errror", err)
                 setIsLoading(false)
             });
     };

@@ -36,7 +36,6 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             <TextInput
                 onChangeText={text => handleGuestChange(index, 'lastName', text)}
                 value={guest.lastName}
-
                 placeholderTextColor='darkgrey'
                 placeholder='अंतिम नाम*'
                 style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
@@ -105,6 +104,7 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
         <TextInput
             style={styles.input}
             placeholder="आईडी नंबर"
+            placeholderTextColor={"darkgrey"}
             onChangeText={text => handleGuestChange(index, 'idNumber', text)}
             value={guest.idNumber} />
 
@@ -148,15 +148,15 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
 const CreateReport = ({ navigation }) => {
     const [name, setName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [gender, setGender] = useState(null);
+    const [gender, setGender] = useState('पुरुष');
     const [city, setCity] = useState('');
     const [address, setAddress] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [idType, setIdType] = useState('');
+    const [idType, setIdType] = useState('आधार कार्ड');
     const [idNumber, setIdNumber] = useState('');
     const [pincode, setPincode] = useState('')
-    const [travelReason, setTravelReason] = useState(null)
-    const [additionalGuests, setAdditionalGuests] = useState(1);
+    const [travelReason, setTravelReason] = useState('दर्शन')
+    const [additionalGuests, setAdditionalGuests] = useState("1");
     const [guests, setGuests] = useState([]);
     const [idFront, setIdFront] = useState(null);
     const [idBack, setIdBack] = useState(null);
@@ -193,6 +193,70 @@ const CreateReport = ({ navigation }) => {
         setGuests(newGuests);
     };
 
+    // const handleDocumentPicker = async (index, field) => {
+    //     try {
+    //         const result = await ImagePicker.openPicker({
+    //             includeBase64: true,
+    //             mediaType: 'photo',
+    //         });
+    //         console.log("Typoe??????/", result.data)
+    //         const base64Image = `data:${result.mime};base64,${result.data}`;
+    //         // const base64Image = result.data
+    //         // const base64Image = result
+
+    //         if (index === -1) {
+    //             // console.log("base65image>>>", base64Image)
+    //             if (field === 'idFront') setIdFront(base64Image);
+    //             if (field === 'idBack') setIdBack(base64Image);
+    //         } else {
+    //             const newGuests = [...guests];
+    //             newGuests[index] = { ...newGuests[index], [field]: base64Image };
+    //             setGuests(newGuests);
+    //         }
+    //     } catch (err) {
+    //         if (ImagePicker.isCancel(err)) {
+    //             Alert.alert('Canceled', 'Image picker was canceled');
+    //         } else {
+    //             Alert.alert('Error', 'Failed to pick image');
+    //         }
+    //     }
+    // };
+    // const handleDocumentPicker = async (index, field) => {
+    //     try {
+    //         const result = await ImagePicker.openPicker({
+    //             includeBase64: true,
+    //             mediaType: 'photo',
+    //         });
+
+    //         // Check the MIME type of the selected file
+    //         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    //         if (!allowedMimeTypes.includes(result.mime)) {
+    //             Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
+    //             return;
+    //         }
+
+    //         console.log("Type??????/", result.data);
+    //         const base64Image = `data:${result.mime};base64,${result.data}`;
+    //         // const base64Image = `${result.data}`;
+
+
+    //         if (index === -1) {
+    //             if (field === 'idFront') setIdFront(base64Image);
+    //             if (field === 'idBack') setIdBack(base64Image);
+    //         } else {
+    //             const newGuests = [...guests];
+    //             newGuests[index] = { ...newGuests[index], [field]: base64Image };
+    //             setGuests(newGuests);
+    //         }
+    //     } catch (err) {
+    //         if (ImagePicker.isCancel(err)) {
+    //             Alert.alert('Canceled', 'Image picker was canceled');
+    //         } else {
+    //             Alert.alert('Error', 'Failed to pick image');
+    //         }
+    //     }
+    // };
+
     const handleDocumentPicker = async (index, field) => {
         try {
             const result = await ImagePicker.openPicker({
@@ -200,12 +264,21 @@ const CreateReport = ({ navigation }) => {
                 mediaType: 'photo',
             });
 
-            const base64Image = `data:${result.mime};base64,${result.data}`;
-            // const base64Image = result.data
-            // const base64Image = result
+            // Check the MIME type of the selected file
+            const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!allowedMimeTypes.includes(result.mime)) {
+                Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
+                return;
+            }
 
+            // Check the file size (5MB = 5 * 1024 * 1024 bytes)
+            const maxSizeInBytes = 5 * 1024 * 1024;
+            if (result.size > maxSizeInBytes) {
+                Alert.alert('File Too Large', 'The selected file size should not exceed 5MB.');
+                return;
+            }
+            const base64Image = `data:${result.mime};base64,${result.data}`;
             if (index === -1) {
-                // console.log("base65image>>>", base64Image)
                 if (field === 'idFront') setIdFront(base64Image);
                 if (field === 'idBack') setIdBack(base64Image);
             } else {
@@ -395,7 +468,7 @@ const CreateReport = ({ navigation }) => {
         }
 
         if (!phoneNumber) {
-            newErrors.phoneNumber = 'कृपया संपर्क नंबर दर्ज करें।';
+            newErrors.phoneNumber = 'कृपया मोबाइल नंबर दर्ज करें।';
             valid = false;
         } else if (!/^[0-9]+$/.test(phoneNumber) || phoneNumber.length !== 10) {
             newErrors.phoneNumber = 'Phone number must be 10 digits';
@@ -523,6 +596,7 @@ const CreateReport = ({ navigation }) => {
             contactNo: phoneNumber,
             checkInDate: moment(checkinDate).format("DD-MMM-YYYY"),
             checkOutDate: moment(checkoutDate).format("DD-MMM-YYYY"),
+            enterDate: moment(new Date()).format("DD-MMM-YYYY"),
             description: "None",
             bActive: true,
             guestName: name,
@@ -537,6 +611,7 @@ const CreateReport = ({ navigation }) => {
                 identificationType: guest.idType,
                 image: guest.idFront,
                 gender: guest.gender,
+                contactNo: "8787878787",
                 filePass: "7d465d03",
                 lastName: guest.lastName,
                 image2: guest.idBack,
@@ -557,21 +632,21 @@ const CreateReport = ({ navigation }) => {
             // image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
             // image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
         };
-        console.log("BODYYY", body)
+        // console.log("BODYYY", body)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 console.log("RESPONSE----", response.data)
-                Toast.show({
-                    type: 'success',
-                    text1: 'Success',
-                    text2: 'Success'
-                });
-                navigation.navigate("BottomNavigator")
-                // setStatusCode(response.data)
-                // setOpenModal2(true)
+                // Toast.show({
+                //     type: 'success',
+                //     text1: 'Success',
+                //     text2: 'Success'
+                // });
+                // navigation.navigate("BottomNavigator")
+                setStatusCode(response.data)
+                setOpenModal2(true)
             })
             .catch(error => {
-                console.error('Error sending form data:', error.response.data);
+                console.error('Error sending form data:', error);
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -610,14 +685,13 @@ const CreateReport = ({ navigation }) => {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <TextInput
                         onChangeText={text => setName(text)}
-                        placeholderTextColor='darkgrey'
+                        placeholderTextColor={"darkgrey"}
                         placeholder='प्रथम नाम*'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
                     />
                     <TextInput
                         onChangeText={text => setLastName(text)}
-
-                        placeholderTextColor='darkgrey'
+                        placeholderTextColor={"darkgrey"}
                         placeholder='अंतिम नाम*'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
                     />
@@ -636,7 +710,7 @@ const CreateReport = ({ navigation }) => {
                     <TouchableOpacity
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                         onPress={openDatePicker}>
-                        <Text>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
+                        <Text style={{ color: "darkgrey" }}>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
                         <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                     </TouchableOpacity>
 
@@ -671,7 +745,7 @@ const CreateReport = ({ navigation }) => {
                     <TouchableOpacity
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                         onPress={() => setShowCheckoutPicker(true)}>
-                        <Text>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
+                        <Text style={{ color: "darkgrey" }}>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
                         <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                     </TouchableOpacity>
 
@@ -691,11 +765,12 @@ const CreateReport = ({ navigation }) => {
                 </View>
                 <TextInput
                     style={styles.input}
-                    placeholder="Phone Number"
+                    placeholder="मोबाइल नंबर"
                     keyboardType="numeric"
                     onChangeText={text => setPhoneNumber(text)}
                     value={phoneNumber}
                     maxLength={10}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.phoneNumber ? <Text style={styles.errorText}>{errors.phoneNumber}</Text> : null}
 
@@ -785,6 +860,7 @@ const CreateReport = ({ navigation }) => {
                     placeholder="पता"
                     onChangeText={text => setAddress(text)}
                     value={address}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
 
@@ -796,6 +872,7 @@ const CreateReport = ({ navigation }) => {
                     placeholder="शहर"
                     onChangeText={text => setCity(text)}
                     value={city}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.city ? <Text style={styles.errorText}>{errors.city}</Text> : null}
 
@@ -808,6 +885,7 @@ const CreateReport = ({ navigation }) => {
                     onChangeText={text => setPincode(text)}
                     value={pincode}
                     maxLength={6}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.pincode ? <Text style={styles.errorText}>{errors.pincode}</Text> : null}
 
@@ -825,6 +903,7 @@ const CreateReport = ({ navigation }) => {
                     placeholder="आईडी प्रकार*"
                     value={idType}
                     onChange={item => setIdType(item.value)}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.idType ? <Text style={styles.errorText}>{errors.idType}</Text> : null}
 
@@ -836,6 +915,7 @@ const CreateReport = ({ navigation }) => {
                     placeholder='आईडी नंबर*'
                     onChangeText={text => setIdNumber(text)}
                     value={idNumber}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
 
@@ -853,6 +933,9 @@ const CreateReport = ({ navigation }) => {
                                     <CheckBox
                                         value={category.isChecked}
                                         onValueChange={() => handleCategoryCheck(index)}
+                                        tintColors='grey'
+                                        onTintColor="grey"
+                                        onFillColor='grey'
                                     />
                                     <Text style={{ fontSize: 13, color: "#000", fontWeight: "500" }}>{category.CategoryName} - {category.iPrice}</Text>
                                 </View>
@@ -910,7 +993,7 @@ const CreateReport = ({ navigation }) => {
                     <Text style={styles.button}>Save</Text>
                 </TouchableOpacity>
                 <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal2}>
-                    <Pressable style={styles.modalOverlay}>
+                    <Pressable style={styles.modalOverlay} onPress={() => setOpenModal2(false)}>
                         <View style={styles.modalView}>
                             <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                             {
@@ -976,7 +1059,7 @@ const styles = StyleSheet.create({
         height: 40,
     },
     guestContainer: {
-        marginTop: 10,
+        marginTop: 20,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -1050,6 +1133,7 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 12,
+        color: "grey"
     },
     lableText: {
         fontSize: 12,

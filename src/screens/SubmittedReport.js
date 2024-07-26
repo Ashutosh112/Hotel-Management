@@ -36,6 +36,7 @@ const SubmittedReport = ({ navigation }) => {
                 setLoading(false);
             })
             .catch(err => {
+                console.log("errr", err)
                 setLoading(false);
             });
     };
@@ -87,10 +88,10 @@ const SubmittedReport = ({ navigation }) => {
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setShowCheckinPicker(true)}>
-                        <Text>{checkinDate ? moment(checkinDate).format("DD-MMM-YYYY") : "दिनांक से*"}</Text>
+                        <Text style={{ color: "darkgrey" }}>{checkinDate ? moment(checkinDate).format("DD-MMM-YYYY") : "दिनांक से*"}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.input, { justifyContent: "center", marginTop: 8, width: "45%" }]} onPress={() => setShowCheckoutPicker(true)}>
-                        <Text>{checkoutDate ? moment(checkoutDate).format("DD-MMM-YYYY") : "दिनांक तक*"}</Text>
+                        <Text style={{ color: "darkgrey" }}>{checkoutDate ? moment(checkoutDate).format("DD-MMM-YYYY") : "दिनांक तक*"}</Text>
                     </TouchableOpacity>
                 </View>
                 {showCheckinPicker && (
@@ -119,7 +120,7 @@ const SubmittedReport = ({ navigation }) => {
             ) : (
                 data.map((item, index) => (
                     <View key={index} style={styles.itemContainer}>
-                        <View style={{ flex: 0.8 }}>
+                        <View style={{ flex: 0.8, justifyContent: "center", alignItems: "flex-start" }}>
                             <Image source={Logo} style={{ height: 45, width: 45 }} resizeMode="contain" />
                         </View>
                         <View style={{ flex: 3 }}>
@@ -129,7 +130,7 @@ const SubmittedReport = ({ navigation }) => {
                             </View>
                         </View>
                         <TouchableOpacity onPress={() => navigation.navigate("SubmittedReportDetails", { checkInD: item.SubmitDate, checkOutD: item.SubmitDate })} style={styles.detailButton}>
-                            <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7 }}>Detail</Text>
+                            <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7, paddingHorizontal: 5 }}>जानकारी देखें</Text>
                         </TouchableOpacity>
                     </View>
                 ))

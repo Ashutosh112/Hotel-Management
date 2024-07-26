@@ -88,6 +88,7 @@ const Login = ({ navigation }) => {
           })
           .catch((err) => {
             setIsLoading(false)
+            console.log("errr", err)
           })
       }
     }
