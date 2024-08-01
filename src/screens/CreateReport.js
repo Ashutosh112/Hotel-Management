@@ -362,7 +362,11 @@ const CreateReport = ({ navigation }) => {
     const onChangeCheckout = (event, selectedDate) => {
         const currentDate = selectedDate || checkoutDate;
         setShowCheckoutPicker(false);
-        if (currentDate >= checkinDate) {
+
+        if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
+            setCheckoutDate(currentDate);
+            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
+        } else if (currentDate >= checkinDate) {
             setCheckoutDate(currentDate);
             setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
         } else {
