@@ -35,18 +35,19 @@ const SearchGuestDetails = ({ navigation, route }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
+        console.log("rrrrrr", masterId)
         await axios.post(`${baseUrl}GuestDetails?idGuestMaster=${masterId}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("??????????????", res.data)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
             .catch(err => {
                 setIsLoading(false)
+                console.log("eeeerrr", err)
             });
     };
 
@@ -86,11 +87,11 @@ const SearchGuestDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image1 }} style={styles.image} resizeMode="contain" />
                             {/* <Image source={{ uri: item.Image1 }} style={styles.image} resizeMode="contain" /> */}
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_back.jpeg")} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image2 }} style={styles.image} resizeMode="contain" />
                         </View>
                     </View>
                     <View style={styles.guestContent}>

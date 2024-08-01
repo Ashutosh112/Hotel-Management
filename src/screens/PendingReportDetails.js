@@ -108,13 +108,14 @@ const PendingReportDetails = ({ navigation, route }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
+        console.log("sub", SubmitDate)
         await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("GGGGGG>>>>>", res.data.Result)
+                // console.log("GGGGGG>>>>>", res.data.Result)
                 setGuestData(res.data.Result);
             })
             .catch(err => {
@@ -167,10 +168,10 @@ const PendingReportDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image1 }} style={styles.image} resizeMode="contain" />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_back.jpeg")} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image2 }} style={styles.image} resizeMode="contain" />
                         </View>
                     </View>
                     <View style={styles.guestContent}>

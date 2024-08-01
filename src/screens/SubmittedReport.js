@@ -27,7 +27,7 @@ const SubmittedReport = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}AllSubmitedGuestByHotelId?HotelId=${updatedValue.idHotelMaster}&fromDate=${moment(checkinDate).format("DD/MMM/YYYY")}&toDate=${moment(checkoutDate).format("DD/MMM/YYYY")}`, {}, config)

@@ -28,10 +28,13 @@ const PendingReport = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}AllPendingGuestList?HotelId=${updatedValue.idHotelMaster}`, {}, config)
+        let body = {}
+        let url = `${baseUrl}AllPendingGuestList?HotelId=${updatedValue.idHotelMaster}`
+        console.log("url", url)
+        await axios.post(url, body, config)
             .then((res) => {
                 setIsLoading(false)
                 console.log("resss", res.data.Result)

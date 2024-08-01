@@ -14,6 +14,7 @@ import CalendorIcon from "../assets/images/CalenderIcon.png";
 import ImagePicker from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import AlertIcon from "react-native-vector-icons/Ionicons";
+import Spinner from './Spinner';
 
 const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, errors }) => (
     <View style={styles.guestContainer}>
@@ -111,6 +112,19 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
         {errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+            <Text style={styles.lableText}>मोबाइल नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+        </View>
+        <TextInput
+            style={styles.input}
+            placeholder="मोबाइल नंबर"
+            placeholderTextColor={"darkgrey"}
+            onChangeText={text => handleGuestChange(index, 'mobileNumber', text)}
+            value={guest.mobileNumber}
+            maxLength={10} />
+
+        {errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
+
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
             <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
@@ -181,6 +195,8 @@ const CreateReport = ({ navigation }) => {
     const [openModal2, setOpenModal2] = useState(false)
     const [statusCode, setStatusCode] = useState({})
     const [submitValidateDateStatusCode, setSubmitValidateDateStatusCode] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+
 
     useEffect(() => {
         hotelRoomCategory()
@@ -192,70 +208,6 @@ const CreateReport = ({ navigation }) => {
         newGuests[index] = { ...newGuests[index], [field]: value };
         setGuests(newGuests);
     };
-
-    // const handleDocumentPicker = async (index, field) => {
-    //     try {
-    //         const result = await ImagePicker.openPicker({
-    //             includeBase64: true,
-    //             mediaType: 'photo',
-    //         });
-    //         console.log("Typoe??????/", result.data)
-    //         const base64Image = `data:${result.mime};base64,${result.data}`;
-    //         // const base64Image = result.data
-    //         // const base64Image = result
-
-    //         if (index === -1) {
-    //             // console.log("base65image>>>", base64Image)
-    //             if (field === 'idFront') setIdFront(base64Image);
-    //             if (field === 'idBack') setIdBack(base64Image);
-    //         } else {
-    //             const newGuests = [...guests];
-    //             newGuests[index] = { ...newGuests[index], [field]: base64Image };
-    //             setGuests(newGuests);
-    //         }
-    //     } catch (err) {
-    //         if (ImagePicker.isCancel(err)) {
-    //             Alert.alert('Canceled', 'Image picker was canceled');
-    //         } else {
-    //             Alert.alert('Error', 'Failed to pick image');
-    //         }
-    //     }
-    // };
-    // const handleDocumentPicker = async (index, field) => {
-    //     try {
-    //         const result = await ImagePicker.openPicker({
-    //             includeBase64: true,
-    //             mediaType: 'photo',
-    //         });
-
-    //         // Check the MIME type of the selected file
-    //         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    //         if (!allowedMimeTypes.includes(result.mime)) {
-    //             Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
-    //             return;
-    //         }
-
-    //         console.log("Type??????/", result.data);
-    //         const base64Image = `data:${result.mime};base64,${result.data}`;
-    //         // const base64Image = `${result.data}`;
-
-
-    //         if (index === -1) {
-    //             if (field === 'idFront') setIdFront(base64Image);
-    //             if (field === 'idBack') setIdBack(base64Image);
-    //         } else {
-    //             const newGuests = [...guests];
-    //             newGuests[index] = { ...newGuests[index], [field]: base64Image };
-    //             setGuests(newGuests);
-    //         }
-    //     } catch (err) {
-    //         if (ImagePicker.isCancel(err)) {
-    //             Alert.alert('Canceled', 'Image picker was canceled');
-    //         } else {
-    //             Alert.alert('Error', 'Failed to pick image');
-    //         }
-    //     }
-    // };
 
     const handleDocumentPicker = async (index, field) => {
         try {
@@ -277,7 +229,9 @@ const CreateReport = ({ navigation }) => {
                 Alert.alert('File Too Large', 'The selected file size should not exceed 5MB.');
                 return;
             }
-            const base64Image = `data:${result.mime};base64,${result.data}`;
+            // const base64Image = `data:${result.mime};base64,${result.data}`;
+            const base64Image = `${result.data}`;
+
             if (index === -1) {
                 if (field === 'idFront') setIdFront(base64Image);
                 if (field === 'idBack') setIdBack(base64Image);
@@ -303,7 +257,7 @@ const CreateReport = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
@@ -385,7 +339,7 @@ const CreateReport = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}ValidateDateForAddGuest?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(yesterday).format("DD/MMM/YYYY")}`, {}, config)
@@ -444,7 +398,7 @@ const CreateReport = ({ navigation }) => {
             idNumber: '',
             travelReason: '',
             pincode: '',
-            guests: guests.map(() => ({ firstName: '', lastName: '', phoneNumber: '', idType: '', idNumber: '' })),
+            guests: guests.map(() => ({ firstName: '', lastName: '', phoneNumber: '', idType: '', idNumber: '', mobileNumber: '' })),
         };
 
         if (!name) {
@@ -479,7 +433,6 @@ const CreateReport = ({ navigation }) => {
             newErrors.gender = 'जेंडर दर्ज करें।';
             valid = false;
         }
-
 
         if (!travelReason) {
             newErrors.travelReason = 'यात्रा का उद्देश्य दर्ज करें।';
@@ -538,6 +491,11 @@ const CreateReport = ({ navigation }) => {
                 valid = false;
             }
 
+            if (!guest.mobileNumber) {
+                newErrors.guests[index].mobileNumber = 'मोबाइल नंबर दर्ज करें।';
+                valid = false;
+            }
+
             if (!guest.idNumber) {
                 newErrors.guests[index].idNumber = 'कृपया पहचान संख्या दर्ज करें।';
                 valid = false;
@@ -574,13 +532,14 @@ const CreateReport = ({ navigation }) => {
 
     const handleSubmit = async () => {
         if (!validate()) return;
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         const selectedCategories = hotelCategories
@@ -594,9 +553,9 @@ const CreateReport = ({ navigation }) => {
         let body = {
             idHotel: updatedValue.idHotelMaster,
             contactNo: phoneNumber,
-            checkInDate: moment(checkinDate).format("DD-MMM-YYYY"),
-            checkOutDate: moment(checkoutDate).format("DD-MMM-YYYY"),
-            enterDate: moment(new Date()).format("DD-MMM-YYYY"),
+            checkInDate: moment(checkinDate).format("MM/DD/YYYY"),
+            checkOutDate: moment(checkoutDate).format("MM/DD/YYYY"),
+            enterDate: moment(new Date()).format("MM/DD/YYYY"),
             description: "None",
             bActive: true,
             guestName: name,
@@ -609,44 +568,36 @@ const CreateReport = ({ navigation }) => {
                 sName: guest.firstName,
                 identificationNo: guest.idNumber,
                 identificationType: guest.idType,
-                image: guest.idFront,
                 gender: guest.gender,
-                contactNo: "8787878787",
-                filePass: "7d465d03",
+                contactNo: guest.mobileNumber,
+                filePass: "",
                 lastName: guest.lastName,
+                image: guest.idFront,
                 image2: guest.idBack,
-                // image: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
-                // image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
             })),
             categories: selectedCategories,
-            addionalGuest: additionalGuests,
+            additionalGuest: additionalGuests,
             hotelName: updatedValue.HotelName,
             guestLastName: lastName,
             gender: gender,
             travelReson: travelReason,
             city: city,
             pIncode: pincode,
-            filePass: "7d465d03", // Example filePass value
+            filePass: "", // Example filePass value
             image1: idFront,
             image2: idBack
-            // image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
-            // image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
         };
-        // console.log("BODYYY", body)
+        console.log("BODYYY", body)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
+                setIsLoading(false)
                 console.log("RESPONSE----", response.data)
-                // Toast.show({
-                //     type: 'success',
-                //     text1: 'Success',
-                //     text2: 'Success'
-                // });
-                // navigation.navigate("BottomNavigator")
                 setStatusCode(response.data)
                 setOpenModal2(true)
             })
             .catch(error => {
-                console.error('Error sending form data:', error);
+                console.error('Error sending form data:');
+                setIsLoading(false)
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -657,6 +608,7 @@ const CreateReport = ({ navigation }) => {
 
     return (
         <ScrollView style={{ backgroundColor: "#fff" }}>
+            <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -1097,7 +1049,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         color: "#000",
         height: 50,
-        marginTop: 15,
+        marginTop: 10,
     },
     buttonContainer: {
         borderRadius: 20,

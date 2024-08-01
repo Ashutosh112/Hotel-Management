@@ -31,7 +31,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}SubmitedGuestDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${checkInD}&toDate=${checkInD}`, {}, config)
@@ -78,10 +78,10 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_card_front.jpg")} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image1 }} style={styles.image} resizeMode="contain" />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={require("../assets/images/aadhar_back.jpeg")} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image2 }} style={styles.image} resizeMode="contain" />
                         </View>
                     </View>
                     <View style={styles.guestContent}>

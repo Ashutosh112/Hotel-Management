@@ -33,7 +33,7 @@ const SearchGuest = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         console.log("bodyyyyy", `${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${firstName}&AadharNo=${idNumberValue}&sMobile=${mobileNumber}`)

@@ -6,8 +6,8 @@ import Alert from "react-native-vector-icons/Ionicons";
 import { baseUrl } from '../utils/env';
 import axios from 'axios';
 import Spinner from './Spinner';
-
-
+import Toast from 'react-native-toast-message';
+import LogoutIcon from "react-native-vector-icons/MaterialCommunityIcons"
 
 const Profile = ({ navigation }) => {
 
@@ -18,8 +18,6 @@ const Profile = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [categoryDetails, CategoryDetails] = useState([])
 
-
-
     useEffect(() => {
         const fetchData = async () => {
             const value = await AsyncStorage.getItem('hotelmgmt');
@@ -28,7 +26,6 @@ const Profile = ({ navigation }) => {
                 setProfileDetails(updatedValue);
             }
         };
-
         fetchData();
         getCategory()
     }, []);
@@ -42,26 +39,31 @@ const Profile = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
-        const body = {
+        const body = [{
             idHotelRoomCategory: 0,
             idHotel: updatedValue.idHotelMaster,
             categoryName: roomCategory,
             iPrice: roomPrice,
             noOfRoom: 1,
             bChecked: true
-        }
-        console.log("body", body)
+        }];
         await axios.post(`${baseUrl}InsertCategory`, body, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("success", res.data)
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: res.data.Message
+                });
+                getCategory()
+                setRoomCategory('')
+                setRoomPrice('')
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errr", err)
             });
     };
 
@@ -70,22 +72,21 @@ const Profile = ({ navigation }) => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
+        console.log("opopop", updatedValue)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
                 CategoryDetails(res.data.Result)
-
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errr", err)
             });
     };
 
@@ -101,9 +102,9 @@ const Profile = ({ navigation }) => {
                     </TouchableOpacity>
                     <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>होटल प्रोफ़ाइल</Text>
                 </View>
-                <TouchableOpacity style={{ flex: 2, justifyContent: "center", alignItems: "flex-end" }} onPress={() => setOpenModal(true)}>
-                    {/* <Image source={require('../assets/images/profileLogo.png')} style={{ height: 40, width: 40, borderWidth: 1, borderRadius: 40, borderColor: "#fff" }} /> */}
+                <TouchableOpacity style={{ flex: 2, flexDirection: "row", justifyContent: "center", alignItems: 'center' }} onPress={() => setOpenModal(true)}>
                     <Text style={{ fontSize: 16, fontWeight: "500", color: "#fff" }}>Logout</Text>
+                    <LogoutIcon name="location-exit" size={22} color="#fff" style={{ marginLeft: 5 }} />
                 </TouchableOpacity>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
@@ -169,7 +170,7 @@ const Profile = ({ navigation }) => {
                     style={[styles.input, { marginTop: 8 }]} />
                 <View style={{ height: 1, backgroundColor: "#024063", width: '90%', marginVertical: 20 }} />
 
-                <View style={{ width: "90%", justifyContent: "center", paddingVertical: 10, elevation: 2, backgroundColor: "white", borderRadius: 10, paddingHorizontal: 15 }}>
+                <View style={{ width: "90%", justifyContent: "center", paddingVertical: 10, elevation: 2, backgroundColor: "#ccd8df", borderRadius: 10, paddingHorizontal: 15 }}>
                     <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
                         <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>S. No. </Text>
                         <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>कमरे की श्रेणी </Text>

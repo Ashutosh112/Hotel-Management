@@ -63,36 +63,43 @@ const Login = ({ navigation }) => {
   };
 
   const verifyOtp = async () => {
-    setIsLoading(true)
-    const fullOtp = Object.values(otp).join("")
-    if (fullOtp.length == 6) {
-      if (mobileNumber) {
-        const config = {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-type": "application/json"
-          }
-        };
-        await axios.post(`${baseUrl}HotelLogin?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
-          .then((res) => {
-            setIsLoading(false)
-            const data = res.data.Result
-            AsyncStorage.setItem("hotelmgmt", JSON.stringify(data))
-            navigation.navigate("BottomNavigator")
-            setShowOtpModal(false)
-            Toast.show({
-              type: 'success',
-              text1: 'Success',
-              text2: "Login Successfull!"
-            });
-          })
-          .catch((err) => {
-            setIsLoading(false)
-            console.log("errr", err)
-          })
-      }
+    setIsLoading(true);
+    const fullOtp = Object.values(otp).join("");
+
+    if (fullOtp.length < 6) {
+      setIsLoading(false);
+      alert("Please enter a valid OTP")
+      return;
+    }
+
+    if (mobileNumber) {
+      const config = {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-type": "application/json"
+        }
+      };
+
+      axios.post(`${baseUrl}HotelLogin?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
+        .then((res) => {
+          setIsLoading(false);
+          const data = res.data.Result;
+          AsyncStorage.setItem("hotelmgmt", JSON.stringify(data));
+          navigation.navigate("BottomNavigator");
+          setShowOtpModal(false);
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: "Login Successful!"
+          });
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          alert("OTP is wrong. Please try again.")
+        });
     }
   }
+
 
   return (
     <View style={styles.container}>
