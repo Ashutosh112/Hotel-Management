@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, Alert, StyleSheet, StatusBar, TouchableOpacity, Dimensions, Image, Modal, Pressable } from 'react-native';
 import axios from 'axios';
 import DocumentPicker from 'react-native-document-picker';
@@ -16,10 +16,12 @@ import Toast from 'react-native-toast-message';
 import AlertIcon from "react-native-vector-icons/Ionicons";
 import Spinner from './Spinner';
 
+
+
 const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, errors }) => (
     <View style={styles.guestContainer}>
         <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ fontSize: 16, color: "#000", marginBottom: 10, textAlign: "left", marginTop: 10 }}>अतिरिक्त अतिथि {index + 1}</Text>
+            <Text style={{ fontSize: 14, color: "#000", marginBottom: 10, textAlign: "left", marginTop: 15, fontWeight: "600" }}>अतिरिक्त अतिथि {index + 1}</Text>
         </View>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
@@ -43,63 +45,67 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             />
         </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-            {errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
-            {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+            {errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+            {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
         </View>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 0 }}>
             <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
             <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
-            <Dropdown
-                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                itemTextStyle={styles.selectedTextStyle}
-                data={[
-                    { label: 'पुरुष', value: 'पुरुष' },
-                    { label: 'महिला', value: 'महिला' },
-                    { label: 'अन्य', value: 'अन्य' },
-                ]}
-                labelField="label"
-                valueField="value"
-                placeholder="जेंडर"
-                value={guest.gender}
-                onChange={item => handleGuestChange(index, 'gender', item.value)}
-            />
+        </View>*/}
 
-            <Dropdown
-                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                itemTextStyle={styles.selectedTextStyle} data={[
-                    { label: 'आधार कार्ड', value: 'आधार कार्ड' },
-                    { label: 'पासपोर्ट', value: 'पासपोर्ट' },
-                    { label: 'वोटर आई कार्ड', value: 'वोटर आई कार्ड' },
-                    { label: 'ड्राइविंग लाइसेंस', value: 'ड्राइविंग लाइसेंस' },
-                    { label: 'पैन कार्ड', value: 'पैन कार्ड' },
-                    { label: 'राशन कार्ड', value: 'राशन कार्ड' },
-                    { label: 'सरकारी कर्मचारी पहचान पत्र', value: 'सरकारी कर्मचारी पहचान पत्र' },
-                    { label: 'विदेशियों का पंजीकरण कार्ड (FRC)', value: 'विदेशियों का पंजीकरण कार्ड (FRC)' },
-                    { label: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र', value: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र' },
-                ]}
-                labelField="label"
-                valueField="value"
-                placeholder="आईडी प्रकार*"
-                value={guest.idType}
-                onChange={item => handleGuestChange(index, 'idType', item.value)}
-            />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.firstName && errors.lastName ? 10 : 0 }}>
+            <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
+
+        <Dropdown
+            style={[styles.input, { width: "95%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            itemTextStyle={styles.selectedTextStyle}
+            data={[
+                { label: 'पुरुष', value: 'पुरुष' },
+                { label: 'महिला', value: 'महिला' },
+                { label: 'अन्य', value: 'अन्य' },
+            ]}
+            labelField="label"
+            valueField="value"
+            placeholder="जेंडर"
+            value={guest.gender}
+            onChange={item => handleGuestChange(index, 'gender', item.value)}
+        />
+        {errors.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.gender}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+
+        <Text style={[styles.lableText, { marginTop: errors.gender ? 10 : 0, width: '90%' }]}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+        <Dropdown
+            style={[styles.input, { width: "95%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            itemTextStyle={styles.selectedTextStyle} data={[
+                { label: 'आधार कार्ड', value: 'आधार कार्ड' },
+                { label: 'पासपोर्ट', value: 'पासपोर्ट' },
+                { label: 'वोटर आई कार्ड', value: 'वोटर आई कार्ड' },
+                { label: 'ड्राइविंग लाइसेंस', value: 'ड्राइविंग लाइसेंस' },
+                { label: 'पैन कार्ड', value: 'पैन कार्ड' },
+                { label: 'राशन कार्ड', value: 'राशन कार्ड' },
+                { label: 'सरकारी कर्मचारी पहचान पत्र', value: 'सरकारी कर्मचारी पहचान पत्र' },
+                { label: 'विदेशियों का पंजीकरण कार्ड (FRC)', value: 'विदेशियों का पंजीकरण कार्ड (FRC)' },
+                { label: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र', value: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र' },
+            ]}
+            labelField="label"
+            valueField="value"
+            placeholder="आईडी प्रकार*"
+            value={guest.idType}
+            onChange={item => handleGuestChange(index, 'idType', item.value)}
+        />
+        {errors.idType && errors.idType ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.idType}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-            {errors.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.gender}</Text> : null}
-            {errors.idType && errors.idType ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idType}</Text> : null}
         </View>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.idType ? 10 : 0 }}>
             <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
         <TextInput
@@ -109,9 +115,9 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             onChangeText={text => handleGuestChange(index, 'idNumber', text)}
             value={guest.idNumber} />
 
-        {errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
+        {errors.idNumber && errors.idNumber ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.idNumber}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.idNumber ? 10 : 0 }}>
             <Text style={styles.lableText}>मोबाइल नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
         <TextInput
@@ -120,14 +126,15 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             placeholderTextColor={"darkgrey"}
             onChangeText={text => handleGuestChange(index, 'mobileNumber', text)}
             value={guest.mobileNumber}
+            keyboardType="numeric"
             maxLength={10} />
 
-        {errors.mobileNumber ? <Text style={styles.errorText}>{errors.mobileNumber}</Text> : null}
+        {errors.mobileNumber && errors.mobileNumber ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.mobileNumber}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: 10 }}>
             <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
             {guest.idFront ? (
                 <TouchableOpacity
                     style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idFront')}>
@@ -155,7 +162,7 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             {guest.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text> : (errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : null)}
             {guest.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text> : (errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : null)}
         </View>
-    </View>
+    </View >
 );
 
 
@@ -205,9 +212,41 @@ const CreateReport = ({ navigation }) => {
 
     const handleGuestChange = (index, field, value) => {
         const newGuests = [...guests];
-        newGuests[index] = { ...newGuests[index], [field]: value };
+        newGuests[index][field] = value;
         setGuests(newGuests);
+        validateGuestField(index, field, value);
     };
+
+    const validateGuestField = (index, field, value) => {
+        const newErrors = { ...errors };
+        let error = '';
+
+        if (field === 'firstName') {
+            if (/\d/.test(value)) {
+                error = 'प्रथम नाम में संख्याएँ नहीं हो सकतीं';
+            } else if (!value) {
+                error = 'कृपया प्रथम नाम दर्ज करें।';
+            }
+        } else if (field === 'lastName') {
+            if (/\d/.test(value)) {
+                error = 'अंतिम नाम में संख्याएँ नहीं हो सकतीं';
+            } else if (!value) {
+                error = 'कृपया अंतिम नाम दर्ज करें।';
+            }
+        } else if (field === 'mobileNumber') {
+            if (!/^[0-9]+$/.test(value) || value.length !== 10) {
+                error = 'मोबाइल नंबर 10 अंकों का होना चाहिए';
+            }
+        }
+
+        if (!newErrors.guests[index]) {
+            newErrors.guests[index] = {};
+        }
+
+        newErrors.guests[index][field] = error;
+        setErrors(newErrors);
+    };
+
 
     const handleDocumentPicker = async (index, field) => {
         try {
@@ -263,7 +302,6 @@ const CreateReport = ({ navigation }) => {
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 // setIsLoading(false);
-                console.log("resss", res.data)
                 const categories = res.data.Result.map(cat => ({ ...cat, isChecked: false }));
                 setHotelCategories(categories);
             })
@@ -344,7 +382,6 @@ const CreateReport = ({ navigation }) => {
         };
         await axios.post(`${baseUrl}ValidateDateForAddGuest?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(yesterday).format("DD/MMM/YYYY")}`, {}, config)
             .then((res) => {
-                console.log("submitValidateDate----", res.data)
                 setSubmitValidateDateStatusCode(res.data)
             })
             .catch(err => {
@@ -387,6 +424,67 @@ const CreateReport = ({ navigation }) => {
         }
     };
 
+    const validatePhoneNumber = (text) => {
+        setPhoneNumber(text);
+        let error = '';
+        if (!/^[0-9]+$/.test(text) || text.length !== 10) {
+            error = 'फ़ोन नंबर 10 अंकों का होना चाहिए';
+        }
+        setErrors(prevErrors => ({ ...prevErrors, phoneNumber: error }));
+    };
+
+    const validateName = (text, field) => {
+        let error = '';
+        if (/[\d]/.test(text)) {
+            error = 'नाम में संख्याएँ नहीं हो सकतीं';
+        }
+        setErrors(prevErrors => ({ ...prevErrors, [field]: error }));
+        if (field === 'name') {
+            setName(text);
+        } else {
+            setLastName(text);
+        }
+    };
+
+    const handleCityChange = (text) => {
+        // Remove numeric characters from the text
+        const filteredText = text.replace(/[0-9]/g, '');
+        setCity(filteredText);
+    };
+
+    const handleIdNumberChange = (text) => {
+        setIdNumber(text);
+        const pattern = idValidationPatterns[idType] || idValidationPatterns["default"];
+        if (!pattern.test(text)) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                idNumber: `अमान्य ${idType} नंबर`
+            }));
+        } else if (pattern.test(text) && text.length === getPatternLength(idType)) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                idNumber: ''
+            }));
+        }
+    };
+
+    const getPatternLength = (type) => {
+        switch (type) {
+            case 'आधार कार्ड':
+                return 12;
+            case 'पैन कार्ड':
+                return 10;
+            case 'वोटर आई कार्ड':
+                return 10;
+            default:
+                return null;
+        }
+    }
+
+
+    const lastNameInputRef = useRef(null);
+    const cityInputRef = useRef(null);
+    const pincodeInputRef = useRef(null);
 
     const validate = () => {
         let valid = true;
@@ -525,7 +623,7 @@ const CreateReport = ({ navigation }) => {
         // Validate categories
         const checkedCategories = hotelCategories.filter(cat => cat.isChecked);
         if (hotelCategories.length > 1 && checkedCategories.length === 0) {
-            setCategoryErrors('At least one category should be selected');
+            setCategoryErrors('कमरे की एक श्रेणी चुनें');
             valid = false;
         } else {
             setCategoryErrors('');
@@ -580,28 +678,27 @@ const CreateReport = ({ navigation }) => {
                 image2: guest.idBack,
             })),
             categories: selectedCategories,
-            additionalGuest: additionalGuests,
+            AddionalGuest: additionalGuests,
             hotelName: updatedValue.HotelName,
             guestLastName: lastName,
             gender: gender,
             travelReson: travelReason,
             city: city,
             pIncode: pincode,
-            filePass: "", // Example filePass value
+            filePass: "",
             image1: idFront,
             image2: idBack
         };
-        console.log("BODYYY", body)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 setIsLoading(false)
-                console.log("RESPONSE----", response.data)
                 setStatusCode(response.data)
                 setOpenModal2(true)
             })
             .catch(error => {
                 console.error('Error sending form data:');
                 setIsLoading(false)
+                console.log("errr", error.response)
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -609,6 +706,8 @@ const CreateReport = ({ navigation }) => {
                 });
             });
     };
+
+
 
     return (
         <ScrollView style={{ backgroundColor: "#fff" }}>
@@ -623,7 +722,7 @@ const CreateReport = ({ navigation }) => {
             </View>
 
             <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
-                <Text style={[styles.modalText, { fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { fontSize: 14, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>1. इस फॉर्म के माध्यम से आप गेस्ट की एंट्री सेव कर रहे हैं। इसे थाने में भेजने के लिए कृपया पेंडिंग रिपोर्ट में जाकर इस रिपोर्ट को सबमिट करें।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>2. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today)और कल(Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
@@ -632,7 +731,7 @@ const CreateReport = ({ navigation }) => {
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
             <View style={styles.container}>
-                <Text style={[styles.lableText, { fontSize: 16, fontWeight: "400", color: "#000", width: "auto", marginVertical: 5 }]}>प्राथमिक अतिथि की जानकारी</Text>
+                <Text style={[styles.lableText, { fontSize: 16, fontWeight: "600", color: "#000", width: "auto", marginVertical: 5 }]}>प्राथमिक अतिथि की जानकारी</Text>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
@@ -640,25 +739,26 @@ const CreateReport = ({ navigation }) => {
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <TextInput
-                        onChangeText={text => setName(text)}
+                        onChangeText={(text) => validateName(text, 'name')}
+                        onSubmitEditing={() => lastNameInputRef.current.focus()} // Move focus to the last name input
                         placeholderTextColor={"darkgrey"}
                         placeholder='प्रथम नाम*'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
                     />
                     <TextInput
-                        onChangeText={text => setLastName(text)}
+                        onChangeText={(text) => validateName(text, 'lastName')}
+                        ref={lastNameInputRef} // Reference for the last name input
                         placeholderTextColor={"darkgrey"}
                         placeholder='अंतिम नाम*'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
                     />
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                    {errors.name ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.name}</Text> : null}
-                    {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+                    {errors.name ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.name}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+                    {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
                 </View>
 
-
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 0 }}>
                     <Text style={styles.lableText}>चेक इन तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                     <Text style={styles.lableText}>चेक आउट तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
@@ -666,7 +766,7 @@ const CreateReport = ({ navigation }) => {
                     <TouchableOpacity
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                         onPress={openDatePicker}>
-                        <Text style={{ color: "darkgrey" }}>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
+                        <Text style={{ color: "black", fontSize: 12 }}>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
                         <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                     </TouchableOpacity>
 
@@ -701,7 +801,7 @@ const CreateReport = ({ navigation }) => {
                     <TouchableOpacity
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                         onPress={() => setShowCheckoutPicker(true)}>
-                        <Text style={{ color: "darkgrey" }}>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
+                        <Text style={{ color: "black", fontSize: 12 }}>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
                         <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                     </TouchableOpacity>
 
@@ -723,7 +823,7 @@ const CreateReport = ({ navigation }) => {
                     style={styles.input}
                     placeholder="मोबाइल नंबर"
                     keyboardType="numeric"
-                    onChangeText={text => setPhoneNumber(text)}
+                    onChangeText={validatePhoneNumber}
                     value={phoneNumber}
                     maxLength={10}
                     placeholderTextColor={"darkgrey"}
@@ -817,6 +917,8 @@ const CreateReport = ({ navigation }) => {
                     onChangeText={text => setAddress(text)}
                     value={address}
                     placeholderTextColor={"darkgrey"}
+                    onSubmitEditing={() => cityInputRef.current.focus()} // Focus on the next input (city)
+
                 />
                 {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
 
@@ -824,11 +926,14 @@ const CreateReport = ({ navigation }) => {
                     <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <TextInput
+                    ref={cityInputRef} // Reference for the city input
                     style={styles.input}
                     placeholder="शहर"
-                    onChangeText={text => setCity(text)}
+                    onChangeText={handleCityChange}
                     value={city}
                     placeholderTextColor={"darkgrey"}
+                    returnKeyType="next"
+                    onSubmitEditing={() => pincodeInputRef.current.focus()} // Focus on the next input (pincode)
                 />
                 {errors.city ? <Text style={styles.errorText}>{errors.city}</Text> : null}
 
@@ -836,13 +941,20 @@ const CreateReport = ({ navigation }) => {
                     <Text style={styles.lableText}>पिन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <TextInput
+                    ref={pincodeInputRef} // Reference for the pincode input
                     style={styles.input}
                     placeholder="पिन"
-                    onChangeText={text => setPincode(text)}
+                    onChangeText={text => {
+                        const numericText = text.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+                        setPincode(numericText);
+                    }}
                     value={pincode}
                     maxLength={6}
+                    keyboardType="numeric"
                     placeholderTextColor={"darkgrey"}
+                    returnKeyType="done" // No further input, so "done"
                 />
+
                 {errors.pincode ? <Text style={styles.errorText}>{errors.pincode}</Text> : null}
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
@@ -869,7 +981,7 @@ const CreateReport = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     placeholder='आईडी नंबर*'
-                    onChangeText={text => setIdNumber(text)}
+                    onChangeText={handleIdNumberChange}
                     value={idNumber}
                     placeholderTextColor={"darkgrey"}
                 />
@@ -893,15 +1005,21 @@ const CreateReport = ({ navigation }) => {
                                         onTintColor="grey"
                                         onFillColor='grey'
                                     />
-                                    <Text style={{ fontSize: 13, color: "#000", fontWeight: "500" }}>{category.CategoryName} - {category.iPrice}</Text>
+                                    <Text style={{ fontSize: 13, color: "#000", fontWeight: "500", textTransform: "capitalize" }}>{category.CategoryName} - {category.iPrice}</Text>
                                 </View>
                             ))}
-                            {categoryErrors ? <Text style={styles.errorText}>{categoryErrors}</Text> : null}
+                            <Text style={{
+                                fontSize: 12,
+                                color: "#000",
+                                marginTop: 10,
+                                fontWeight: "500"
+                            }}>{categoryErrors ? <Text style={styles.errorText}>{categoryErrors}</Text> : null}</Text>
+
                         </View>
                     )}
                 </View>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 5 }}>
                     <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
@@ -940,7 +1058,7 @@ const CreateReport = ({ navigation }) => {
                             guest={guest}
                             handleGuestChange={handleGuestChange}
                             handleDocumentPicker={handleDocumentPicker}
-                            errors={errors.guests[index]}
+                            errors={errors.guests[index] || {}}
                         />
                     </View>
                 ))}
@@ -948,6 +1066,7 @@ const CreateReport = ({ navigation }) => {
                 <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
                     <Text style={styles.button}>Save</Text>
                 </TouchableOpacity>
+
                 <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal2}>
                     <Pressable style={styles.modalOverlay} onPress={() => setOpenModal2(false)}>
                         <View style={styles.modalView}>
@@ -966,7 +1085,7 @@ const CreateReport = ({ navigation }) => {
                                             null
 
                             }
-                            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 {
                                     statusCode.StatusCode == -1 ?
 
@@ -978,12 +1097,11 @@ const CreateReport = ({ navigation }) => {
                                                 <Text style={styles.textStyle}>ठीक</Text>
                                             </Pressable> :
                                             statusCode.StatusCode == 1 ?
-                                                <Pressable style={styles.modalButton} onPress={() => setOpenModal2(false)}>
+                                                <Pressable style={styles.modalButton} onPress={() => navigation.navigate('BottomNavigator')}>
                                                     <Text style={styles.textStyle}>ठीक</Text>
                                                 </Pressable> :
                                                 null
                                 }
-
                             </View>
                         </View>
                     </Pressable>
@@ -1057,7 +1175,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         borderRadius: 20,
-        marginTop: 16,
+        marginTop: 30,
         width: Dimensions.get('window').width - 60,
         height: 50,
         marginBottom: 20,

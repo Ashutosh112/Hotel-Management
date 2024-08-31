@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, Alert, StyleSheet, StatusBar, TouchableOpacity, Dimensions, Image, Modal, Pressable } from 'react-native';
 import axios from 'axios';
 import DocumentPicker from 'react-native-document-picker';
@@ -14,11 +14,14 @@ import CalendorIcon from "../assets/images/CalenderIcon.png";
 import ImagePicker from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import AlertIcon from "react-native-vector-icons/Ionicons";
+import Spinner from './Spinner';
+
+
 
 const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, errors }) => (
     <View style={styles.guestContainer}>
         <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ fontSize: 16, color: "#000", marginBottom: 10, textAlign: "left", marginTop: 10 }}>अतिरिक्त अतिथि {index + 1}</Text>
+            <Text style={{ fontSize: 14, color: "#000", marginBottom: 10, textAlign: "left", marginTop: 15, fontWeight: "600" }}>अतिरिक्त अतिथि {index + 1}</Text>
         </View>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
@@ -36,84 +39,102 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             <TextInput
                 onChangeText={text => handleGuestChange(index, 'lastName', text)}
                 value={guest.lastName}
-
                 placeholderTextColor='darkgrey'
                 placeholder='अंतिम नाम*'
                 style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
             />
         </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-            {errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : null}
-            {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+            {errors.firstName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.firstName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+            {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
         </View>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 0 }}>
             <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
             <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
-            <Dropdown
-                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                itemTextStyle={styles.selectedTextStyle}
-                data={[
-                    { label: 'पुरुष', value: 'पुरुष' },
-                    { label: 'महिला', value: 'महिला' },
-                    { label: 'अन्य', value: 'अन्य' },
-                ]}
-                labelField="label"
-                valueField="value"
-                placeholder="जेंडर"
-                value={guest.gender}
-                onChange={item => handleGuestChange(index, 'gender', item.value)}
-            />
+        </View>*/}
 
-            <Dropdown
-                style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                itemTextStyle={styles.selectedTextStyle} data={[
-                    { label: 'आधार कार्ड', value: 'आधार कार्ड' },
-                    { label: 'पासपोर्ट', value: 'पासपोर्ट' },
-                    { label: 'वोटर आई कार्ड', value: 'वोटर आई कार्ड' },
-                    { label: 'ड्राइविंग लाइसेंस', value: 'ड्राइविंग लाइसेंस' },
-                    { label: 'पैन कार्ड', value: 'पैन कार्ड' },
-                    { label: 'राशन कार्ड', value: 'राशन कार्ड' },
-                    { label: 'सरकारी कर्मचारी पहचान पत्र', value: 'सरकारी कर्मचारी पहचान पत्र' },
-                    { label: 'विदेशियों का पंजीकरण कार्ड (FRC)', value: 'विदेशियों का पंजीकरण कार्ड (FRC)' },
-                    { label: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र', value: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र' },
-                ]}
-                labelField="label"
-                valueField="value"
-                placeholder="आईडी प्रकार*"
-                value={guest.idType}
-                onChange={item => handleGuestChange(index, 'idType', item.value)}
-            />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.firstName && errors.lastName ? 10 : 0 }}>
+            <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
+
+        <Dropdown
+            style={[styles.input, { width: "95%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            itemTextStyle={styles.selectedTextStyle}
+            data={[
+                { label: 'पुरुष', value: 'पुरुष' },
+                { label: 'महिला', value: 'महिला' },
+                { label: 'अन्य', value: 'अन्य' },
+            ]}
+            labelField="label"
+            valueField="value"
+            placeholder="जेंडर"
+            value={guest.gender}
+            onChange={item => handleGuestChange(index, 'gender', item.value)}
+        />
+        {errors.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.gender}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+
+        <Text style={[styles.lableText, { marginTop: errors.gender ? 10 : 0, width: '90%' }]}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+        <Dropdown
+            style={[styles.input, { width: "95%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            itemTextStyle={styles.selectedTextStyle} data={[
+                { label: 'आधार कार्ड', value: 'आधार कार्ड' },
+                { label: 'पासपोर्ट', value: 'पासपोर्ट' },
+                { label: 'वोटर आई कार्ड', value: 'वोटर आई कार्ड' },
+                { label: 'ड्राइविंग लाइसेंस', value: 'ड्राइविंग लाइसेंस' },
+                { label: 'पैन कार्ड', value: 'पैन कार्ड' },
+                { label: 'राशन कार्ड', value: 'राशन कार्ड' },
+                { label: 'सरकारी कर्मचारी पहचान पत्र', value: 'सरकारी कर्मचारी पहचान पत्र' },
+                { label: 'विदेशियों का पंजीकरण कार्ड (FRC)', value: 'विदेशियों का पंजीकरण कार्ड (FRC)' },
+                { label: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र', value: ' कोई अन्य सरकारी जारी किया गया पहचान पत्र' },
+            ]}
+            labelField="label"
+            valueField="value"
+            placeholder="आईडी प्रकार*"
+            value={guest.idType}
+            onChange={item => handleGuestChange(index, 'idType', item.value)}
+        />
+        {errors.idType && errors.idType ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.idType}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-            {errors.gender && errors.gender ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.gender}</Text> : null}
-            {errors.idType && errors.idType ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idType}</Text> : null}
         </View>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.idType ? 10 : 0 }}>
             <Text style={styles.lableText}>आईडी नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
         <TextInput
             style={styles.input}
             placeholder="आईडी नंबर"
+            placeholderTextColor={"darkgrey"}
             onChangeText={text => handleGuestChange(index, 'idNumber', text)}
             value={guest.idNumber} />
 
-        {errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
+        {errors.idNumber && errors.idNumber ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.idNumber}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.idNumber ? 10 : 0 }}>
+            <Text style={styles.lableText}>मोबाइल नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+        </View>
+        <TextInput
+            style={styles.input}
+            placeholder="मोबाइल नंबर"
+            placeholderTextColor={"darkgrey"}
+            onChangeText={text => handleGuestChange(index, 'mobileNumber', text)}
+            value={guest.mobileNumber}
+            keyboardType="numeric"
+            maxLength={10} />
+
+        {errors.mobileNumber && errors.mobileNumber ? <Text style={[styles.errorText, { marginLeft: 0, width: "90%", }]}>{errors.mobileNumber}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: 10 }}>
             <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
             {guest.idFront ? (
                 <TouchableOpacity
                     style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idFront')}>
@@ -141,21 +162,21 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             {guest.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text> : (errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : null)}
             {guest.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text> : (errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : null)}
         </View>
-    </View>
+    </View >
 );
 
 
 const AddGuestInPendingReport = ({ navigation }) => {
     const [name, setName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [gender, setGender] = useState(null);
+    const [gender, setGender] = useState('पुरुष');
     const [city, setCity] = useState('');
     const [address, setAddress] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [idType, setIdType] = useState('');
+    const [idType, setIdType] = useState('आधार कार्ड');
     const [idNumber, setIdNumber] = useState('');
     const [pincode, setPincode] = useState('')
-    const [travelReason, setTravelReason] = useState(null)
+    const [travelReason, setTravelReason] = useState('दर्शन')
     const [additionalGuests, setAdditionalGuests] = useState("1");
     const [guests, setGuests] = useState([]);
     const [idFront, setIdFront] = useState(null);
@@ -181,6 +202,8 @@ const AddGuestInPendingReport = ({ navigation }) => {
     const [openModal2, setOpenModal2] = useState(false)
     const [statusCode, setStatusCode] = useState({})
     const [submitValidateDateStatusCode, setSubmitValidateDateStatusCode] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+
 
     useEffect(() => {
         hotelRoomCategory()
@@ -189,73 +212,41 @@ const AddGuestInPendingReport = ({ navigation }) => {
 
     const handleGuestChange = (index, field, value) => {
         const newGuests = [...guests];
-        newGuests[index] = { ...newGuests[index], [field]: value };
+        newGuests[index][field] = value;
         setGuests(newGuests);
+        validateGuestField(index, field, value);
     };
 
-    // const handleDocumentPicker = async (index, field) => {
-    //     try {
-    //         const result = await ImagePicker.openPicker({
-    //             includeBase64: true,
-    //             mediaType: 'photo',
-    //         });
-    //         console.log("Typoe??????/", result.data)
-    //         const base64Image = `data:${result.mime};base64,${result.data}`;
-    //         // const base64Image = result.data
-    //         // const base64Image = result
+    const validateGuestField = (index, field, value) => {
+        const newErrors = { ...errors };
+        let error = '';
 
-    //         if (index === -1) {
-    //             // console.log("base65image>>>", base64Image)
-    //             if (field === 'idFront') setIdFront(base64Image);
-    //             if (field === 'idBack') setIdBack(base64Image);
-    //         } else {
-    //             const newGuests = [...guests];
-    //             newGuests[index] = { ...newGuests[index], [field]: base64Image };
-    //             setGuests(newGuests);
-    //         }
-    //     } catch (err) {
-    //         if (ImagePicker.isCancel(err)) {
-    //             Alert.alert('Canceled', 'Image picker was canceled');
-    //         } else {
-    //             Alert.alert('Error', 'Failed to pick image');
-    //         }
-    //     }
-    // };
-    // const handleDocumentPicker = async (index, field) => {
-    //     try {
-    //         const result = await ImagePicker.openPicker({
-    //             includeBase64: true,
-    //             mediaType: 'photo',
-    //         });
+        if (field === 'firstName') {
+            if (/\d/.test(value)) {
+                error = 'प्रथम नाम में संख्याएँ नहीं हो सकतीं';
+            } else if (!value) {
+                error = 'कृपया प्रथम नाम दर्ज करें।';
+            }
+        } else if (field === 'lastName') {
+            if (/\d/.test(value)) {
+                error = 'अंतिम नाम में संख्याएँ नहीं हो सकतीं';
+            } else if (!value) {
+                error = 'कृपया अंतिम नाम दर्ज करें।';
+            }
+        } else if (field === 'mobileNumber') {
+            if (!/^[0-9]+$/.test(value) || value.length !== 10) {
+                error = 'मोबाइल नंबर 10 अंकों का होना चाहिए';
+            }
+        }
 
-    //         // Check the MIME type of the selected file
-    //         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    //         if (!allowedMimeTypes.includes(result.mime)) {
-    //             Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
-    //             return;
-    //         }
+        if (!newErrors.guests[index]) {
+            newErrors.guests[index] = {};
+        }
 
-    //         console.log("Type??????/", result.data);
-    //         const base64Image = `data:${result.mime};base64,${result.data}`;
-    //         // const base64Image = `${result.data}`;
+        newErrors.guests[index][field] = error;
+        setErrors(newErrors);
+    };
 
-
-    //         if (index === -1) {
-    //             if (field === 'idFront') setIdFront(base64Image);
-    //             if (field === 'idBack') setIdBack(base64Image);
-    //         } else {
-    //             const newGuests = [...guests];
-    //             newGuests[index] = { ...newGuests[index], [field]: base64Image };
-    //             setGuests(newGuests);
-    //         }
-    //     } catch (err) {
-    //         if (ImagePicker.isCancel(err)) {
-    //             Alert.alert('Canceled', 'Image picker was canceled');
-    //         } else {
-    //             Alert.alert('Error', 'Failed to pick image');
-    //         }
-    //     }
-    // };
 
     const handleDocumentPicker = async (index, field) => {
         try {
@@ -277,8 +268,8 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 Alert.alert('File Too Large', 'The selected file size should not exceed 5MB.');
                 return;
             }
-            const base64Image = `data:${result.mime};base64,${result.data}`;
-            // const base64Image = `${result.data}`;
+            // const base64Image = `data:${result.mime};base64,${result.data}`;
+            const base64Image = `${result.data}`;
 
             if (index === -1) {
                 if (field === 'idFront') setIdFront(base64Image);
@@ -305,13 +296,12 @@ const AddGuestInPendingReport = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 // setIsLoading(false);
-                console.log("resss", res.data)
                 const categories = res.data.Result.map(cat => ({ ...cat, isChecked: false }));
                 setHotelCategories(categories);
             })
@@ -387,12 +377,11 @@ const AddGuestInPendingReport = ({ navigation }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}ValidateDateForAddGuest?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(yesterday).format("DD/MMM/YYYY")}`, {}, config)
             .then((res) => {
-                console.log("submitValidateDate----", res.data)
                 setSubmitValidateDateStatusCode(res.data)
             })
             .catch(err => {
@@ -410,7 +399,11 @@ const AddGuestInPendingReport = ({ navigation }) => {
     const onChangeCheckout = (event, selectedDate) => {
         const currentDate = selectedDate || checkoutDate;
         setShowCheckoutPicker(false);
-        if (currentDate >= checkinDate) {
+
+        if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
+            setCheckoutDate(currentDate);
+            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
+        } else if (currentDate >= checkinDate) {
             setCheckoutDate(currentDate);
             setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
         } else {
@@ -431,6 +424,67 @@ const AddGuestInPendingReport = ({ navigation }) => {
         }
     };
 
+    const validatePhoneNumber = (text) => {
+        setPhoneNumber(text);
+        let error = '';
+        if (!/^[0-9]+$/.test(text) || text.length !== 10) {
+            error = 'फ़ोन नंबर 10 अंकों का होना चाहिए';
+        }
+        setErrors(prevErrors => ({ ...prevErrors, phoneNumber: error }));
+    };
+
+    const validateName = (text, field) => {
+        let error = '';
+        if (/[\d]/.test(text)) {
+            error = 'नाम में संख्याएँ नहीं हो सकतीं';
+        }
+        setErrors(prevErrors => ({ ...prevErrors, [field]: error }));
+        if (field === 'name') {
+            setName(text);
+        } else {
+            setLastName(text);
+        }
+    };
+
+    const handleCityChange = (text) => {
+        // Remove numeric characters from the text
+        const filteredText = text.replace(/[0-9]/g, '');
+        setCity(filteredText);
+    };
+
+    const handleIdNumberChange = (text) => {
+        setIdNumber(text);
+        const pattern = idValidationPatterns[idType] || idValidationPatterns["default"];
+        if (!pattern.test(text)) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                idNumber: `अमान्य ${idType} नंबर`
+            }));
+        } else if (pattern.test(text) && text.length === getPatternLength(idType)) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                idNumber: ''
+            }));
+        }
+    };
+
+    const getPatternLength = (type) => {
+        switch (type) {
+            case 'आधार कार्ड':
+                return 12;
+            case 'पैन कार्ड':
+                return 10;
+            case 'वोटर आई कार्ड':
+                return 10;
+            default:
+                return null;
+        }
+    }
+
+
+    const lastNameInputRef = useRef(null);
+    const cityInputRef = useRef(null);
+    const pincodeInputRef = useRef(null);
 
     const validate = () => {
         let valid = true;
@@ -446,7 +500,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
             idNumber: '',
             travelReason: '',
             pincode: '',
-            guests: guests.map(() => ({ firstName: '', lastName: '', phoneNumber: '', idType: '', idNumber: '' })),
+            guests: guests.map(() => ({ firstName: '', lastName: '', phoneNumber: '', idType: '', idNumber: '', mobileNumber: '' })),
         };
 
         if (!name) {
@@ -470,7 +524,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
         }
 
         if (!phoneNumber) {
-            newErrors.phoneNumber = 'कृपया संपर्क नंबर दर्ज करें।';
+            newErrors.phoneNumber = 'कृपया मोबाइल नंबर दर्ज करें।';
             valid = false;
         } else if (!/^[0-9]+$/.test(phoneNumber) || phoneNumber.length !== 10) {
             newErrors.phoneNumber = 'Phone number must be 10 digits';
@@ -481,7 +535,6 @@ const AddGuestInPendingReport = ({ navigation }) => {
             newErrors.gender = 'जेंडर दर्ज करें।';
             valid = false;
         }
-
 
         if (!travelReason) {
             newErrors.travelReason = 'यात्रा का उद्देश्य दर्ज करें।';
@@ -540,6 +593,11 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 valid = false;
             }
 
+            if (!guest.mobileNumber) {
+                newErrors.guests[index].mobileNumber = 'मोबाइल नंबर दर्ज करें।';
+                valid = false;
+            }
+
             if (!guest.idNumber) {
                 newErrors.guests[index].idNumber = 'कृपया पहचान संख्या दर्ज करें।';
                 valid = false;
@@ -565,7 +623,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
         // Validate categories
         const checkedCategories = hotelCategories.filter(cat => cat.isChecked);
         if (hotelCategories.length > 1 && checkedCategories.length === 0) {
-            setCategoryErrors('At least one category should be selected');
+            setCategoryErrors('कमरे की एक श्रेणी चुनें');
             valid = false;
         } else {
             setCategoryErrors('');
@@ -576,13 +634,14 @@ const AddGuestInPendingReport = ({ navigation }) => {
 
     const handleSubmit = async () => {
         if (!validate()) return;
+        setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         const selectedCategories = hotelCategories
@@ -596,9 +655,9 @@ const AddGuestInPendingReport = ({ navigation }) => {
         let body = {
             idHotel: updatedValue.idHotelMaster,
             contactNo: phoneNumber,
-            checkInDate: moment(checkinDate).format("DD-MMM-YYYY"),
-            checkOutDate: moment(checkoutDate).format("DD-MMM-YYYY"),
-            enterDate: moment(new Date()).format("DD-MMM-YYYY"),
+            checkInDate: moment(checkinDate).format("MM/DD/YYYY"),
+            checkOutDate: moment(checkoutDate).format("MM/DD/YYYY"),
+            enterDate: moment(new Date()).format("MM/DD/YYYY"),
             description: "None",
             bActive: true,
             guestName: name,
@@ -611,44 +670,35 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 sName: guest.firstName,
                 identificationNo: guest.idNumber,
                 identificationType: guest.idType,
-                image: guest.idFront,
                 gender: guest.gender,
-                contactNo: "8787878787",
-                filePass: "7d465d03",
+                contactNo: guest.mobileNumber,
+                filePass: "",
                 lastName: guest.lastName,
+                image: guest.idFront,
                 image2: guest.idBack,
-                // image: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
-                // image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
             })),
             categories: selectedCategories,
-            addionalGuest: additionalGuests,
+            AddionalGuest: additionalGuests,
             hotelName: updatedValue.HotelName,
             guestLastName: lastName,
             gender: gender,
             travelReson: travelReason,
             city: city,
             pIncode: pincode,
-            filePass: "7d465d03", // Example filePass value
+            filePass: "",
             image1: idFront,
             image2: idBack
-            // image1: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
-            // image2: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg"
         };
-        console.log("BODYYY", body)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
-                console.log("RESPONSE----", response.data)
-                // Toast.show({
-                //     type: 'success',
-                //     text1: 'Success',
-                //     text2: 'Success'
-                // });
-                // navigation.navigate("BottomNavigator")
+                setIsLoading(false)
                 setStatusCode(response.data)
                 setOpenModal2(true)
             })
             .catch(error => {
-                console.error('Error sending form data:', error.response.data);
+                console.error('Error sending form data:');
+                setIsLoading(false)
+                console.log("errr", error.response)
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -657,8 +707,11 @@ const AddGuestInPendingReport = ({ navigation }) => {
             });
     };
 
+
+
     return (
         <ScrollView style={{ backgroundColor: "#fff" }}>
+            <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -669,7 +722,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
             </View>
 
             <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
-                <Text style={[styles.modalText, { fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { fontSize: 14, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>1. इस फॉर्म के माध्यम से आप गेस्ट की एंट्री सेव कर रहे हैं। इसे थाने में भेजने के लिए कृपया पेंडिंग रिपोर्ट में जाकर इस रिपोर्ट को सबमिट करें।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>2. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today)और कल(Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
@@ -678,7 +731,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
             <View style={styles.container}>
-                <Text style={[styles.lableText, { fontSize: 16, fontWeight: "400", color: "#000", width: "auto", marginVertical: 5 }]}>प्राथमिक अतिथि की जानकारी</Text>
+                <Text style={[styles.lableText, { fontSize: 16, fontWeight: "600", color: "#000", width: "auto", marginVertical: 5 }]}>प्राथमिक अतिथि की जानकारी</Text>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
@@ -686,26 +739,26 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <TextInput
-                        onChangeText={text => setName(text)}
-                        placeholderTextColor='darkgrey'
+                        onChangeText={(text) => validateName(text, 'name')}
+                        onSubmitEditing={() => lastNameInputRef.current.focus()} // Move focus to the last name input
+                        placeholderTextColor={"darkgrey"}
                         placeholder='प्रथम नाम*'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
                     />
                     <TextInput
-                        onChangeText={text => setLastName(text)}
-
-                        placeholderTextColor='darkgrey'
+                        onChangeText={(text) => validateName(text, 'lastName')}
+                        ref={lastNameInputRef} // Reference for the last name input
+                        placeholderTextColor={"darkgrey"}
                         placeholder='अंतिम नाम*'
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", alignItems: "center", marginTop: 8 }]}
                     />
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                    {errors.name ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.name}</Text> : null}
-                    {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : null}
+                    {errors.name ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.name}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
+                    {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
                 </View>
 
-
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 0 }}>
                     <Text style={styles.lableText}>चेक इन तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                     <Text style={styles.lableText}>चेक आउट तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
@@ -713,7 +766,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
                     <TouchableOpacity
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                         onPress={openDatePicker}>
-                        <Text>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
+                        <Text style={{ color: "black", fontSize: 12 }}>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
                         <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                     </TouchableOpacity>
 
@@ -748,7 +801,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
                     <TouchableOpacity
                         style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
                         onPress={() => setShowCheckoutPicker(true)}>
-                        <Text>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
+                        <Text style={{ color: "black", fontSize: 12 }}>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
                         <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
                     </TouchableOpacity>
 
@@ -768,11 +821,12 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 </View>
                 <TextInput
                     style={styles.input}
-                    placeholder="Phone Number"
+                    placeholder="मोबाइल नंबर"
                     keyboardType="numeric"
-                    onChangeText={text => setPhoneNumber(text)}
+                    onChangeText={validatePhoneNumber}
                     value={phoneNumber}
                     maxLength={10}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.phoneNumber ? <Text style={styles.errorText}>{errors.phoneNumber}</Text> : null}
 
@@ -862,6 +916,9 @@ const AddGuestInPendingReport = ({ navigation }) => {
                     placeholder="पता"
                     onChangeText={text => setAddress(text)}
                     value={address}
+                    placeholderTextColor={"darkgrey"}
+                    onSubmitEditing={() => cityInputRef.current.focus()} // Focus on the next input (city)
+
                 />
                 {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
 
@@ -869,10 +926,14 @@ const AddGuestInPendingReport = ({ navigation }) => {
                     <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <TextInput
+                    ref={cityInputRef} // Reference for the city input
                     style={styles.input}
                     placeholder="शहर"
-                    onChangeText={text => setCity(text)}
+                    onChangeText={handleCityChange}
                     value={city}
+                    placeholderTextColor={"darkgrey"}
+                    returnKeyType="next"
+                    onSubmitEditing={() => pincodeInputRef.current.focus()} // Focus on the next input (pincode)
                 />
                 {errors.city ? <Text style={styles.errorText}>{errors.city}</Text> : null}
 
@@ -880,12 +941,20 @@ const AddGuestInPendingReport = ({ navigation }) => {
                     <Text style={styles.lableText}>पिन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <TextInput
+                    ref={pincodeInputRef} // Reference for the pincode input
                     style={styles.input}
                     placeholder="पिन"
-                    onChangeText={text => setPincode(text)}
+                    onChangeText={text => {
+                        const numericText = text.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+                        setPincode(numericText);
+                    }}
                     value={pincode}
                     maxLength={6}
+                    keyboardType="numeric"
+                    placeholderTextColor={"darkgrey"}
+                    returnKeyType="done" // No further input, so "done"
                 />
+
                 {errors.pincode ? <Text style={styles.errorText}>{errors.pincode}</Text> : null}
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
@@ -902,6 +971,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
                     placeholder="आईडी प्रकार*"
                     value={idType}
                     onChange={item => setIdType(item.value)}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.idType ? <Text style={styles.errorText}>{errors.idType}</Text> : null}
 
@@ -911,8 +981,9 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     placeholder='आईडी नंबर*'
-                    onChangeText={text => setIdNumber(text)}
+                    onChangeText={handleIdNumberChange}
                     value={idNumber}
+                    placeholderTextColor={"darkgrey"}
                 />
                 {errors.idNumber ? <Text style={styles.errorText}>{errors.idNumber}</Text> : null}
 
@@ -930,16 +1001,25 @@ const AddGuestInPendingReport = ({ navigation }) => {
                                     <CheckBox
                                         value={category.isChecked}
                                         onValueChange={() => handleCategoryCheck(index)}
+                                        tintColors='grey'
+                                        onTintColor="grey"
+                                        onFillColor='grey'
                                     />
-                                    <Text style={{ fontSize: 13, color: "#000", fontWeight: "500" }}>{category.CategoryName} - {category.iPrice}</Text>
+                                    <Text style={{ fontSize: 13, color: "#000", fontWeight: "500", textTransform: "capitalize" }}>{category.CategoryName} - {category.iPrice}</Text>
                                 </View>
                             ))}
-                            {categoryErrors ? <Text style={styles.errorText}>{categoryErrors}</Text> : null}
+                            <Text style={{
+                                fontSize: 12,
+                                color: "#000",
+                                marginTop: 10,
+                                fontWeight: "500"
+                            }}>{categoryErrors ? <Text style={styles.errorText}>{categoryErrors}</Text> : null}</Text>
+
                         </View>
                     )}
                 </View>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 5 }}>
                     <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
@@ -978,7 +1058,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
                             guest={guest}
                             handleGuestChange={handleGuestChange}
                             handleDocumentPicker={handleDocumentPicker}
-                            errors={errors.guests[index]}
+                            errors={errors.guests[index] || {}}
                         />
                     </View>
                 ))}
@@ -986,6 +1066,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
                 <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
                     <Text style={styles.button}>Save</Text>
                 </TouchableOpacity>
+
                 <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal2}>
                     <Pressable style={styles.modalOverlay} onPress={() => setOpenModal2(false)}>
                         <View style={styles.modalView}>
@@ -1004,7 +1085,7 @@ const AddGuestInPendingReport = ({ navigation }) => {
                                             null
 
                             }
-                            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 {
                                     statusCode.StatusCode == -1 ?
 
@@ -1016,12 +1097,11 @@ const AddGuestInPendingReport = ({ navigation }) => {
                                                 <Text style={styles.textStyle}>ठीक</Text>
                                             </Pressable> :
                                             statusCode.StatusCode == 1 ?
-                                                <Pressable style={styles.modalButton} onPress={() => setOpenModal2(false)}>
+                                                <Pressable style={styles.modalButton} onPress={() => navigation.navigate('BottomNavigator')}>
                                                     <Text style={styles.textStyle}>ठीक</Text>
                                                 </Pressable> :
                                                 null
                                 }
-
                             </View>
                         </View>
                     </Pressable>
@@ -1053,7 +1133,7 @@ const styles = StyleSheet.create({
         height: 40,
     },
     guestContainer: {
-        marginTop: 10,
+        marginTop: 20,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -1091,11 +1171,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         color: "#000",
         height: 50,
-        marginTop: 15,
+        marginTop: 10,
     },
     buttonContainer: {
         borderRadius: 20,
-        marginTop: 16,
+        marginTop: 30,
         width: Dimensions.get('window').width - 60,
         height: 50,
         marginBottom: 20,
@@ -1127,6 +1207,7 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 12,
+        color: "grey"
     },
     lableText: {
         fontSize: 12,

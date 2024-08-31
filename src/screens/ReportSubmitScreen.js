@@ -80,6 +80,7 @@ const ReportSubmitScreen = ({ navigation, route }) => {
             })
             .catch(err => {
                 setIsLoading(false)
+                console.log("errrr", err)
             });
     };
 

@@ -14,11 +14,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
 import ContactUs from "react-native-vector-icons/AntDesign"
 import PrivacyPolicyIcon from "react-native-vector-icons/MaterialIcons"
+import SubscriptionIcon from "../assets/images/subscription.png";
+import moment from 'moment';
 
 
 const Home = ({ navigation }) => {
 
-    const [hotelData, setHotelData] = useState(null)
+    const [hotelData, setHotelData] = useState({})
 
     useFocusEffect(
         React.useCallback(() => {
@@ -44,28 +46,17 @@ const Home = ({ navigation }) => {
     );
 
 
-    const fetchHotelData = useCallback(async () => {
-        try {
+    useEffect(() => {
+        const fetchData = async () => {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
                 let updatedValue = JSON.parse(value);
-                setHotelData(prevState => {
-                    // Only update state if the data is different
-                    if (JSON.stringify(prevState) !== JSON.stringify(updatedValue)) {
-                        return updatedValue;
-                    } else {
-                        return prevState;
-                    }
-                });
+                console.log("updatedValue", updatedValue)
+                setHotelData(updatedValue);
             }
-        } catch (error) {
-            console.error('Error fetching hotel data:', error);
-        }
+        };
+        fetchData();
     }, []);
-
-    useEffect(() => {
-        fetchHotelData();
-    }, [fetchHotelData]);
 
     return (
 
@@ -75,7 +66,7 @@ const Home = ({ navigation }) => {
                     <UserIcon name="feed-person" size={32} color="#fff" />
                 </Pressable>
                 <View style={{ flex: 6 }}>
-                    <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}> {hotelData ? hotelData.HotelName : "Loading..."}</Text>
+                    <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0, textTransform: "capitalize" }]}> {hotelData ? hotelData.HotelName : "Loading..."}</Text>
                     <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91  {hotelData ? hotelData.Contact : "Loading..."}</Text>
                 </View>
                 {/* <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }} onPress={() => navigation.navigate("Profile")}>
@@ -179,6 +170,24 @@ const Home = ({ navigation }) => {
                         <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
+
+
+
+                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SubscriptionPlan")}>
+                    <View style={{ flex: 1 }}>
+                        <Image source={SubscriptionIcon} style={{ height: 24, width: 24 }} />
+                    </View>
+                    <View style={{ flex: 5 }}>
+                        <Text style={styles.text}>मैनेज सब्क्रिप्शन </Text>
+                        <Text style={styles.text1}>प्लान एन्ड डेट - {hotelData ? moment(hotelData.ValidUpto).format("DD-MMM-YYYY") : "N/A"}</Text>
+
+                    </View>
+                    <View style={{ flex: 2, alignItems: "center" }}>
+                        <TouchableOpacity onPress={() => navigation.navigate("SubscriptionPlan")} style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 8, paddingVertical: 5, justifyContent: "center", alignItems: "center", borderRadius: 6 }}>
+                            <Text style={styles.textStyle}>Pay Now</Text>
+                        </TouchableOpacity>
+                    </View>
+                </TouchableOpacity>
             </ScrollView>
         </View>
 
@@ -218,7 +227,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#000",
         fontWeight: "400"
-    }
+    },
+    text1: {
+        fontSize: 12,
+        color: "#024063",
+        fontWeight: "400"
+    },
+    textStyle: {
+        fontSize: 12,
+        color: "white",
+        textAlign: "center",
+    },
 });
 
 

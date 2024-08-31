@@ -37,6 +37,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}SubmitedGuestDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${checkInD}&toDate=${checkInD}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("vvvv", res.data.Result)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })

@@ -21,6 +21,7 @@ import Profile from '../../screens/Profile';
 import ContactWithUs from '../../screens/ContactWithUs';
 import PrivacyPolicy from '../../screens/PrivacyPolicy';
 import PrivacyPolicyDetail from '../../screens/PrivacyPolicyDetail';
+import SubscriptionPlan from '../../screens/SubscriptionPlan';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,7 @@ const StackNavigator = () => {
                     <Stack.Screen name="ContactWithUS" component={ContactWithUs} options={{ headerShown: false, headerTitle: "Contact With Us" }} />
                     <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false, headerTitle: "Privacy Policy" }} />
                     <Stack.Screen name="PrivacyPolicyDetail" component={PrivacyPolicyDetail} options={{ headerShown: false, headerTitle: "Privacy Policy Detail" }} />
+                    <Stack.Screen name="SubscriptionPlan" component={SubscriptionPlan} options={{ headerShown: false, headerTitle: "Subscription Plan" }} />
 
 
                 </Stack.Navigator>

@@ -11,11 +11,14 @@ import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import Spinner from './Spinner';
+import AlertIcon from "react-native-vector-icons/Ionicons";
 
 const Login = ({ navigation }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [subscriptionAlertModal, setSubscriptionAlertModal] = useState(false)
+  const [subscriptionErrorMsg, setSubscriptionErrorMsg] = useState("")
 
   const firstInput = useRef();
   const secondInput = useRef();
@@ -33,19 +36,29 @@ const Login = ({ navigation }) => {
     return () => clearInterval(timer);
   }, [counter]);
 
+  useEffect(() => {
+    if (showOtpModal) {
+      firstInput.current.focus();
+    }
+  }, [showOtpModal]);
+
+
   const sendOtp = async (mobileNumber) => {
-    setIsLoading(true)
+    setIsLoading(true);
     const config = {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-type": "application/json"
       }
     };
-    await axios.post(`${baseUrl}SendOTPLogin?sMobile=${mobileNumber}`, config)
-      .then((res) => {
-        setIsLoading(false)
-        console.log("Login", res.data)
-        setMobileNumber(mobileNumber); // Store the mobile number
+
+    try {
+      const res = await axios.post(`${baseUrl}SendOTPLogin?sMobile=${mobileNumber}`, config);
+      setIsLoading(false);
+      console.log("Login", res.data);
+      setMobileNumber(mobileNumber); // Store the mobile number
+
+      if (res.data.StatusCode == 0) {
         Alert.alert(
           'OTP Sent',
           `Your OTP is ${res.data.Result.OTP}`,
@@ -54,13 +67,18 @@ const Login = ({ navigation }) => {
           ],
           { cancelable: false }
         );
-      })
-      .catch(err => {
-        setIsLoading(false)
-        console.log("errr", err)
-
-      });
+      } else if (res.data.StatusCode == 1) {
+        setSubscriptionErrorMsg(res.data.Message)
+        console.log("Setting subscriptionAlertModal to true");
+        setSubscriptionAlertModal(true);  // Ensure this is being called
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.log("err", err);
+    }
   };
+
+
 
   const verifyOtp = async () => {
     setIsLoading(true);
@@ -147,12 +165,12 @@ const Login = ({ navigation }) => {
               </View>
             )}
           </Formik>
-          <Text style={[styles.greyText, { marginTop: 5, color: "grey", fontWeight: "300" }]}>Continue with</Text>
+          {/* <Text style={[styles.greyText, { marginTop: 5, color: "grey", fontWeight: "300" }]}>Continue with</Text>
 
           <TouchableOpacity onPress={() => alert("Currently Google login is not available, Please login by Mobile Number")} style={[styles.buttonContainer, { backgroundColor: "#fff", borderWidth: 1, borderColor: '#E3E2E2', flexDirection: "row" }]} >
             <GoogleLogo />
             <Text style={[styles.button, { color: "#000", fontWeight: "400", marginLeft: 10 }]}>Google</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }} onPress={() => navigation.navigate("Signup")}>
             <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Don't have an account?
               <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> New Hotel Registration</Text>
@@ -175,7 +193,7 @@ const Login = ({ navigation }) => {
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={styles.content}>We have sent a verification code to</Text>
-                <Text style={[styles.content, { color: "#595970", marginTop: 5 }]}>7854744564</Text>
+                <Text style={[styles.content, { color: "#595970", marginTop: 5 }]}>{mobileNumber}</Text>
               </View>
 
               <View style={styles.otpContainer}>
@@ -290,9 +308,44 @@ const Login = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             </View>
+
+
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* Open modal for Subsription Alert start */}
+      <Modal transparent={true}
+        animationType={'fade'}
+        hardwareAccelerated={true}
+        visible={subscriptionAlertModal}>
+
+        <Pressable onPress={() => { setSubscriptionAlertModal(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+          <View style={styles.modalView}>
+            <View style={{ flex: 1 }}>
+              <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+            </View>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <Text style={styles.modalText}>{subscriptionErrorMsg}</Text>
+            </View>
+            <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
+              <Pressable
+                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                onPress={() => { navigation.navigate("SubscriptionPlan"), setSubscriptionAlertModal(false) }}
+              >
+                <Text style={styles.textStyle}>Go to Link</Text>
+              </Pressable>
+              <Pressable
+                style={{ backgroundColor: "#000", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15, marginLeft: 40 }}
+                onPress={() => { setSubscriptionAlertModal(false) }}
+              >
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
+      {/* Open modal for Subsription Alert end */}
     </View>
   );
 }
@@ -446,5 +499,26 @@ const styles = StyleSheet.create({
     width: "100%",
     marginLeft: 70,
     fontSize: 12
+  },
+  modalView: {
+    // flex: 1,
+    height: 200,
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingHorizontal: 40,
+    paddingVertical: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+
+  },
+  textStyle: {
+    color: "white",
+    textAlign: "center",
+  },
+  modalText: {
+    textAlign: "center",
+    color: "black",
+    fontSize: 15,
   },
 });

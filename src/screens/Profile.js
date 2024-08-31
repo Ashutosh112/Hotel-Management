@@ -8,6 +8,7 @@ import axios from 'axios';
 import Spinner from './Spinner';
 import Toast from 'react-native-toast-message';
 import LogoutIcon from "react-native-vector-icons/MaterialCommunityIcons"
+import AlertIcon from "react-native-vector-icons/Ionicons";
 
 const Profile = ({ navigation }) => {
 
@@ -17,6 +18,7 @@ const Profile = ({ navigation }) => {
     const [roomPrice, setRoomPrice] = useState('')
     const [isLoading, setIsLoading] = useState(false);
     const [categoryDetails, CategoryDetails] = useState([])
+    const [addCategoryAlertModal, setAddCategoryAlertModal] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -42,17 +44,18 @@ const Profile = ({ navigation }) => {
                 "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
-        const body = [{
+        const body = {
             idHotelRoomCategory: 0,
             idHotel: updatedValue.idHotelMaster,
             categoryName: roomCategory,
             iPrice: roomPrice,
             noOfRoom: 1,
             bChecked: true
-        }];
+        };
         await axios.post(`${baseUrl}InsertCategory`, body, config)
             .then((res) => {
                 setIsLoading(false)
+                setAddCategoryAlertModal(false)
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -64,6 +67,7 @@ const Profile = ({ navigation }) => {
             })
             .catch(err => {
                 setIsLoading(false)
+                console.log("errrr", err.response)
             });
     };
 
@@ -72,7 +76,6 @@ const Profile = ({ navigation }) => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
-        console.log("opopop", updatedValue)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -84,6 +87,29 @@ const Profile = ({ navigation }) => {
             .then((res) => {
                 setIsLoading(false)
                 CategoryDetails(res.data.Result)
+            })
+            .catch(err => {
+                setIsLoading(false)
+            });
+    };
+
+    const logout = async () => {
+        setIsLoading(true)
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `Bearer ${updatedValue.Token}`
+            }
+        };
+        await axios.post(`${baseUrl}HotelLogout?HotelId=${updatedValue.idHotelMaster}`, {}, config)
+            .then((res) => {
+                setIsLoading(false)
+                AsyncStorage.clear()
+                setOpenModal(false);
+                navigation.navigate('Login');
             })
             .catch(err => {
                 setIsLoading(false)
@@ -142,6 +168,16 @@ const Profile = ({ navigation }) => {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                     <Text style={styles.lableText}>संपर्क न.<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
+
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    placeholder='होटल मालिक का नाम'
+                    editable={false}
+                    value={profileDetails.ContactPerson || ''}
+                    style={[styles.input, { marginTop: 8 }]} />
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>होटल मालिक का नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
                 <TextInput
                     placeholderTextColor='darkgrey'
                     placeholder='संपर्क न.*'
@@ -152,9 +188,53 @@ const Profile = ({ navigation }) => {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                     <Text style={styles.lableText}>ईमेल आईडी<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
+
                 <TextInput
                     placeholderTextColor='darkgrey'
-                    placeholder='ईमेल आईडी*'
+                    placeholder='प्रॉपर्टी प्रकार*'
+                    editable={false}
+                    value={profileDetails.PropertyTypeName || ''}
+                    style={[styles.input, { marginTop: 8 }]} />
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>प्रॉपर्टी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    placeholder='शहर*'
+                    editable={false}
+                    value={profileDetails.CityName || ''}
+                    style={[styles.input, { marginTop: 8 }]} />
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    placeholder='ज़िला*'
+                    editable={false}
+                    value={profileDetails.DistrictName || ''}
+                    style={[styles.input, { marginTop: 8 }]} />
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>ज़िला<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    placeholder='राज्य*'
+                    editable={false}
+                    value={profileDetails.stateName || ''}
+                    style={[styles.input, { marginTop: 8 }]} />
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>राज्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    placeholder='पुलिस स्टेशन*'
                     editable={false}
                     value={profileDetails.EmailAddress || ''}
                     style={[styles.input, { marginTop: 8 }]} />
@@ -166,11 +246,11 @@ const Profile = ({ navigation }) => {
                     placeholderTextColor='darkgrey'
                     placeholder='पुलिस स्टेशन*'
                     editable={false}
-                    // value={profileDetails.HotelName || ''}
+                    value={profileDetails.PoliceStationName || ''}
                     style={[styles.input, { marginTop: 8 }]} />
                 <View style={{ height: 1, backgroundColor: "#024063", width: '90%', marginVertical: 20 }} />
 
-                <View style={{ width: "90%", justifyContent: "center", paddingVertical: 10, elevation: 2, backgroundColor: "#ccd8df", borderRadius: 10, paddingHorizontal: 15 }}>
+                <View style={{ width: "90%", justifyContent: "center", paddingVertical: 10, elevation: 2, backgroundColor: "#F5F5F5", borderRadius: 10, paddingHorizontal: 15 }}>
                     <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
                         <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>S. No. </Text>
                         <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>कमरे की श्रेणी </Text>
@@ -183,8 +263,8 @@ const Profile = ({ navigation }) => {
                         : categoryDetails.map((item, index) => (
                             <View key={index} style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center", marginTop: 10 }}>
                                 <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}> {index + 1}</Text>
-                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}>{item.CategoryName}</Text>
-                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}> {item.iPrice}</Text>
+                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center", textTransform: "capitalize" }}>{item.CategoryName}</Text>
+                                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}> ₹{item.iPrice}</Text>
                             </View>
                         ))}
                 </View>
@@ -212,7 +292,7 @@ const Profile = ({ navigation }) => {
                     style={[styles.input2, { marginTop: 8 }]} />
 
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }} >
-                    <TouchableOpacity style={styles.buttonContainer} onPress={() => addCategorie()}>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={() => setAddCategoryAlertModal(true)}>
                         <Text style={styles.button}>Save</Text>
                     </TouchableOpacity>
                 </View>
@@ -235,12 +315,7 @@ const Profile = ({ navigation }) => {
                         <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row" }}>
                             <Pressable
                                 style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
-                                onPress={async () => {
-                                    await AsyncStorage.clear();
-                                    setOpenModal(false);
-                                    navigation.navigate('Login'); // Adjust 'Login' to your login screen name
-                                }}
-                            >
+                                onPress={() => logout()}>
                                 <Text style={styles.textStyle}>Logout</Text>
                             </Pressable>
                             <Pressable
@@ -255,6 +330,38 @@ const Profile = ({ navigation }) => {
             </Modal>
             {/* Open modal for Logout end */}
 
+            {/* Open modal for Add room category start */}
+            <Modal transparent={true}
+                animationType={'fade'}
+                hardwareAccelerated={true}
+                visible={addCategoryAlertModal}>
+
+                <Pressable onPress={() => { setAddCategoryAlertModal(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+                    <View style={styles.modalView}>
+                        <View style={{ flex: 1 }}>
+                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center" }}>
+                            <Text style={styles.modalText}>एक बार रूम कैटेगरी और रेट डालने के बाद आप इसे अपडेट नहीं कर पाएंगे।</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
+                            <Pressable
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                onPress={() => addCategorie()}
+                            >
+                                <Text style={styles.textStyle}>Save</Text>
+                            </Pressable>
+                            <Pressable
+                                style={{ backgroundColor: "#000", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15, marginLeft: 40 }}
+                                onPress={() => { setAddCategoryAlertModal(false) }}
+                            >
+                                <Text style={styles.textStyle}>Cancel</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Pressable>
+            </Modal>
+            {/* Open modal for Add room category end */}
         </ScrollView>
 
     );

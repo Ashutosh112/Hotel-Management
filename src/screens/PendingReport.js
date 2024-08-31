@@ -37,7 +37,6 @@ const PendingReport = ({ navigation }) => {
         await axios.post(url, body, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("resss", res.data.Result)
                 setPendingGuestDetails(res.data.Result)
 
             })

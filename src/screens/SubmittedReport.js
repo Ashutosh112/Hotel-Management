@@ -100,6 +100,8 @@ const SubmittedReport = ({ navigation }) => {
                         mode="date"
                         display="default"
                         onChange={onChangeCheckinDate}
+                        minimumDate={new Date(new Date().setMonth(new Date().getMonth() - 1))}
+                        maximumDate={new Date()}
                     />
                 )}
                 {showCheckoutPicker && (
@@ -108,6 +110,8 @@ const SubmittedReport = ({ navigation }) => {
                         mode="date"
                         display="default"
                         onChange={onChangeCheckoutDate}
+                        minimumDate={new Date(new Date().setMonth(new Date().getMonth() - 1))}
+                        maximumDate={new Date()}
                     />
                 )}
             </View>

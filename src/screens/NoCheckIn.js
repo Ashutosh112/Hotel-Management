@@ -68,6 +68,9 @@ const NoCheckIn = ({ navigation }) => {
                             <CheckBox
                                 disabled={false}
                                 value={values.agreeToTerms}
+                                tintColors='grey'
+                                onTintColor="grey"
+                                onFillColor='grey'
                                 onValueChange={(newValue) => setFieldValue('agreeToTerms', newValue)}
                             />
                             <Text style={{ fontSize: 14, color: "#000", fontWeight: "500", marginTop: 10, textAlign: "justify" }}>
