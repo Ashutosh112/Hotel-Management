@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, Platform, Modal, Pressable } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -11,6 +11,9 @@ import Toast from 'react-native-toast-message';
 import ImagePicker from 'react-native-image-crop-picker';
 import { androidCameraPermission } from "../../Permissions"
 import Spinner from './Spinner';
+import AlertIcon from "react-native-vector-icons/Ionicons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const validationSchema = Yup.object().shape({
     firstName: Yup.string().required('प्रथम नाम अनिवार्य'),
@@ -19,42 +22,48 @@ const validationSchema = Yup.object().shape({
     propertyType: Yup.string().required('सम्पत्ती का प्रकार अनिवार्य'),
     gender: Yup.string().required('जेंडर अनिवार्य'),
     mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
-    contactNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+    // contactNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
     address: Yup.string().required('होटल का पता अनिवार्य'),
     city: Yup.string().required('शहर अनिवार्य'),
     state: Yup.string().required('राज्य अनिवार्य'),
     policeStation: Yup.string().required('थाना का नाम अनिवार्य'),
-    area: Yup.string().required('क्षेत्र अनिवार्य'),
+    district: Yup.string().required('district अनिवार्य'),
     emailID: Yup.string().required('होटल की ईमेल आईडी अनिवार्य'),
-    website: Yup.string().required('होटल की वेबसाइट अनिवार्य'),
+    // website: Yup.string().required('होटल की वेबसाइट अनिवार्य'),
     idFront: Yup.array().min(1, 'होटल का गुमस्ता अनिवार्य'),
     idBack: Yup.array().min(1, 'मालिक का आधार अनिवार्य'),
 });
 
-const Signup = ({ navigation }) => {
+const Signup = ({ navigation, route }) => {
     const [stateData, setStateData] = useState([])
     const [stateValue, setStateValue] = useState(null)
     const [cityData, setCityData] = useState([]);
     const [cityValue, setCityValue] = useState(null)
-    const [zoneData, setZoneData] = useState([])
-    const [zoneValue, setZoneValue] = useState(null)
+    const [districtData, setDistrictData] = useState([])
+    const [districtValue, setDistrictValue] = useState(null)
     const [policeStationData, setPoliceStationData] = useState([])
     const [policeStationValue, setPoliceStationValue] = useState(null)
     const [propertyTypeData, setPropertyTypeData] = useState([])
     const [propertyTypeValue, setPropertyTypeValue] = useState(null)
     const [isLoading, setIsLoading] = useState(false);
+    const [openModal, setOpenModal] = useState(false)
+    const [hotelCategory, setHotelCategory] = useState('')
+
+    const mobileNumber = route.params.mobileNumber
 
 
     useEffect(() => {
         getState()
         getProType()
+        console.log("number----", mobileNumber)
     }, [])
 
+    // Function to handle image selection
     const onSelectImage = async (imagePickerFunc, setFieldValue, field) => {
         const permissionStatus = await androidCameraPermission();
         if (permissionStatus || Platform.OS === 'ios' || Platform.OS === 'android') {
             Alert.alert(
-                'Id Image',
+                'Image',
                 'Choose an option',
                 [
                     { text: 'Camera', onPress: () => imagePickerFunc(setFieldValue, field) },
@@ -65,24 +74,43 @@ const Signup = ({ navigation }) => {
         }
     };
 
+    // Image picker function with size and type validation
     const imagePicker = async (setFieldValue, field, isCamera = true) => {
         const options = {
             compressImageMaxWidth: 300,
             compressImageMaxHeight: 300,
-            includeBase64: true
+            includeBase64: true,
         };
-        if (isCamera) {
-            ImagePicker.openCamera(options).then(image => {
-                setFieldValue(field, [image]);
-            });
-        } else {
-            ImagePicker.openPicker(options).then(image => {
 
-                setFieldValue(field, [image]);
-            });
+        let result;
+        try {
+            result = isCamera ? await ImagePicker.openCamera(options) : await ImagePicker.openPicker(options);
+
+            // Validate file type
+            const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!allowedMimeTypes.includes(result.mime)) {
+                Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
+                return;
+            }
+
+            // Validate file size (limit: 5MB)
+            const maxSizeInBytes = 5 * 1024 * 1024;
+            if (result.size > maxSizeInBytes) {
+                Alert.alert('File Too Large', 'The selected file size should not exceed 5MB.');
+                return;
+            }
+
+            const base64Image = `${result.data}`;
+            setFieldValue(field, base64Image);
+
+        } catch (err) {
+            if (ImagePicker.isCancel(err)) {
+                Alert.alert('Canceled', 'Image picker was canceled');
+            } else {
+                Alert.alert('Error', 'Failed to pick image');
+            }
         }
     };
-
 
     const userSignup = (values) => {
         setIsLoading(true)
@@ -97,41 +125,39 @@ const Signup = ({ navigation }) => {
             idHotelMaster: 0,
             hotelName: values.hotelName,
             address: values.address,
-            contact: values.contactNumber,
+            contact: mobileNumber, // Using the mobile number from route
             contactPerson: `${values.firstName} ${values.lastName}`,
             emailAddress: values.emailID,
-            bActive: true,
+            bActive: false,
             idPoliceStation: values.policeStation,
             idState: values.state,
             idCity: values.city,
-            idZone: values.area,
+            idDistrict: values.district,
             propertyType: values.propertyType,
-            // fileGumasta: values.idFront[0]?.data, // Set the base64 string for fileGumasta
-            // fileAdhar: values.idBack[0]?.data,
-            fileGumasta: "82110f8a-a1df-49c3-be32-ca9f78bb02f3_WhatsApp Image 2024-03-10 at 15.52.08_bd3315ca.jpg",
-            fileAdhar: "565cb8c4-cbf4-47fc-81ee-7483a2c84b6d_WhatsApp Image 2024-03-10 at 15.52.06_48034e3c.jpg",
+            filePass: "",
+            fileGumasta: values.idFront,
+            fileAdhar: values.idBack,
             contactPersonMobile: values.mobileNumber,
             website: values.website,
-            filePass: "7d465d03"
         };
 
+        const data = body;
+        AsyncStorage.setItem("signupdetail", JSON.stringify(data));
 
         axios.post(`${baseUrl}HotelSignUp`, body, config)
             .then(res => {
                 setIsLoading(false)
-                Toast.show({
-                    type: 'success',
-                    text1: 'Success',
-                    text2: res.data.Message,
-                    autoHide: true,
-                    visibilityTime: 1500,
-                });
-                setTimeout(() => {
-                    navigation.navigate("Login");
-                }, 1500);
+                setOpenModal(true)
+                setHotelCategory(res.data.Result)
+                // const data = res.data;
+                // AsyncStorage.setItem("signupdetail", JSON.stringify(data));
+                // setTimeout(() => {
+                //     navigation.navigate("Login");
+                // }, 1500);
             })
             .catch(err => {
                 setIsLoading(false)
+                console.log("errrr", err)
                 Toast.show({
                     type: 'info',
                     text1: 'Info',
@@ -201,34 +227,37 @@ const Signup = ({ navigation }) => {
     };
 
 
-    const getZone = async (cityId) => {
+    const getDistrict = async (stateId) => {
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json"
             }
         };
-        await axios.post(`${baseUrl}GetAllZone?CityId=${cityId}`, config)
+        await axios.post(`${baseUrl}GetAllDistrict?StateId=${stateId}`, config)
             .then((res) => {
-                const ZoneData = res.data.Result.map(item => ({
-                    label: item.ZoneName,
-                    value: item.idZone
+                const DistrictData = res.data.Result.map(item => ({
+                    label: item.DistrictName,
+                    value: item.idDistrict
                 }));
-                setZoneData(ZoneData)
+                setDistrictData(DistrictData)
             })
             .catch(err => {
+                console.log("errrrroooo", err)
             });
     };
 
-    const getPoliceStation = async (ZoneId) => {
+    const getPoliceStation = async (cityId) => {
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json"
             }
         };
-        await axios.post(`${baseUrl}GetAllPoliceStation?idZone=${ZoneId}`, config)
+        await axios.post(`${baseUrl}GetAllPoliceStation?idCity=${cityId}`, config)
             .then((res) => {
+                console.log("police station", res.data)
+
                 const policeStationData = res.data.Result.map(item => ({
                     label: item.PoliceStationName,
                     value: item.idPoliceStationMaster
@@ -236,6 +265,8 @@ const Signup = ({ navigation }) => {
                 setPoliceStationData(policeStationData)
             })
             .catch(err => {
+                console.log("111111", err)
+
             });
     };
     return (
@@ -249,17 +280,17 @@ const Signup = ({ navigation }) => {
                     hotelName: '',
                     propertyType: '',
                     mobileNumber: '',
-                    contactNumber: '',
+                    // contactNumber: '',
                     address: '',
                     city: '',
                     state: '',
-                    area: '',
+                    district: '',
                     policeStation: '',
                     emailID: '',
                     filePass: "", // Example filePass value
                     website: '',
-                    idFront: [],
-                    idBack: [],
+                    idFront: '',
+                    idBack: '',
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values) => {
@@ -326,10 +357,9 @@ const Signup = ({ navigation }) => {
                                 keyboardType='number-pad'
                                 placeholderTextColor='darkgrey'
                                 placeholder='मोबाइल नंबर*'
-                                style={[styles.input, { marginTop: 8 }]}
-                                onChangeText={handleChange('contactNumber')}
-                                onBlur={handleBlur('contactNumber')}
-                                value={values.contactNumber}
+                                style={[styles.input, { marginTop: 8, backgroundColor: "#E5E5E5" }]}
+                                value={mobileNumber} // Set the mobile number from route params
+                                editable={false} // Disable the input field
                             />
                             {touched.contactNumber && errors.contactNumber ? <Text style={styles.errorText}>{errors.contactNumber}</Text> : null}
 
@@ -349,11 +379,11 @@ const Signup = ({ navigation }) => {
 
                             {/* Webiste ID */}
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                <Text style={styles.lableText}>होटल की वेबसाइट आईडी<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                                <Text style={styles.lableText}>होटल की वेबसाइट आईडी</Text>
                             </View>
                             <TextInput
                                 placeholderTextColor='darkgrey'
-                                placeholder='होटल वेबसाइट आईडी*'
+                                placeholder='होटल वेबसाइट आईडी'
                                 style={[styles.input, { marginTop: 8 }]}
                                 onChangeText={handleChange('website')}
                                 onBlur={handleBlur('website')}
@@ -398,6 +428,22 @@ const Signup = ({ navigation }) => {
                             />
                             {touched.propertyType && errors.propertyType ? <Text style={styles.errorText}>{errors.propertyType}</Text> : null}
 
+                            {/* Room Quantity */}
+                            {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>कमरों की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                maxLength={10}
+                                keyboardType='number-pad'
+                                placeholderTextColor='darkgrey'
+                                placeholder='कमरों की संख्या*'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('roomQty')}
+                                onBlur={handleBlur('roomQty')}
+                                value={values.roomQty}
+                            />
+                            {touched.roomQty && errors.roomQty ? <Text style={styles.errorText}>{errors.roomQty}</Text> : null} */}
+
                             {/* Mobile Number */}
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                                 <Text style={styles.lableText}>होटल मालिक का मो. नंबर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
@@ -437,6 +483,7 @@ const Signup = ({ navigation }) => {
                                         setStateValue(item.value)
                                         setFieldValue('state', item.value);
                                         getCity(item.value); // Call getCity when stateValue changes
+                                        getDistrict(item.value)
                                     }}
 
                                 />
@@ -447,15 +494,14 @@ const Signup = ({ navigation }) => {
                                 {/* {touched.pin && errors.pin ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.pin}</Text> : null} */}
                             </View>
 
-                            {/* State and Area */}
+                            {/* State */}
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                                 <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                                <Text style={styles.lableText}>क्षेत्र<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
 
                                 <Dropdown
-                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    style={[styles.input, { marginTop: 8 }]}
                                     placeholderStyle={styles.placeholderStyle}
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
@@ -470,32 +516,43 @@ const Signup = ({ navigation }) => {
                                     onChange={item => {
                                         setCityValue(item.value);
                                         setFieldValue('city', item.value);
-                                        getZone(item.value)
+                                        getPoliceStation(item.value)
                                     }}
                                 />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                                {touched.city && errors.city ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.city}</Text> : null}
+                            </View>
+
+
+                            {/* State */}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>District<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+
                                 <Dropdown
-                                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "center", marginTop: 8 }]}
+                                    style={[styles.input, { marginTop: 8 }]}
                                     placeholderStyle={styles.placeholderStyle}
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     itemTextStyle={styles.selectedTextStyle}
                                     labelField="label"
                                     valueField="value"
-                                    placeholder='क्षेत्र*'
+                                    placeholder='District*'
                                     search
                                     searchPlaceholder="Search"
-                                    data={zoneData}
-                                    value={zoneValue}
+                                    data={districtData}
+                                    value={districtValue}
                                     onChange={item => {
-                                        setZoneValue(item.value);
-                                        getPoliceStation(item.value)
-                                        setFieldValue('area', item.value);
+                                        setDistrictValue(item.value);
+                                        setFieldValue('district', item.value);
+                                        // getDistrict(item.value)
                                     }}
                                 />
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                                 {touched.city && errors.city ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.city}</Text> : null}
-                                {touched.area && errors.area ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.area}</Text> : null}
                             </View>
 
                             {/* Police Station */}
@@ -516,49 +573,54 @@ const Signup = ({ navigation }) => {
                                 value={policeStationValue}
                                 onChange={item => {
                                     setPoliceStationValue(item.value);
+                                    // getPoliceStation(item.value)
                                     setFieldValue('policeStation', item.value);
                                 }}
                             />
                             {touched.policeStation && errors.policeStation ? <Text style={styles.errorText}>{errors.policeStation}</Text> : null}
 
-                            {/* ID Photos */}
+                            {/* // JSX structure with Formik */}
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                                 <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                                 {values.idFront.length > 0 ? (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => onSelectImage(imagePicker, setFieldValue, 'idFront')}>
-                                        <Text>Image Uploaded</Text>
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => { onSelectImage(imagePicker, setFieldValue, 'idFront') }}>
+                                        <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => onSelectImage(imagePicker, setFieldValue, 'idFront')}>
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'idFront')}>
                                         <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                     </TouchableOpacity>
                                 )}
 
                                 {values.idBack.length > 0 ? (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => onSelectImage(imagePicker, setFieldValue, 'idBack')}>
-                                        <Text>Image Uploaded</Text>
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'idBack')}>
+                                        <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => onSelectImage(imagePicker, setFieldValue, 'idBack')}>
+                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'idBack')}>
                                         <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                     </TouchableOpacity>
                                 )}
                             </View>
+
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                                 {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>होटल का गुमस्ता</Text>}
                                 {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>मालिक का आधार</Text>}
                             </View>
-
                             {/* Submit Button */}
                             <TouchableOpacity style={styles.buttonContainer}
                                 onPress={() => {
-                                    if (!values.firstName || !values.lastName || !values.hotelName || !values.contactNumber || !values.mobileNumber || !values.website || !values.emailID || !values.propertyType || !values.address || !values.state || !values.city || !values.area || !values.policeStation || values.idFront.length === 0 || values.idBack.length === 0) {
+                                    if (!values.firstName || !values.lastName || !values.hotelName || !values.mobileNumber || !values.emailID || !values.propertyType || !values.address || !values.state || !values.city || !values.policeStation || values.idFront.length === 0 || values.idBack.length === 0) {
                                         Toast.show({
                                             type: 'error',
                                             text1: 'Warning',
@@ -575,6 +637,34 @@ const Signup = ({ navigation }) => {
                     </ScrollView>
                 )}
             </Formik>
+
+
+            {/* Open modal for Success Signup start */}
+            <Modal transparent={true}
+                animationType={'fade'}
+                hardwareAccelerated={true}
+                visible={openModal}>
+
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+                    <View style={styles.modalView}>
+                        <View style={{ flex: 1 }}>
+                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center" }}>
+                            <Text style={styles.modalText}>धन्यवाद, आपकी जानकारी सुरक्षित कर ली गई है। आप अगले चरण में अपनी रूम कैटेगरी जोड़ सकते हैं।</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
+                            <Pressable
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                onPress={() => navigation.navigate('AddRoomCategory', { hotelCategory: hotelCategory })}
+                            >
+                                <Text style={styles.textStyle}>ठीक है</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* Open modal for Success Signup end */}
 
             <TouchableOpacity style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }} onPress={() => navigation.navigate("Login")}>
                 <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Already have an account?
@@ -659,5 +749,25 @@ const styles = StyleSheet.create({
         width: "45%",
         marginTop: 10
     },
+    modalView: {
+        // flex: 1,
+        height: 220,
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        paddingHorizontal: 40,
+        paddingVertical: 20,
+        alignItems: "center",
+        shadowColor: "#000",
 
+    },
+    textStyle: {
+        color: "white",
+        textAlign: "center",
+    },
+    modalText: {
+        textAlign: "center",
+        color: "black",
+        fontSize: 15,
+    },
 });

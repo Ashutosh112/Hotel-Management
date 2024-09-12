@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal, Alert, Linking } from 'react-native';
 import Logo1 from "../assets/images/UjjainPoliceLogo.png";
 import Logo2 from "../assets/images/LoginLogo.svg";
 import GoogleLogo from "../assets/images/googleLogo.svg";
@@ -55,7 +55,6 @@ const Login = ({ navigation }) => {
     try {
       const res = await axios.post(`${baseUrl}SendOTPLogin?sMobile=${mobileNumber}`, config);
       setIsLoading(false);
-      console.log("Login", res.data);
       setMobileNumber(mobileNumber); // Store the mobile number
 
       if (res.data.StatusCode == 0) {
@@ -69,12 +68,14 @@ const Login = ({ navigation }) => {
         );
       } else if (res.data.StatusCode == 1) {
         setSubscriptionErrorMsg(res.data.Message)
-        console.log("Setting subscriptionAlertModal to true");
         setSubscriptionAlertModal(true);  // Ensure this is being called
+      } else if (res.data.StatusCode == -1) {
+        Alert.alert(
+          `${res.data.Message}`
+        );
       }
     } catch (err) {
       setIsLoading(false);
-      console.log("err", err);
     }
   };
 
@@ -171,7 +172,7 @@ const Login = ({ navigation }) => {
             <GoogleLogo />
             <Text style={[styles.button, { color: "#000", fontWeight: "400", marginLeft: 10 }]}>Google</Text>
           </TouchableOpacity> */}
-          <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }} onPress={() => navigation.navigate("Signup")}>
+          <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }} onPress={() => navigation.navigate("SignupFirst")}>
             <Text style={[styles.greyText, { marginVertical: 20, color: "black", fontWeight: "400" }]}>Don't have an account?
               <Text style={[styles.greyText, { marginVertical: 20, fontWeight: "500" }]}> New Hotel Registration</Text>
             </Text>
@@ -320,7 +321,7 @@ const Login = ({ navigation }) => {
         hardwareAccelerated={true}
         visible={subscriptionAlertModal}>
 
-        <Pressable onPress={() => { setSubscriptionAlertModal(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
           <View style={styles.modalView}>
             <View style={{ flex: 1 }}>
               <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
@@ -331,7 +332,7 @@ const Login = ({ navigation }) => {
             <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
               <Pressable
                 style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
-                onPress={() => { navigation.navigate("SubscriptionPlan"), setSubscriptionAlertModal(false) }}
+                onPress={() => Linking.openURL('https://pages.razorpay.com/pl_OVJS2jyJPemwHD/view')}
               >
                 <Text style={styles.textStyle}>Go to Link</Text>
               </Pressable>
@@ -343,7 +344,7 @@ const Login = ({ navigation }) => {
               </Pressable>
             </View>
           </View>
-        </Pressable>
+        </View>
       </Modal>
       {/* Open modal for Subsription Alert end */}
     </View>

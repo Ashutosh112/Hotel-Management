@@ -65,7 +65,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                     <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>सबमिट की तारीख :</Text> {checkInD}</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>वारा प्रस्तुत रिपोर्ट :</Text> {commonData.SubmitBy} ({moment(commonData.CreatedDate).format("DD-MMM-YYYY LT")})</Text>
+                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>वारा प्रस्तुत रिपोर्ट :</Text> {commonData?.SubmitBy ? commonData.SubmitBy : "N/A"} ({moment(commonData?.CreatedDate).format("DD-MMM-YYYY LT")})</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
                     <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>कुल व्यक्ति संख्या :</Text> {guestData.length}</Text>

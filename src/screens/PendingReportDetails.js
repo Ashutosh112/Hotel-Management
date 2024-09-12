@@ -91,7 +91,7 @@ const PendingReportDetails = ({ navigation, route }) => {
     const SubmitDate = route.params.SubmitDate;
 
     useEffect(() => {
-        searchGuest();
+        PendingDetails();
     }, []);
 
     const [guestData, setGuestData] = useState([]);
@@ -99,7 +99,7 @@ const PendingReportDetails = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false);
 
 
-    const searchGuest = async () => {
+    const PendingDetails = async () => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
@@ -115,7 +115,7 @@ const PendingReportDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                // console.log("GGGGGG>>>>>", res.data.Result)
+                console.log("GGGGGG>>>>>", res.data.Result)
                 setGuestData(res.data.Result);
             })
             .catch(err => {
@@ -195,9 +195,9 @@ const PendingReportDetails = ({ navigation, route }) => {
                                 <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
                             </Pressable>
                         ) : (
-                            <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, marginTop: 10 }} >
+                            <TouchableOpacity onPress={() => navigation.navigate("AddGuestInPendingReport")} style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, marginTop: 10 }} >
                                 <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
-                            </Pressable>
+                            </TouchableOpacity>
 
                         )}
                     </View>

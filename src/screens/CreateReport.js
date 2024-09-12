@@ -49,11 +49,6 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             {errors.lastName ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.lastName}</Text> : <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}></Text>}
         </View>
 
-        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 0 }}>
-            <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-            <Text style={styles.lableText}>आईडी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-        </View>*/}
-
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", marginTop: errors.firstName && errors.lastName ? 10 : 0 }}>
             <Text style={styles.lableText}>जेंडर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
         </View>

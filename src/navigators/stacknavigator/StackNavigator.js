@@ -22,6 +22,8 @@ import ContactWithUs from '../../screens/ContactWithUs';
 import PrivacyPolicy from '../../screens/PrivacyPolicy';
 import PrivacyPolicyDetail from '../../screens/PrivacyPolicyDetail';
 import SubscriptionPlan from '../../screens/SubscriptionPlan';
+import SignupFirst from '../../screens/SignupFirst';
+import AddRoomCategory from '../../screens/AddRoomCategory';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +43,7 @@ const StackNavigator = () => {
                 <Stack.Navigator>
                     {showSplashScreen ? (<Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />) : null}
                     <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+                    <Stack.Screen name="SignupFirst" component={SignupFirst} options={{ headerShown: false }} />
                     <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
                     <Stack.Screen name="BottomNavigator" component={BottomNavigator} options={{ headerShown: false }} />
                     <Stack.Screen name="CreateReport" component={CreateReport} options={{ headerShown: false, headerTitle: "Create Report" }} />
@@ -59,6 +62,7 @@ const StackNavigator = () => {
                     <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false, headerTitle: "Privacy Policy" }} />
                     <Stack.Screen name="PrivacyPolicyDetail" component={PrivacyPolicyDetail} options={{ headerShown: false, headerTitle: "Privacy Policy Detail" }} />
                     <Stack.Screen name="SubscriptionPlan" component={SubscriptionPlan} options={{ headerShown: false, headerTitle: "Subscription Plan" }} />
+                    <Stack.Screen name="AddRoomCategory" component={AddRoomCategory} options={{ headerShown: false, headerTitle: "Add Room Category" }} />
 
 
                 </Stack.Navigator>

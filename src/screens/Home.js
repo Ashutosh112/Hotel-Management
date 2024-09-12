@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, BackHandler, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Alert, BackHandler, Pressable, Modal, Linking } from 'react-native';
 import PlusIcon from "react-native-vector-icons/Entypo"
 import HomeIcon1 from "../assets/images/HomeIcon1.svg"
 import HomeIcon2 from "../assets/images/HomeIcon2.svg"
@@ -16,11 +16,16 @@ import ContactUs from "react-native-vector-icons/AntDesign"
 import PrivacyPolicyIcon from "react-native-vector-icons/MaterialIcons"
 import SubscriptionIcon from "../assets/images/subscription.png";
 import moment from 'moment';
+import { baseUrl } from '../utils/env';
+import axios from 'axios';
+import AlertIcon from "react-native-vector-icons/Ionicons";
 
 
 const Home = ({ navigation }) => {
 
     const [hotelData, setHotelData] = useState({})
+    const [expiryDetails, setExpiryDetails] = useState(false)
+    const [details, setDetails] = useState("")
 
     useFocusEffect(
         React.useCallback(() => {
@@ -56,7 +61,36 @@ const Home = ({ navigation }) => {
             }
         };
         fetchData();
+        getExpiryDetails()
     }, []);
+
+
+    useEffect(() => {
+        getExpiryDetails()
+    }, []);
+
+
+    const getExpiryDetails = async () => {
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `Bearer ${updatedValue.Token}`
+            }
+        };
+        await axios.post(`${baseUrl}ValidateSubcription?HotelId=${updatedValue.idHotelMaster}`, {}, config)
+            .then((res) => {
+                setDetails(res.data.Message)
+                if (res.data.StatusCode == -1) {
+                    setExpiryDetails(true)
+                }
+            })
+            .catch(err => {
+                console.log("errrr", err)
+            });
+    };
 
     return (
 
@@ -173,7 +207,7 @@ const Home = ({ navigation }) => {
 
 
 
-                <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SubscriptionPlan")}>
+                <View style={styles.input} >
                     <View style={{ flex: 1 }}>
                         <Image source={SubscriptionIcon} style={{ height: 24, width: 24 }} />
                     </View>
@@ -183,12 +217,53 @@ const Home = ({ navigation }) => {
 
                     </View>
                     <View style={{ flex: 2, alignItems: "center" }}>
-                        <TouchableOpacity onPress={() => navigation.navigate("SubscriptionPlan")} style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 8, paddingVertical: 5, justifyContent: "center", alignItems: "center", borderRadius: 6 }}>
+                        <TouchableOpacity
+                            style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 8, paddingVertical: 5, justifyContent: "center", alignItems: "center", borderRadius: 6 }}
+                            onPress={() => Linking.openURL('https://pages.razorpay.com/pl_OVJS2jyJPemwHD/view')}
+                        >
                             <Text style={styles.textStyle}>Pay Now</Text>
                         </TouchableOpacity>
                     </View>
-                </TouchableOpacity>
+                </View>
             </ScrollView>
+
+
+            {/* Open modal for Add room category start */}
+            <Modal transparent={true}
+                animationType={'fade'}
+                hardwareAccelerated={true}
+                visible={expiryDetails}>
+
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+                    <View style={styles.modalView}>
+                        <View style={{ flex: 1 }}>
+                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center" }}>
+                            <Text style={styles.modalText}>{details}</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
+                            <Pressable
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                onPress={async () => {
+                                    await AsyncStorage.removeItem('hotelmgmt'); // Remove token
+                                    setExpiryDetails(false); // Close modal
+                                    navigation.replace('Login'); // Navigate to Login screen
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Okay</Text>
+                            </Pressable>
+                            {/* <Pressable
+                                style={{ backgroundColor: "#000", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15, marginLeft: 40 }}
+                                onPress={() => { setExpiryDetails(false) }}
+                            >
+                                <Text style={styles.textStyle}>Cancel</Text>
+                            </Pressable> */}
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* Open modal for Add room category end */}
         </View>
 
 
@@ -237,6 +312,23 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "white",
         textAlign: "center",
+    },
+    modalView: {
+        // flex: 1,
+        height: 200,
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        paddingHorizontal: 40,
+        paddingVertical: 20,
+        alignItems: "center",
+        shadowColor: "#000",
+
+    },
+    modalText: {
+        textAlign: "center",
+        color: "black",
+        fontSize: 15,
     },
 });
 
