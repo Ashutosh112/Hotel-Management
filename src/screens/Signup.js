@@ -656,7 +656,7 @@ const Signup = ({ navigation, route }) => {
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
                             <Pressable
                                 style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
-                                onPress={() => navigation.navigate('AddRoomCategory', { hotelCategory: hotelCategory })}
+                                onPress={() => navigation.navigate('AddRoomCategory', { hotelCategory: hotelCategory }, setOpenModal(false))}
                             >
                                 <Text style={styles.textStyle}>ठीक है</Text>
                             </Pressable>
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         // flex: 1,
-        height: 220,
+        height: 230,
         margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
@@ -768,6 +768,6 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 15,
+        fontSize: 14,
     },
 });

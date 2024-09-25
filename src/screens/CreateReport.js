@@ -442,10 +442,11 @@ const CreateReport = ({ navigation }) => {
     };
 
     const handleCityChange = (text) => {
-        // Remove numeric characters from the text
-        const filteredText = text.replace(/[0-9]/g, '');
+        // Remove numeric and special characters from the text
+        const filteredText = text.replace(/[0-9@<$%#&*]/g, '');
         setCity(filteredText);
     };
+
 
     const handleIdNumberChange = (text) => {
         setIdNumber(text);

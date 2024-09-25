@@ -25,6 +25,7 @@ const Profile = ({ navigation }) => {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
                 let updatedValue = JSON.parse(value);
+                console.log("updatedValue", updatedValue)
                 setProfileDetails(updatedValue);
             }
         };
@@ -94,27 +95,40 @@ const Profile = ({ navigation }) => {
     };
 
     const logout = async () => {
-        setIsLoading(true)
-        const value = await AsyncStorage.getItem('hotelmgmt');
-        let updatedValue = JSON.parse(value);
-        const config = {
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Content-type": "application/json",
-                "Authorization": `Bearer ${updatedValue.Token}`
-            }
-        };
-        await axios.post(`${baseUrl}HotelLogout?HotelId=${updatedValue.idHotelMaster}`, {}, config)
-            .then((res) => {
-                setIsLoading(false)
-                AsyncStorage.clear()
+        try {
+            setIsLoading(true);
+
+            // Retrieve the stored value
+            const value = await AsyncStorage.getItem('hotelmgmt');
+            if (value !== null) {
+                let updatedValue = JSON.parse(value);
+
+                // Set up the config for the API request
+                const config = {
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                        "Content-type": "application/json",
+                        "Authorization": `Bearer ${updatedValue.Token}`
+                    }
+                };
+
+                // Make the API request for logout
+                await axios.post(`${baseUrl}HotelLogout?HotelId=${updatedValue.idHotelMaster}`, {}, config);
+
+                // Clear AsyncStorage after a successful logout
+                await AsyncStorage.clear();
+
+                // Navigate to the Login screen after clearing storage
                 setOpenModal(false);
                 navigation.navigate('Login');
-            })
-            .catch(err => {
-                setIsLoading(false)
-            });
+            }
+        } catch (error) {
+            console.log("Logout error: ", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
 
 
     return (
@@ -165,10 +179,11 @@ const Profile = ({ navigation }) => {
                     editable={false}
                     value={profileDetails.Contact || ''}
                     style={[styles.input, { marginTop: 8 }]} />
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>संपर्क न.<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                </View>
 
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>होटल मालिक का नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
                 <TextInput
                     placeholderTextColor='darkgrey'
                     placeholder='होटल मालिक का नाम'
@@ -176,7 +191,7 @@ const Profile = ({ navigation }) => {
                     value={profileDetails.ContactPerson || ''}
                     style={[styles.input, { marginTop: 8 }]} />
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>होटल मालिक का नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                    <Text style={styles.lableText}>संपर्क न.<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <TextInput
                     placeholderTextColor='darkgrey'
@@ -185,8 +200,9 @@ const Profile = ({ navigation }) => {
                     value={profileDetails.ContactPersonMobile || ''}
                     style={[styles.input, { marginTop: 8 }]} />
 
+
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>ईमेल आईडी<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                    <Text style={styles.lableText}>प्रॉपर्टी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
 
                 <TextInput
@@ -195,11 +211,19 @@ const Profile = ({ navigation }) => {
                     editable={false}
                     value={profileDetails.PropertyTypeName || ''}
                     style={[styles.input, { marginTop: 8 }]} />
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>ईमेल आईडी<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
+                <TextInput
+                    placeholderTextColor='darkgrey'
+                    placeholder='ईमेल आईडी*'
+                    editable={false}
+                    value={profileDetails.EmailAddress || ''}
+                    style={[styles.input, { marginTop: 8 }]} />
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>प्रॉपर्टी प्रकार<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                    <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
-
                 <TextInput
                     placeholderTextColor='darkgrey'
                     placeholder='शहर*'
@@ -208,9 +232,8 @@ const Profile = ({ navigation }) => {
                     style={[styles.input, { marginTop: 8 }]} />
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>शहर<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                    <Text style={styles.lableText}>ज़िला<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
-
                 <TextInput
                     placeholderTextColor='darkgrey'
                     placeholder='ज़िला*'
@@ -218,10 +241,10 @@ const Profile = ({ navigation }) => {
                     value={profileDetails.DistrictName || ''}
                     style={[styles.input, { marginTop: 8 }]} />
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>ज़िला<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                </View>
 
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                    <Text style={styles.lableText}>राज्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                </View>
                 <TextInput
                     placeholderTextColor='darkgrey'
                     placeholder='राज्य*'
@@ -230,18 +253,10 @@ const Profile = ({ navigation }) => {
                     style={[styles.input, { marginTop: 8 }]} />
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                    <Text style={styles.lableText}>राज्य<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                </View>
-                <TextInput
-                    placeholderTextColor='darkgrey'
-                    placeholder='पुलिस स्टेशन*'
-                    editable={false}
-                    value={profileDetails.EmailAddress || ''}
-                    style={[styles.input, { marginTop: 8 }]} />
-
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                     <Text style={styles.lableText}>पुलिस स्टेशन<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
+
+
                 <TextInput
                     placeholderTextColor='darkgrey'
                     placeholder='पुलिस स्टेशन*'

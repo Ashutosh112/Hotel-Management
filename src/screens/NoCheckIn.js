@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, ScrollView, Dimensions, Modal, Pressable } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -8,11 +8,13 @@ import AlertIcon from "react-native-vector-icons/Ionicons";
 import { baseUrl } from '../utils/env';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 
 const NoCheckIn = ({ navigation }) => {
 
     const [openModal, setOpenModal] = useState(false)
     const [confirmSubmitModal, setconfirmSubmitModal] = useState(false)
+    const [statusCode, setStatusCode] = useState('')
 
     const validationSchema = Yup.object().shape({
         reporterName: Yup.string()
@@ -52,6 +54,31 @@ const NoCheckIn = ({ navigation }) => {
             });
     };
 
+    useEffect(() => {
+        submitValidateDate()
+    }, [])
+
+    const submitValidateDate = async () => {
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `Bearer ${updatedValue.Token}`
+            }
+        };
+        await axios.post(`${baseUrl}ValidateDateForAddGuest?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${encodeURIComponent(getYesterdayDate())}`, {}, config)
+
+            .then((res) => {
+                console.log("resss", res.data)
+                setStatusCode(res.data)
+            })
+            .catch(err => {
+                console.log("errr", err)
+            });
+    };
+
     return (
         <ScrollView style={styles.container}>
             <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
@@ -70,51 +97,76 @@ const NoCheckIn = ({ navigation }) => {
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>2. अगर आप कल की चेक इन रिपोर्ट पहले ही सबमिट कर चुके हैं, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>3. अगर पेंडिंग रिपोर्ट सेक्शन में कल की तारीख की कोई चेक इन रिपोर्ट है, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
             </View>
-            <Text style={{ fontSize: 16, color: "#000", marginTop: 20, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
 
-            <Formik
-                initialValues={{ reporterName: '', agreeToTerms: false }}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmitForm}
-            >
+            {
+                statusCode.StatusCode == 1 ?
+                    <>
+                        <Text style={{ fontSize: 16, color: "#000", marginTop: 40, marginHorizontal: 25, fontWeight: "bold" }}>{statusCode.Message}</Text>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
 
-                {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            placeholderTextColor='darkgrey'
-                            placeholder='रिपोर्ट निर्माता का नाम*'
-                            style={styles.input}
-                            onChangeText={handleChange('reporterName')}
-                            onBlur={handleBlur('reporterName')}
-                            value={values.reporterName}
-                        />
-                        {errors.reporterName && touched.reporterName && (
-                            <Text style={styles.errorText}>{errors.reporterName}</Text>
-                        )}
 
-                        <View style={{ flexDirection: "row", alignItems: "center", marginHorizontal: 25, marginTop: 10 }}>
-                            <CheckBox
-                                disabled={false}
-                                value={values.agreeToTerms}
-                                tintColors='grey'
-                                onTintColor="grey"
-                                onFillColor='grey'
-                                onValueChange={(newValue) => setFieldValue('agreeToTerms', newValue)}
-                            />
-                            <Text style={{ fontSize: 14, color: "#000", fontWeight: "500", marginTop: 10, textAlign: "justify" }}>
-                                कल मेरी होटल में कोई गेस्ट नहीं रुका था | मैं प्रमणित करता हु की इस रिपोर्ट में दी हुई जानकारी पूर्ण एवं सत्य है |
-                            </Text>
+                            <Pressable
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                onPress={() => navigation.navigate('BottomNavigator')}
+                            >
+                                <Text style={styles.textStyle}>ठीक है</Text>
+                            </Pressable>
                         </View>
-                        {errors.agreeToTerms && touched.agreeToTerms && (
-                            <Text style={styles.errorText}>{errors.agreeToTerms}</Text>
-                        )}
+                    </>
 
-                        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-                            <Text style={styles.button}>पुष्टि एवं सबमिट करे</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </Formik>
+                    :
+                    <>
+                        <Text style={{ fontSize: 14, color: "#000", marginTop: 20, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
+
+                        <Formik
+                            initialValues={{ reporterName: '', agreeToTerms: false }}
+                            validationSchema={validationSchema}
+                            onSubmit={handleSubmitForm}
+                        >
+
+                            {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        placeholderTextColor='darkgrey'
+                                        placeholder='रिपोर्ट निर्माता का नाम*'
+                                        style={styles.input}
+                                        onChangeText={handleChange('reporterName')}
+                                        onBlur={handleBlur('reporterName')}
+                                        value={values.reporterName}
+                                    />
+                                    {errors.reporterName && touched.reporterName && (
+                                        <Text style={styles.errorText}>{errors.reporterName}</Text>
+                                    )}
+
+                                    <View style={{ flexDirection: "row", alignItems: "center", marginHorizontal: 25, marginTop: 10 }}>
+                                        <CheckBox
+                                            disabled={false}
+                                            value={values.agreeToTerms}
+                                            tintColors='grey'
+                                            onTintColor="grey"
+                                            onFillColor='grey'
+                                            onValueChange={(newValue) => setFieldValue('agreeToTerms', newValue)}
+                                        />
+                                        <Text style={{ fontSize: 12, color: "#000", fontWeight: "500", marginTop: 10, textAlign: "justify" }}>
+                                            कल मेरी होटल में कोई गेस्ट नहीं रुका था | मैं प्रमणित करता हु की इस रिपोर्ट में दी हुई जानकारी पूर्ण एवं सत्य है |
+                                        </Text>
+                                    </View>
+                                    {errors.agreeToTerms && touched.agreeToTerms && (
+                                        <Text style={styles.errorText}>{errors.agreeToTerms}</Text>
+                                    )}
+
+                                    <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                                        <Text style={styles.button}>पुष्टि एवं सबमिट करे</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                        </Formik>
+                    </>
+
+            }
+
+
+
             <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalView}>
@@ -130,6 +182,36 @@ const NoCheckIn = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
+
+
+            {/* Open modal for submit report confirm start */}
+            <Modal transparent={true}
+                animationType={'fade'}
+                hardwareAccelerated={true}
+                visible={confirmSubmitModal}>
+
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
+                    <View style={styles.modalView}>
+                        <View style={{ flex: 1 }}>
+                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center" }}>
+                            <Text style={styles.modalText}>धन्यवाद,आपकी {getYesterdayDate()} की गेस्ट रिपोर्ट सबमिट हो गई है</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
+
+
+                            <Pressable
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                onPress={() => navigation.navigate('BottomNavigator')}
+                            >
+                                <Text style={styles.textStyle}>होम पेज पर जाए</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* Open modal for submit report confirm end */}
 
 
             {/* Open modal for submit report confirm start */}
@@ -197,7 +279,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#1AA7FF'
     },
     button: {
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500"
@@ -224,9 +306,9 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 12,
-        marginVertical: 10,
-        fontWeight: "500"
+        fontSize: 13,
+        marginVertical: 3,
+        // fontWeight: "500"
     },
     modalOverlay: {
         flex: 1,
@@ -259,9 +341,9 @@ const styles = StyleSheet.create({
         color: "white",
         textAlign: "center",
     },
-    modalText: {
-        textAlign: "center",
-        color: "black",
-        fontSize: 15,
-    },
+    // modalText: {
+    //     textAlign: "center",
+    //     color: "black",
+    //     fontSize: 15,
+    // },
 });

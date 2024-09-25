@@ -12,11 +12,8 @@ import AlertIcon from "react-native-vector-icons/Ionicons";
 const AddRoomCategory = ({ navigation, route }) => {
     const hotelCategory = route.params.hotelCategory;
 
-
     const [isLoading, setIsLoading] = useState(false);
     const [categoryDetails, CategoryDetails] = useState([])
-
-
 
     const addCategorie = async (values) => {
         setIsLoading(true)

@@ -324,9 +324,9 @@ const Login = ({ navigation }) => {
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
           <View style={styles.modalView}>
             <View style={{ flex: 1 }}>
-              <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+              <AlertIcon size={45} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
             </View>
-            <View style={{ flex: 1, justifyContent: "center" }}>
+            <View style={{ flex: 1.5, justifyContent: "center" }}>
               <Text style={styles.modalText}>{subscriptionErrorMsg}</Text>
             </View>
             <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     // flex: 1,
-    height: 200,
+    height: 250,
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
@@ -520,6 +520,6 @@ const styles = StyleSheet.create({
   modalText: {
     textAlign: "center",
     color: "black",
-    fontSize: 15,
+    fontSize: 14,
   },
 });

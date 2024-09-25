@@ -20,78 +20,71 @@ import { baseUrl } from '../utils/env';
 import axios from 'axios';
 import AlertIcon from "react-native-vector-icons/Ionicons";
 
-
 const Home = ({ navigation }) => {
+    const [hotelData, setHotelData] = useState({});
+    const [expiryDetails, setExpiryDetails] = useState(false);
+    const [details, setDetails] = useState("");
 
-    const [hotelData, setHotelData] = useState({})
-    const [expiryDetails, setExpiryDetails] = useState(false)
-    const [details, setDetails] = useState("")
-
+    // Run when component mounts and when the user navigates back
     useFocusEffect(
         React.useCallback(() => {
+            fetchData(); // Refetch data when the component gains focus
+            getExpiryDetails(); // Fetch expiry details
+
+            // Handle back button
             const backAction = () => {
                 Alert.alert("Exit App", "Do you want to exit the app?", [
                     {
                         text: "Cancel",
                         onPress: () => null,
-                        style: "cancel"
+                        style: "cancel",
                     },
-                    { text: "YES", onPress: () => BackHandler.exitApp() }
+                    { text: "YES", onPress: () => BackHandler.exitApp() },
                 ]);
                 return true;
             };
 
-            const backHandler = BackHandler.addEventListener(
-                "hardwareBackPress",
-                backAction
-            );
+            const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
 
             return () => backHandler.remove();
-        }, [])
+        }, []) // Empty dependency array ensures it runs only once
     );
 
-
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchData = async () => {
+        try {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
-                let updatedValue = JSON.parse(value);
-                console.log("updatedValue", updatedValue)
-                setHotelData(updatedValue);
+                const updatedValue = JSON.parse(value);
+                console.log("Hotel Data Fetched:", updatedValue);
+                setHotelData(updatedValue); // Update the state with fetched data
+            } else {
+                console.log("No data found in AsyncStorage");
             }
-        };
-        fetchData();
-        getExpiryDetails()
-    }, []);
-
-
-    useEffect(() => {
-        getExpiryDetails()
-    }, []);
-
-
-    const getExpiryDetails = async () => {
-        const value = await AsyncStorage.getItem('hotelmgmt');
-        let updatedValue = JSON.parse(value);
-        const config = {
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Content-type": "application/json",
-                "Authorization": `Bearer ${updatedValue.Token}`
-            }
-        };
-        await axios.post(`${baseUrl}ValidateSubcription?HotelId=${updatedValue.idHotelMaster}`, {}, config)
-            .then((res) => {
-                setDetails(res.data.Message)
-                if (res.data.StatusCode == -1) {
-                    setExpiryDetails(true)
-                }
-            })
-            .catch(err => {
-                console.log("errrr", err)
-            });
+        } catch (error) {
+            console.log('Error fetching data:', error);
+        }
     };
 
+    const getExpiryDetails = async () => {
+        try {
+            const value = await AsyncStorage.getItem('hotelmgmt');
+            const updatedValue = JSON.parse(value);
+            const config = {
+                headers: {
+                    "Content-type": "application/json",
+                    "Authorization": `Bearer ${updatedValue.Token}`,
+                },
+            };
+
+            const res = await axios.post(`${baseUrl}ValidateSubcription?HotelId=${updatedValue.idHotelMaster}`, {}, config);
+            setDetails(res.data.Message);
+            if (res.data.StatusCode === -1) {
+                setExpiryDetails(true);
+            }
+        } catch (error) {
+            console.log("Error fetching expiry details:", error);
+        }
+    };
     return (
 
         <View style={styles.container}>
@@ -100,8 +93,8 @@ const Home = ({ navigation }) => {
                     <UserIcon name="feed-person" size={32} color="#fff" />
                 </Pressable>
                 <View style={{ flex: 6 }}>
-                    <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0, textTransform: "capitalize" }]}> {hotelData ? hotelData.HotelName : "Loading..."}</Text>
-                    <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91  {hotelData ? hotelData.Contact : "Loading..."}</Text>
+                    <Text style={[styles.lableText, { fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0, textTransform: "capitalize" }]}> {hotelData.HotelName}</Text>
+                    <Text style={[styles.lableText, { fontSize: 12, fontWeight: "300", color: "#fff", width: "auto", marginTop: 5 }]}>+91  {hotelData.Contact}</Text>
                 </View>
                 {/* <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }} onPress={() => navigation.navigate("Profile")}>
                     <UserIcon name="feed-person" size={32} color="#fff" />

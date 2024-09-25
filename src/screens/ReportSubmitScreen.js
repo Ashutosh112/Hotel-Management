@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import Toast from 'react-native-toast-message';
 import Alert from "react-native-vector-icons/Ionicons";
 import Spinner from './Spinner';
+import moment from 'moment';
 
 const ReportSubmitScreen = ({ navigation, route }) => {
 
@@ -41,14 +42,16 @@ const ReportSubmitScreen = ({ navigation, route }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}ValidateSubmitDate?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${SubmitDate}`, {}, config)
+        await axios.post(`${baseUrl}ValidateSubmitDate?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(SubmitDate, "DD MMM YYYY").format("MM/DD/YYYY")}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("resss", res.data)
                 setGuestData(res.data.Message);
                 setCommonData(res.data.Result);
             })
             .catch(err => {
                 setIsLoading(false)
+                console.log("999999999999", err)
             });
     };
 
@@ -64,9 +67,11 @@ const ReportSubmitScreen = ({ navigation, route }) => {
                 "Authorization": `${updatedValue.Token}`
             }
         };
-        await axios.post(`${baseUrl}SubmitGuestData?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${SubmitDate}&SubmitBy=${name}`, {}, config)
+
+        await axios.post(`${baseUrl}SubmitGuestData?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(SubmitDate, "DD MMM YYYY").format("MM/DD/YYYY")}&SubmitBy=${name}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("ressss", res.data)
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -96,7 +101,7 @@ const ReportSubmitScreen = ({ navigation, route }) => {
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
 
             <View style={{ justifyContent: "center", alignItems: "center", marginTop: 10 }}>
-                <Text style={{ fontSize: 18, color: "#000", textAlign: "center" }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
+                <Text style={{ fontSize: 14, color: "#000", textAlign: "center" }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
             </View>
             <Formik
                 initialValues={{ name: '' }}
@@ -286,7 +291,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 18,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",

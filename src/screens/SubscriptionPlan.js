@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
         color: '#ffffff',
     },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     },
     text2: {
         color: "#000",
-        fontSize: 13,
+        fontSize: 12,
         marginVertical: 5,
         fontWeight: "400"
     },
