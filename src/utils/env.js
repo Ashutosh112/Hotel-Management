@@ -1,2 +1,2 @@
-export const baseUrl = "http://api.guestreport.in/api/HotelGuest/"
+export const baseUrl = "https://api.guestreport.in/api/HotelGuest/"
 

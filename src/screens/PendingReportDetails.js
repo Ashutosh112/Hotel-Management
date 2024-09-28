@@ -112,10 +112,10 @@ const PendingReportDetails = ({ navigation, route }) => {
             }
         };
         console.log("sub", SubmitDate)
+        console.log("ooooooo", `${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`)
         await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("GGGGGG>>>>>", res.data.Result)
                 setGuestData(res.data.Result);
             })
             .catch(err => {
@@ -192,11 +192,14 @@ const PendingReportDetails = ({ navigation, route }) => {
 
                         {isDateOlderThanTodayAndYesterday(SubmitDate) ? (
                             <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5, marginTop: 10 }} >
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
+                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 6 }}>Edit</Text>
                             </Pressable>
                         ) : (
-                            <TouchableOpacity onPress={() => navigation.navigate("AddGuestInPendingReport")} style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, marginTop: 10 }} >
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 25, paddingVertical: 10 }}>Edit</Text>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate("AddGuestInPendingReport", { guestsId: guestData[0].idGuestMaster })}
+                                // onPress={() => alert("In Progress")}
+                                style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, marginTop: 10 }} >
+                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 6 }}>Edit</Text>
                             </TouchableOpacity>
 
                         )}

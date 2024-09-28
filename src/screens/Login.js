@@ -56,7 +56,7 @@ const Login = ({ navigation }) => {
       const res = await axios.post(`${baseUrl}SendOTPLogin?sMobile=${mobileNumber}`, config);
       setIsLoading(false);
       setMobileNumber(mobileNumber); // Store the mobile number
-
+      console.log("rrrrr", res)
       if (res.data.StatusCode == 0) {
         Alert.alert(
           'OTP Sent',
@@ -76,6 +76,7 @@ const Login = ({ navigation }) => {
       }
     } catch (err) {
       setIsLoading(false);
+      console.log("errr", err)
     }
   };
 

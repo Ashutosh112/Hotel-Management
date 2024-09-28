@@ -685,6 +685,7 @@ const CreateReport = ({ navigation }) => {
             image1: idFront,
             image2: idBack
         };
+        console.log("bodyyy---", body)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 setIsLoading(false)
@@ -961,7 +962,8 @@ const CreateReport = ({ navigation }) => {
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     inputSearchStyle={styles.inputSearchStyle}
-                    itemTextStyle={styles.selectedTextStyle} data={idTypeData}
+                    itemTextStyle={styles.selectedTextStyle}
+                    data={idTypeData}
                     labelField="label"
                     valueField="value"
                     placeholder="आईडी प्रकार*"

@@ -71,6 +71,7 @@ const Home = ({ navigation }) => {
             const updatedValue = JSON.parse(value);
             const config = {
                 headers: {
+                    "Access-Control-Allow-Origin": "*",
                     "Content-type": "application/json",
                     "Authorization": `Bearer ${updatedValue.Token}`,
                 },
@@ -78,6 +79,7 @@ const Home = ({ navigation }) => {
 
             const res = await axios.post(`${baseUrl}ValidateSubcription?HotelId=${updatedValue.idHotelMaster}`, {}, config);
             setDetails(res.data.Message);
+            console.log("reeeeeeeeeeeeee1111111111", res.data)
             if (res.data.StatusCode === -1) {
                 setExpiryDetails(true);
             }
