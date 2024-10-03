@@ -493,7 +493,84 @@
 
 
 
+import React, { useState } from 'react';
+import { View, Text, Button } from 'react-native';
+import CryptoJS from 'crypto-js';
 
+// Encrypt Function
+function encrypt(toEncrypt, key, useHashing) {
+    let keyHex;
+
+    // If useHashing is true, hash the key using MD5
+    if (useHashing) {
+        keyHex = CryptoJS.MD5(key).toString();
+    } else {
+        keyHex = CryptoJS.enc.Utf8.parse(key);
+    }
+
+    // Encrypt the string using TripleDES
+    const encrypted = CryptoJS.TripleDES.encrypt(toEncrypt, keyHex, {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+
+    // Return Base64 encoded string
+    return encrypted.toString();
+}
+
+// Decrypt Function
+function decrypt(toDecrypt, key, useHashing) {
+    let keyHex;
+
+    // If useHashing is true, hash the key using MD5
+    if (useHashing) {
+        keyHex = CryptoJS.MD5(key).toString();
+    } else {
+        keyHex = CryptoJS.enc.Utf8.parse(key);
+    }
+
+    // Decrypt the Base64 encoded string using TripleDES
+    const decrypted = CryptoJS.TripleDES.decrypt(toDecrypt, keyHex, {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+
+    // Convert decrypted bytes to a string and return it
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+const App = () => {
+    const [encryptedText, setEncryptedText] = useState('');
+    const [decryptedText, setDecryptedText] = useState('');
+
+    const key = 'H0t3l!Gu35t';
+    const plainText = '9999988888';
+
+    // Encrypting the plain text
+    const handleEncrypt = () => {
+        const encrypted = encrypt(plainText, key, true);
+        setEncryptedText(encrypted);
+    };
+
+    // Decrypting the encrypted text
+    const handleDecrypt = () => {
+        const decrypted = decrypt(encryptedText, key, true);
+        setDecryptedText(decrypted);
+    };
+
+    return (
+        <View style={{ padding: 20 }}>
+            <Text>Original: {plainText}</Text>
+            <Text>Encrypted: {encryptedText}</Text>
+            <Text>Decrypted: {decryptedText}</Text>
+
+            <Button title="Encrypt" onPress={handleEncrypt} />
+            <Button title="Decrypt" onPress={handleDecrypt} />
+        </View>
+    );
+};
+
+export default App;
 
 
 

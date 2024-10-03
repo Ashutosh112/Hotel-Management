@@ -850,7 +850,6 @@ const AddGuestInPendingReport = ({ route }) => {
         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
             .then((res) => {
                 // setIsLoading(false);
-                console.log("rrrrtttttt", res.data.Result)
                 const categories = res.data.Result.map(cat => ({ ...cat, isChecked: false }));
                 setHotelCategories(categories);
                 checkRoomCategoryWithGuest(categories);
@@ -985,7 +984,6 @@ const AddGuestInPendingReport = ({ route }) => {
     return (
         <ScrollView style={{ marginHorizontal: 25 }}>
             <Text style={{ fontSize: 16, fontWeight: "bold", color: "black" }}>Primary Guest</Text>
-
             <Text style={styles.label}>First Name</Text>
             <TextInput
                 style={styles.input}
