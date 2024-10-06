@@ -1,798 +1,14 @@
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, TextInput, Button, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, Dimensions } from 'react-native';
-// import { useRoute } from '@react-navigation/native';
-// import { Dropdown } from 'react-native-element-dropdown';
-// import ImagePicker from 'react-native-image-crop-picker';
-// import axios from 'axios';
-// import { baseUrl } from '../utils/env';
-// import CheckBox from '@react-native-community/checkbox';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// const AddGuestInPendingReport = () => {
-//     const route = useRoute();
-//     const { guestData } = route.params; // Accessing guestData from params
-//     const [hotelCategories, setHotelCategories] = useState([]);
-//     const [formValues, setFormValues] = useState({});
-//     const [additionalGuests, setAdditionalGuests] = useState(guestData.length);
-//     const [guestsImages, setGuestsImages] = useState(guestData.map((guest) => ({
-//         Image1: guest.Image1 || null,
-//         Image2: guest.Image2 || null
-//     })));
-
-
-//     useEffect(() => {
-//         initializeFormValues();
-//         hotelRoomCategory()
-//     }, []);
-
-//     const hotelRoomCategory = async () => {
-//         // setIsLoading(true);
-//         const value = await AsyncStorage.getItem('hotelmgmt');
-//         let updatedValue = JSON.parse(value);
-//         const config = {
-//             headers: {
-//                 "Access-Control-Allow-Origin": "*",
-//                 "Content-type": "application/json",
-//                 "Authorization": `Bearer ${updatedValue.Token}`
-//             }
-//         };
-//         await axios.post(`${baseUrl}HotelCategory?idHotel=${updatedValue.idHotelMaster}`, {}, config)
-//             .then((res) => {
-//                 // setIsLoading(false);
-//                 const categories = res.data.Result.map(cat => ({ ...cat, isChecked: false }));
-//                 setHotelCategories(categories);
-//             })
-//             .catch(err => {
-//                 // setIsLoading(false);
-//             });
-//     };
-
-//     const handleCategoryCheck = (index) => {
-//         const newCategories = [...hotelCategories];
-//         newCategories[index].isChecked = !newCategories[index].isChecked;
-//         setHotelCategories(newCategories);
-//     };
-
-// const genderData = [
-//     { label: 'पुरुष', value: 'पुरुष' },
-//     { label: 'महिला', value: 'महिला' },
-//     { label: 'अन्य', value: 'अन्य' },
-// ];
-
-// const idTypeData = [
-//     { label: 'आधार कार्ड', value: 'आधार कार्ड' },
-//     { label: 'पासपोर्ट', value: 'पासपोर्ट' },
-//     { label: 'वोटर आई कार्ड', value: 'वोटर आई कार्ड' },
-//     { label: 'ड्राइविंग लाइसेंस', value: 'ड्राइविंग लाइसेंस' },
-//     { label: 'पैन कार्ड', value: 'पैन कार्ड' },
-//     { label: 'राशन कार्ड', value: 'राशन कार्ड' },
-//     { label: 'सरकारी कर्मचारी पहचान पत्र', value: 'सरकारी कर्मचारी पहचान पत्र' },
-//     { label: 'विदेशियों का पंजीकरण कार्ड (FRC)', value: 'विदेशियों का पंजीकरण कार्ड (FRC)' },
-//     { label: 'कोई अन्य सरकारी जारी किया गया पहचान पत्र', value: 'कोई अन्य सरकारी जारी किया गया पहचान पत्र' },
-// ];
-
-// const travelReasonData = [
-//     { label: 'दर्शन', value: 'दर्शन' },
-//     { label: 'अध्यन या सेमिनार', value: 'अध्यन या सेमिनार' },
-//     { label: 'सत्संग', value: 'सत्संग' },
-//     { label: 'पारिवारिक या मित्रो से मिलना', value: 'पारिवारिक या मित्रो से मिलना' },
-//     { label: 'व्यापारिक या व्यावासयिक यात्रा', value: 'व्यापारिक या व्यावासयिक यात्रा' },
-//     { label: 'अन्य', value: 'अन्य' },
-// ];
-
-
-
-//     const initializeFormValues = () => {
-//         let initialValues = {};
-//         guestData.forEach((guest, index) => {
-//             initialValues[`firstname_${index}`] = guest.GuestName;
-//             initialValues[`lastname_${index}`] = guest.GuestLastName;
-//             initialValues[`gender_${index}`] = guest.gender;
-//             initialValues[`address_${index}`] = guest.Address;
-//             initialValues[`travelReason_${index}`] = guest.TravelReson;
-//             initialValues[`identificationType_${index}`] = guest.IdentificationType;
-//             initialValues[`identificationNo_${index}`] = guest.IdentificationNo;
-//             initialValues[`contactNo_${index}`] = guest.ContactNo;
-//         });
-
-//         setFormValues(initialValues);
-//         setAdditionalGuests(guestData.length); // Set initial guests to match the passed guestData
-//     };
-
-//     const handleChange = (name, value) => {
-//         setFormValues({ ...formValues, [name]: value });
-//     };
-
-//     const handleImagePick = async (index, field) => {
-//         try {
-//             const result = await ImagePicker.openPicker({
-//                 includeBase64: true,
-//                 mediaType: 'photo',
-//             });
-
-//             const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-//             if (!allowedMimeTypes.includes(result.mime)) {
-//                 Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
-//                 return;
-//             }
-
-//             const maxSizeInBytes = 5 * 1024 * 1024;
-//             if (result.size > maxSizeInBytes) {
-//                 Alert.alert('File Too Large', 'The selected file size should not exceed 5MB.');
-//                 return;
-//             }
-
-//             const base64Image = result.data;
-//             const updatedImages = [...guestsImages];
-//             updatedImages[index] = { ...updatedImages[index], [field]: base64Image };
-//             setGuestsImages(updatedImages);
-//         } catch (err) {
-//             if (ImagePicker.isCancel(err)) {
-//                 Alert.alert('Canceled', 'Image picker was canceled');
-//             } else {
-//                 Alert.alert('Error', 'Failed to pick image');
-//             }
-//         }
-//     };
-
-//     const renderGuestFields = () => {
-//         return Array.from({ length: additionalGuests }, (_, index) => (
-//             <View key={index} style={{ justifyContent: "center", alignItems: "center", marginBottom: 20 }}>
-//                 <Text style={styles.userLabel}>अतिथि {index + 1}</Text>
-
-//                 <Text style={styles.label}>First Name:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`firstname_${index}`]}
-//                     onChangeText={(text) => handleChange(`firstname_${index}`, text)}
-//                 />
-//                 <Text style={styles.label}>Last Name:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`lastname_${index}`]}
-//                     onChangeText={(text) => handleChange(`lastname_${index}`, text)}
-//                 />
-
-//                 <Text style={styles.label}>Gender:</Text>
-//                 <Dropdown
-// style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-// placeholderStyle={styles.placeholderStyle}
-// selectedTextStyle={styles.selectedTextStyle}
-// inputSearchStyle={styles.inputSearchStyle}
-// itemTextStyle={styles.selectedTextStyle}
-//                     data={genderData}
-//                     labelField="label"
-//                     valueField="value"
-//                     value={formValues[`gender_${index}`]}
-//                     placeholder="Select Gender"
-//                     onChange={(item) => handleChange(`gender_${index}`, item.value)}
-//                 />
-
-//                 {/* Show Travel Reason and Address only for User 1 */}
-//                 {index === 0 && (
-//                     <>
-//                         <Text style={styles.label}>Travel Reason:</Text>
-//                         <Dropdown
-// style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-// placeholderStyle={styles.placeholderStyle}
-// selectedTextStyle={styles.selectedTextStyle}
-// inputSearchStyle={styles.inputSearchStyle}
-// itemTextStyle={styles.selectedTextStyle}
-//                             data={travelReasonData}
-//                             labelField="label"
-//                             valueField="value"
-//                             value={formValues[`travelReason_${index}`]}
-//                             placeholder="Select Travel Reason"
-//                             onChange={(item) => handleChange(`travelReason_${index}`, item.value)}
-//                         />
-
-//                         <Text style={styles.label}>Address:</Text>
-//                         <TextInput style={styles.input}
-//                             value={formValues[`address_${index}`]}
-//                             onChangeText={(text) => handleChange(`address_${index}`, text)}
-//                         />
-//                     </>
-//                 )}
-
-//                 <Text style={styles.label}>Identification Type:</Text>
-//                 <Dropdown
-//                     style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-//                     placeholderStyle={styles.placeholderStyle}
-//                     selectedTextStyle={styles.selectedTextStyle}
-//                     inputSearchStyle={styles.inputSearchStyle}
-//                     itemTextStyle={styles.selectedTextStyle}
-//                     data={idTypeData}
-//                     labelField="label"
-//                     valueField="value"
-//                     value={formValues[`identificationType_${index}`]}
-//                     placeholder="Select ID Type"
-//                     onChange={(item) => handleChange(`identificationType_${index}`, item.value)}
-//                 />
-
-//                 <Text style={styles.label}>Identification No:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`identificationNo_${index}`]}
-//                     onChangeText={(text) => handleChange(`identificationNo_${index}`, text)}
-//                 />
-
-//                 <Text style={styles.label}>Contact No:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`contactNo_${index}`]}
-//                     onChangeText={(text) => handleChange(`contactNo_${index}`, text)}
-//                 />
-
-//                 {/* Image Upload for User */}
-//                 <Text style={styles.label}>Upload ID Images:</Text>
-//                 <View style={styles.imageContainer}>
-//                     <TouchableOpacity onPress={() => handleImagePick(index, 'Image1')} style={styles.imageUpload}>
-//                         {guestsImages[index]?.Image1 ? (
-//                             <Image source={{ uri: `data:image/jpeg;base64,${guestsImages[index].Image1}` }} style={styles.imagePreview} />
-//                         ) : (
-//                             <Text>Select Image 1</Text>
-//                         )}
-//                     </TouchableOpacity>
-//                     <TouchableOpacity onPress={() => handleImagePick(index, 'Image2')} style={styles.imageUpload}>
-//                         {guestsImages[index]?.Image2 ? (
-//                             <Image source={{ uri: `data:image/jpeg;base64,${guestsImages[index].Image2}` }} style={styles.imagePreview} />
-//                         ) : (
-//                             <Text>Select Image 2</Text>
-//                         )}
-//                     </TouchableOpacity>
-//                 </View>
-//             </View>
-//         ));
-//     };
-
-//     return (
-//         <ScrollView>
-//             {/* Render guest fields based on the number of additional guests */}
-//             {renderGuestFields()}
-
-
-
-//             <View style={{ width: "85%", marginHorizontal: 30 }}>
-//                 {hotelCategories.length > 0 && (
-//                     <View style={{ justifyContent: "flex-start", alignItems: "flex-start" }}>
-//                         <Text style={{
-//                             fontSize: 12,
-//                             color: "#000",
-//                             marginTop: 20,
-//                             fontWeight: "500"
-//                         }}>अतिथि को दिए हुए कमरे की श्रेणी चुनें।<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-//                         {hotelCategories.map((category, index) => (
-//                             <View key={category.idHotelRoomCategory} style={styles.categoryContainer}>
-//                                 <CheckBox
-//                                     value={category.isChecked}
-//                                     onValueChange={() => handleCategoryCheck(index)}
-//                                     tintColors='grey'
-//                                     onTintColor="grey"
-//                                     onFillColor='grey'
-//                                 />
-//                                 <Text style={{ fontSize: 13, color: "#000", fontWeight: "500", textTransform: "capitalize" }}>{category.CategoryName} - {category.iPrice}</Text>
-//                             </View>
-//                         ))}
-
-
-//                     </View>
-//                 )}
-//             </View>
-
-//             <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 20 }}>
-//                 <Text style={styles.label}>Additional Guests:</Text>
-//                 <Dropdown
-//                     style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-//                     placeholderStyle={styles.placeholderStyle}
-//                     selectedTextStyle={styles.selectedTextStyle}
-//                     inputSearchStyle={styles.inputSearchStyle}
-//                     itemTextStyle={styles.selectedTextStyle}
-//                     data={Array.from({ length: 10 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
-//                     labelField="label"
-//                     valueField="value"
-//                     value={additionalGuests}
-//                     onChange={(item) => setAdditionalGuests(item.value)}
-//                 />
-//             </View>
-//         </ScrollView>
-//     );
-// };
-
-
-// const styles = StyleSheet.create({
-//     input: {
-//         borderWidth: 1,
-//         borderColor: '#ccc',
-//         padding: 10,
-//         marginBottom: 10,
-//         width: '80%',
-//         borderRadius: 5,
-//     },
-//     dropdown: {
-//         borderWidth: 1,
-//         borderColor: '#ccc',
-//         padding: 10,
-//         marginBottom: 10,
-//         width: '80%',
-//         borderRadius: 5,
-//     },
-//     label: {
-//         fontSize: 16,
-//         fontWeight: 'bold',
-//         marginBottom: 5,
-//     },
-//     userLabel: {
-//         fontSize: 18,
-//         fontWeight: 'bold',
-//         marginBottom: 15,
-//         color: "#000"
-//     },
-//     imageContainer: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         width: '80%',
-//         marginBottom: 20,
-//     },
-//     imageUpload: {
-//         width: 100,
-//         height: 100,
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         borderWidth: 1,
-//         borderColor: '#ccc',
-//         borderRadius: 5,
-//     },
-//     imagePreview: {
-//         width: '100%',
-//         height: '100%',
-//         borderRadius: 5,
-//     },
-//     container: {
-//         padding: 20,
-//         backgroundColor: '#fff',
-//         flex: 1,
-//     },
-//     textInput: {
-//         height: 40,
-//         borderColor: '#ccc',
-//         borderWidth: 1,
-//         marginBottom: 12,
-//         paddingHorizontal: 10,
-//         borderRadius: 5,
-//         color: "black"
-
-//     },
-//     label: {
-//         fontSize: 16,
-//         marginBottom: 6,
-//         color: "black",
-//     },
-//     input: {
-//         width: Dimensions.get('window').width - 60,
-//         backgroundColor: '#fff',
-//         borderWidth: 1,
-//         borderColor: '#E3E2E2',
-//         borderRadius: 10,
-//         paddingHorizontal: 20,
-//         color: "#000",
-//         height: 50,
-//         marginTop: 10,
-//     },
-//     placeholderStyle: {
-//         fontSize: 14,
-//         color: "grey"
-//     },
-//     selectedTextStyle: {
-//         fontSize: 12,
-//         color: "black"
-//     },
-//     inputSearchStyle: {
-//         height: 40,
-//         fontSize: 12,
-//         color: "grey"
-//     },
-//     lableText: {
-//         fontSize: 12,
-//         color: "#000",
-//         marginLeft: 0,
-//         width: "45%",
-//         marginTop: 10
-//     },
-//     categoryContainer: {
-//         flexDirection: 'row',
-//         alignItems: 'center',
-//         marginVertical: 5,
-//     },
-// });
-
-// export default AddGuestInPendingReport;
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, TextInput, Button, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, Dimensions } from 'react-native';
-// import { useRoute } from '@react-navigation/native';
-// import { Dropdown } from 'react-native-element-dropdown';
-// import ImagePicker from 'react-native-image-crop-picker';
-// import axios from 'axios';
-// import { baseUrl } from '../utils/env';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// const AddGuestInPendingReport = () => {
-//     const route = useRoute();
-//     const { guestData } = route.params; // Accessing guestData from params
-//     const [allGuestData, setAllGuestData] = useState([])
-//     const [formValues, setFormValues] = useState({});
-//     const [additionalGuests, setAdditionalGuests] = useState(guestData.length);
-//     const [guestsImages, setGuestsImages] = useState(guestData.map((guest) => ({
-//         Image1: guest.Image1 || null,
-//         Image2: guest.Image2 || null
-//     })));
-
-//     useEffect(() => {
-//         initializeFormValues();
-//         GuestDetails()
-//     }, []);
-
-
-// const GuestDetails = async () => {
-//     const value = await AsyncStorage.getItem('hotelmgmt');
-//     let updatedValue = JSON.parse(value);
-//     const config = {
-//         headers: {
-//             "Access-Control-Allow-Origin": "*",
-//             "Content-type": "application/json",
-//             "Authorization": `Bearer ${updatedValue.Token}`
-//         }
-//     };
-//     await axios.post(`${baseUrl}GuestDetails?idGuestMaster=${route.params.guestsId}`, {}, config)
-//         .then((res) => {
-//             setAllGuestData(res.data.Result);
-//             console.log("rrrrrr", res.data.Result)
-//         })
-//         .catch(err => {
-//             console.log("eeeerrr", err)
-//         });
-// };
-
-// const genderData = [
-//     { label: 'पुरुष', value: 'पुरुष' },
-//     { label: 'महिला', value: 'महिला' },
-//     { label: 'अन्य', value: 'अन्य' },
-// ];
-
-// const idTypeData = [
-//     { label: 'आधार कार्ड', value: 'आधार कार्ड' },
-//     { label: 'पासपोर्ट', value: 'पासपोर्ट' },
-//     { label: 'वोटर आई कार्ड', value: 'वोटर आई कार्ड' },
-//     { label: 'ड्राइविंग लाइसेंस', value: 'ड्राइविंग लाइसेंस' },
-//     { label: 'पैन कार्ड', value: 'पैन कार्ड' },
-//     { label: 'राशन कार्ड', value: 'राशन कार्ड' },
-//     { label: 'सरकारी कर्मचारी पहचान पत्र', value: 'सरकारी कर्मचारी पहचान पत्र' },
-//     { label: 'विदेशियों का पंजीकरण कार्ड (FRC)', value: 'विदेशियों का पंजीकरण कार्ड (FRC)' },
-//     { label: 'कोई अन्य सरकारी जारी किया गया पहचान पत्र', value: 'कोई अन्य सरकारी जारी किया गया पहचान पत्र' },
-// ];
-
-// const travelReasonData = [
-//     { label: 'दर्शन', value: 'दर्शन' },
-//     { label: 'अध्यन या सेमिनार', value: 'अध्यन या सेमिनार' },
-//     { label: 'सत्संग', value: 'सत्संग' },
-//     { label: 'पारिवारिक या मित्रो से मिलना', value: 'पारिवारिक या मित्रो से मिलना' },
-//     { label: 'व्यापारिक या व्यावासयिक यात्रा', value: 'व्यापारिक या व्यावासयिक यात्रा' },
-//     { label: 'अन्य', value: 'अन्य' },
-// ];
-
-
-
-//     const initializeFormValues = () => {
-//         let initialValues = {};
-//         guestData.forEach((guest, index) => {
-//             initialValues[`firstname_${index}`] = guest.GuestName;
-//             initialValues[`lastname_${index}`] = guest.GuestLastName;
-//             initialValues[`gender_${index}`] = guest.gender;
-//             initialValues[`address_${index}`] = guest.Address;
-//             initialValues[`travelReason_${index}`] = guest.TravelReson;
-//             initialValues[`identificationType_${index}`] = guest.IdentificationType;
-//             initialValues[`identificationNo_${index}`] = guest.IdentificationNo;
-//             initialValues[`contactNo_${index}`] = guest.ContactNo;
-//         });
-
-//         setFormValues(initialValues);
-//         setAdditionalGuests(guestData.length); // Set initial guests to match the passed guestData
-//     };
-
-//     const handleChange = (name, value) => {
-//         setFormValues({ ...formValues, [name]: value });
-//     };
-
-//     const handleImagePick = async (index, field) => {
-//         try {
-//             const result = await ImagePicker.openPicker({
-//                 includeBase64: true,
-//                 mediaType: 'photo',
-//             });
-
-//             const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-//             if (!allowedMimeTypes.includes(result.mime)) {
-//                 Alert.alert('Invalid File', 'Please select a JPG or PNG image.');
-//                 return;
-//             }
-
-//             const maxSizeInBytes = 5 * 1024 * 1024;
-//             if (result.size > maxSizeInBytes) {
-//                 Alert.alert('File Too Large', 'The selected file size should not exceed 5MB.');
-//                 return;
-//             }
-
-//             const base64Image = result.data;
-//             const updatedImages = [...guestsImages];
-//             updatedImages[index] = { ...updatedImages[index], [field]: base64Image };
-//             setGuestsImages(updatedImages);
-//         } catch (err) {
-//             if (ImagePicker.isCancel(err)) {
-//                 Alert.alert('Canceled', 'Image picker was canceled');
-//             } else {
-//                 Alert.alert('Error', 'Failed to pick image');
-//             }
-//         }
-//     };
-
-//     const renderGuestFields = () => {
-//         return Array.from({ length: additionalGuests }, (_, index) => (
-//             <View key={index} style={{ justifyContent: "center", alignItems: "center", marginBottom: 20 }}>
-//                 <Text style={styles.userLabel}>अतिथि {index + 1}</Text>
-
-//                 <Text style={styles.label}>First Name:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`firstname_${index}`]}
-//                     onChangeText={(text) => handleChange(`firstname_${index}`, text)}
-//                 />
-//                 <Text style={styles.label}>Last Name:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`lastname_${index}`]}
-//                     onChangeText={(text) => handleChange(`lastname_${index}`, text)}
-//                 />
-
-//                 <Text style={styles.label}>Gender:</Text>
-//                 <Dropdown
-//                     style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-//                     placeholderStyle={styles.placeholderStyle}
-//                     selectedTextStyle={styles.selectedTextStyle}
-//                     inputSearchStyle={styles.inputSearchStyle}
-//                     itemTextStyle={styles.selectedTextStyle}
-//                     data={genderData}
-//                     labelField="label"
-//                     valueField="value"
-//                     value={formValues[`gender_${index}`]}
-//                     placeholder="Select Gender"
-//                     onChange={(item) => handleChange(`gender_${index}`, item.value)}
-//                 />
-
-//                 {/* Show Travel Reason and Address only for User 1 */}
-//                 {index === 0 && (
-//                     <>
-//                         <Text style={styles.label}>Travel Reason:</Text>
-//                         <Dropdown
-//                             style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-//                             placeholderStyle={styles.placeholderStyle}
-//                             selectedTextStyle={styles.selectedTextStyle}
-//                             inputSearchStyle={styles.inputSearchStyle}
-//                             itemTextStyle={styles.selectedTextStyle}
-//                             data={travelReasonData}
-//                             labelField="label"
-//                             valueField="value"
-//                             value={formValues[`travelReason_${index}`]}
-//                             placeholder="Select Travel Reason"
-//                             onChange={(item) => handleChange(`travelReason_${index}`, item.value)}
-//                         />
-
-//                         <Text style={styles.label}>Address:</Text>
-//                         <TextInput style={styles.input}
-//                             value={formValues[`address_${index}`]}
-//                             onChangeText={(text) => handleChange(`address_${index}`, text)}
-//                         />
-//                     </>
-//                 )}
-
-//                 <Text style={styles.label}>Identification Type:</Text>
-//                 <Dropdown
-// style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-// placeholderStyle={styles.placeholderStyle}
-// selectedTextStyle={styles.selectedTextStyle}
-// inputSearchStyle={styles.inputSearchStyle}
-// itemTextStyle={styles.selectedTextStyle}
-//                     data={idTypeData}
-//                     labelField="label"
-//                     valueField="value"
-//                     value={formValues[`identificationType_${index}`]}
-//                     placeholder="Select ID Type"
-//                     onChange={(item) => handleChange(`identificationType_${index}`, item.value)}
-//                 />
-
-//                 <Text style={styles.label}>Identification No:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`identificationNo_${index}`]}
-//                     onChangeText={(text) => handleChange(`identificationNo_${index}`, text)}
-//                 />
-
-//                 <Text style={styles.label}>Contact No:</Text>
-//                 <TextInput style={styles.input}
-//                     value={formValues[`contactNo_${index}`]}
-//                     onChangeText={(text) => handleChange(`contactNo_${index}`, text)}
-//                 />
-
-//                 {/* Image Upload for User */}
-//                 <Text style={styles.label}>Upload ID Images:</Text>
-//                 <View style={styles.imageContainer}>
-//                     <TouchableOpacity onPress={() => handleImagePick(index, 'Image1')} style={styles.imageUpload}>
-//                         {guestsImages[index]?.Image1 ? (
-//                             <Image source={{ uri: `data:image/jpeg;base64,${guestsImages[index].Image1}` }} style={styles.imagePreview} />
-//                         ) : (
-//                             <Text>Select Image 1</Text>
-//                         )}
-//                     </TouchableOpacity>
-//                     <TouchableOpacity onPress={() => handleImagePick(index, 'Image2')} style={styles.imageUpload}>
-//                         {guestsImages[index]?.Image2 ? (
-//                             <Image source={{ uri: `data:image/jpeg;base64,${guestsImages[index].Image2}` }} style={styles.imagePreview} />
-//                         ) : (
-//                             <Text>Select Image 2</Text>
-//                         )}
-//                     </TouchableOpacity>
-//                 </View>
-//             </View>
-//         ));
-//     };
-
-//     return (
-//         <ScrollView>
-//             {/* Render guest fields based on the number of additional guests */}
-//             {renderGuestFields()}
-//             <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 20 }}>
-//                 <Text style={styles.label}>Additional Guests:</Text>
-//                 <Dropdown
-//  style={[styles.input, { width: "85%", backgroundColor: '#fff', borderColor: '#E3E2E2', alignItems: "center", justifyContent: "center", marginTop: 15 }]}
-// placeholderStyle={styles.placeholderStyle}
-// selectedTextStyle={styles.selectedTextStyle}
-// inputSearchStyle={styles.inputSearchStyle}
-// itemTextStyle={styles.selectedTextStyle}
-//                     data={Array.from({ length: 10 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
-//                     labelField="label"
-//                     valueField="value"
-//                     value={additionalGuests}
-//                     onChange={(item) => setAdditionalGuests(item.value)}
-//                 />
-//             </View>
-//         </ScrollView>
-//     );
-// };
-
-
-// const styles = StyleSheet.create({
-//     input: {
-//         borderWidth: 1,
-//         borderColor: '#ccc',
-//         padding: 10,
-//         marginBottom: 10,
-//         width: '80%',
-//         borderRadius: 5,
-//     },
-//     dropdown: {
-//         borderWidth: 1,
-//         borderColor: '#ccc',
-//         padding: 10,
-//         marginBottom: 10,
-//         width: '80%',
-//         borderRadius: 5,
-//     },
-//     label: {
-//         fontSize: 16,
-//         fontWeight: 'bold',
-//         marginBottom: 5,
-//     },
-//     userLabel: {
-//         fontSize: 18,
-//         fontWeight: 'bold',
-//         marginBottom: 15,
-//         color: "#000"
-//     },
-//     imageContainer: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         width: '80%',
-//         marginBottom: 20,
-//     },
-//     imageUpload: {
-//         width: 100,
-//         height: 100,
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         borderWidth: 1,
-//         borderColor: '#ccc',
-//         borderRadius: 5,
-//     },
-//     imagePreview: {
-//         width: '100%',
-//         height: '100%',
-//         borderRadius: 5,
-//     },
-//     container: {
-//         padding: 20,
-//         backgroundColor: '#fff',
-//         flex: 1,
-//     },
-//     textInput: {
-//         height: 40,
-//         borderColor: '#ccc',
-//         borderWidth: 1,
-//         marginBottom: 12,
-//         paddingHorizontal: 10,
-//         borderRadius: 5,
-//         color: "black"
-
-//     },
-//     label: {
-//         fontSize: 16,
-//         marginBottom: 6,
-//         color: "black",
-//     },
-//     input: {
-//         width: Dimensions.get('window').width - 60,
-//         backgroundColor: '#fff',
-//         borderWidth: 1,
-//         borderColor: '#E3E2E2',
-//         borderRadius: 10,
-//         paddingHorizontal: 20,
-//         color: "#000",
-//         height: 50,
-//         marginTop: 10,
-//     },
-//     placeholderStyle: {
-//         fontSize: 14,
-//         color: "grey"
-//     },
-//     selectedTextStyle: {
-//         fontSize: 12,
-//         color: "black"
-//     },
-//     inputSearchStyle: {
-//         height: 40,
-//         fontSize: 12,
-//         color: "grey"
-//     },
-//     lableText: {
-//         fontSize: 12,
-//         color: "#000",
-//         marginLeft: 0,
-//         width: "45%",
-//         marginTop: 10
-//     },
-//     categoryContainer: {
-//         flexDirection: 'row',
-//         alignItems: 'center',
-//         marginVertical: 5,
-//     },
-// });
-
-// export default AddGuestInPendingReport;
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { View, Text, TextInput, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, Dimensions, Modal } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import CheckBox from '@react-native-community/checkbox';
+import CalendorIcon from "../assets/images/CalenderIcon.png";
+import moment from 'moment';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddGuestInPendingReport = ({ route }) => {
     // const [allGuestData, setAllGuestData] = useState([]);
@@ -874,11 +90,51 @@ const AddGuestInPendingReport = ({ route }) => {
         }
     };
 
-    const handleCategoryCheck = (index) => {
-        const newCategories = [...hotelCategories];
-        newCategories[index].isChecked = !newCategories[index].isChecked;
-        setHotelCategories(newCategories);
+    const handleCategoryCheck = (index, roomCategoryId) => {
+        // Toggle the isChecked value for the selected category
+        const updatedCategories = hotelCategories.map((category, i) =>
+            i === index ? { ...category, isChecked: !category.isChecked } : category
+        );
+
+        // Get the selected category details
+        const selectedCategory = hotelCategories[index];
+        const idGuestRoom = selectedCategory.idGuestRoom || 0;  // Make sure idGuestRoom is available here
+        const iPrice = selectedCategory.iPrice || 0;
+
+        // Check if the category is now checked or unchecked
+        const isChecked = !selectedCategory.isChecked;
+
+        let updatedGuestRoomDetails;
+
+        if (isChecked) {
+            // Add the selected room details to guestRoomDetails if it's checked
+            updatedGuestRoomDetails = [
+                ...guestRoomDetails,
+                {
+                    idGuestRoom,
+                    idGuest: primaryGuest.idGuestMaster,  // Assuming you have primaryGuest data
+                    idHotelRoomCategory: roomCategoryId,
+                    iPrice: iPrice
+                }
+            ];
+        } else {
+            // Remove the room details if it's unchecked
+            updatedGuestRoomDetails = guestRoomDetails.filter(
+                (room) => room.idHotelRoomCategory !== roomCategoryId
+            );
+        }
+
+        // Filter out rooms that no longer have a valid idHotelRoomCategory
+        updatedGuestRoomDetails = updatedGuestRoomDetails.filter(room => room.idHotelRoomCategory !== 0);
+
+        // Update the state with the new data
+        setHotelCategories(updatedCategories);
+        setGuestRoomDetails(updatedGuestRoomDetails);
+
+        // console.log("Updated GuestRoomDetails:", updatedGuestRoomDetails);
     };
+
+
 
     const GuestDetails = async () => {
         const value = await AsyncStorage.getItem('hotelmgmt');
@@ -960,11 +216,71 @@ const AddGuestInPendingReport = ({ route }) => {
         }
     };
 
-    const handleSubmit = () => {
-        if (validateForm()) {
-            console.log({ primaryGuest, guests });
+    const [statusCode, setStatusCode] = useState({})
+    const [submitValidateDateStatusCode, setSubmitValidateDateStatusCode] = useState('')
+
+
+    useEffect(() => {
+        submitValidateDate()
+    }, [])
+
+    const [checkoutDate, setCheckoutDate] = useState(new Date());
+    const [showCheckoutPicker, setShowCheckoutPicker] = useState(false);
+
+    const submitValidateDate = async () => {
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `Bearer ${updatedValue.Token}`
+            }
+        };
+        await axios.post(`${baseUrl}ValidateDateForAddGuest?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(yesterday).format("DD/MMM/YYYY")}`, {}, config)
+            .then((res) => {
+                setSubmitValidateDateStatusCode(res.data)
+            })
+            .catch(err => {
+            });
+    };
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    // Set the default selected date label
+    const [checkinDate, setCheckinDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const onChangeCheckout = (event, selectedDate) => {
+        const currentDate = selectedDate || checkoutDate;
+        setShowCheckoutPicker(false);
+
+        if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
+            setCheckoutDate(currentDate);
+            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
+        } else if (currentDate >= checkinDate) {
+            setCheckoutDate(currentDate);
+            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
+        } else {
+            Alert.alert('Warning', 'चेकआउट कि दिनांक चेक-इन दिनांक से पहले नहीं हो सकती।');
         }
     };
+
+    const openDatePicker = () => {
+        setShowDatePicker(true);
+    };
+
+    const selectDate = (date) => {
+        if (submitValidateDateStatusCode.StatusCode == 1 && moment(date).isSame(yesterday, 'day')) {
+            Alert.alert('Warning', `${submitValidateDateStatusCode.Message}`);
+        } else {
+            setCheckinDate(date);
+            setShowDatePicker(false);
+        }
+    };
+
 
     const handleGuestCountChange = (value) => {
         setGuestCount(value);  // Total guest count, including primary guest
@@ -980,6 +296,88 @@ const AddGuestInPendingReport = ({ route }) => {
             setGuests(guests.slice(0, additionalGuestsNeeded));
         }
     };
+
+
+    const handleSubmit = () => {
+        setStatusCode("Hello");
+        if (validateForm()) {
+            // Parse dates with moment using ISO format
+            const checkinDateISO = moment(checkinDate, "YYYY/MM/DD").isValid() ? moment(checkinDate).format("YYYY/MM/DD") : "";
+            const checkoutDateISO = moment(checkoutDate, "YYYY/MM/DD").isValid() ? moment(checkoutDate).format("YYYY/MM/DD") : "";
+            const enterDateISO = moment(primaryGuest.EnterDate, "YYYY/MM/DD").isValid() ? moment(primaryGuest.EnterDate).format("YYYY/MM/DD") : "";
+
+            const formattedResponse = {
+                idHotel: primaryGuest.idHotel || 0,
+                idGuestMaster: primaryGuest.idGuestMaster || "",
+                contactNo: primaryGuest.ContactNo || "",
+                checkInDate: checkinDateISO,
+                checkOutDate: checkoutDateISO,
+                enterDate: enterDateISO || "",
+                description: primaryGuest.Description || "None",
+                bActive: primaryGuest.bActive || true,
+                guestName: primaryGuest.GuestName || "",
+                identificationNo: primaryGuest.IdentificationNo || "",
+                identificationType: primaryGuest.IdentificationType || "",
+                address: primaryGuest.Address || "",
+                isDeleted: primaryGuest.isDeleted || false,
+                AddionalGuest: guestCount,
+                hotelName: primaryGuest.HotelName || "",
+                details: guests.map(guest => ({
+                    idGuest: primaryGuest.idGuestMaster || 0,
+                    sName: guest.sName || "",
+                    identificationNo: guest.IdentificationNo || "",
+                    identificationType: guest.IdentificationType || "",
+                    image: guest.Image || "",
+                    gender: guest.gender || "",
+                    filePass: guest.filePass || "",
+                    lastName: guest.LastName || "",
+                    image2: guest.Image2 || "",
+                    contactNo: guest.ContactNo || ""
+                })),
+                categories: guestRoomDetails.map(room => ({
+                    idHotelRoomCategory: room.idHotelRoomCategory || 0,
+                    idGuestRoom: room.idGuestRoom || 0,
+                    idGuest: primaryGuest.idGuestMaster || 0,
+                    iPrice: room.iPrice || 0
+                })),
+                guestLastName: primaryGuest.GuestLastName || "",
+                gender: primaryGuest.gender || null,
+                travelReson: primaryGuest.TravelReson || null,
+                city: primaryGuest.city || "",
+                pIncode: primaryGuest.PIncode || "",
+                filePass: primaryGuest.filePass || "",
+                image1: primaryGuest.Image1 || "",
+                image2: primaryGuest.Image2 || ""
+            };
+
+            // console.log(JSON.stringify(formattedResponse, null, 2));
+            UpdateApi(formattedResponse); // Send formattedResponse to the API
+        }
+    };
+
+
+    const UpdateApi = async (formattedResponse) => {
+        const value = await AsyncStorage.getItem('hotelmgmt');
+        let updatedValue = JSON.parse(value);
+        const config = {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-type": "application/json",
+                "Authorization": `Bearer ${updatedValue.Token}`
+            }
+        };
+
+        let body = formattedResponse
+        await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
+            .then(response => {
+                console.log("response>>..", response.data)
+            })
+            .catch(error => {
+                console.error('Error sending form data:', error);
+
+            });
+    };
+
 
     return (
         <ScrollView style={{ marginHorizontal: 25 }}>
@@ -1001,6 +399,64 @@ const AddGuestInPendingReport = ({ route }) => {
                 value={primaryGuest.GuestLastName || ''}
                 onChangeText={(text) => handleInputChange('GuestLastName', text)}
             />
+
+            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 0 }}>
+                <Text style={styles.lableText}>चेक इन तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                <Text style={styles.lableText}>चेक आउट तारीख<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                <TouchableOpacity
+                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
+                    onPress={openDatePicker}>
+                    <Text style={{ color: "black", fontSize: 12 }}>{moment(checkinDate).format("DD-MM-YYYY")}</Text>
+                    <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
+                </TouchableOpacity>
+
+                <Modal
+                    visible={showDatePicker}
+                    transparent={true}
+                    animationType="slide" >
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                        <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+                            <Text style={{ color: "#024063" }}>चेक-इन दिनांक चुनें</Text>
+                            <TouchableOpacity
+                                onPress={() => selectDate(yesterday)}
+                                disabled={statusCode === 1}
+                                style={{ padding: 10, backgroundColor: statusCode === 1 ? 'grey' : 'white', marginVertical: 5 }}
+                            >
+                                <Text style={{ color: statusCode == 1 ? 'lightgrey' : 'black', fontSize: 12 }}>
+                                    {`Yesterday (${moment(yesterday).format("DD/MM/YYYY")})  ${submitValidateDateStatusCode.StatusCode == 1 ? submitValidateDateStatusCode.Message : ''}`}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => selectDate(today)}
+                                style={{ padding: 10, backgroundColor: 'white', marginVertical: 5 }}
+                            >
+                                <Text style={{ color: 'black', fontSize: 12 }}>{`Today (${moment(today).format("DD/MM/YYYY")})`}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setShowDatePicker(false)} >
+                                <Text style={{ color: '#024063', textAlign: 'center', marginTop: 10, fontSize: 14 }}>Close</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+                <TouchableOpacity
+                    style={[styles.input, { width: "45%", backgroundColor: '#fff', borderColor: '#E3E2E2', justifyContent: "space-between", marginTop: 8, flexDirection: "row", alignItems: "center", paddingHorizontal: 15 }]}
+                    onPress={() => setShowCheckoutPicker(true)}>
+                    <Text style={{ color: "black", fontSize: 12 }}>{checkoutDate ? moment(checkoutDate).format("DD-MM-YYYY") : "चेक आउट तारीख*"}</Text>
+                    <Image source={CalendorIcon} style={{ height: 15, width: 15 }} />
+                </TouchableOpacity>
+
+                {showCheckoutPicker && (
+                    <DateTimePicker
+                        value={checkoutDate}
+                        mode="date"
+                        display="default"
+                        onChange={onChangeCheckout}
+                        minimumDate={yesterday}
+                    />
+                )}
+            </View>
 
             <Text style={styles.label}>Mobile Number</Text>
             <TextInput
@@ -1111,11 +567,12 @@ const AddGuestInPendingReport = ({ route }) => {
                         <Text style={{ fontSize: 12, color: "#000", marginTop: 20, fontWeight: "500" }}>
                             Select the room category given to the guest. <Text style={{ color: "red" }}>*</Text>
                         </Text>
+
                         {hotelCategories.map((category, index) => (
                             <View key={category.idHotelRoomCategory} style={styles.categoryContainer}>
                                 <CheckBox
                                     value={category.isChecked}
-                                    onValueChange={() => handleCategoryCheck(index)}
+                                    onValueChange={() => handleCategoryCheck(index, category.idHotelRoomCategory)}
                                     tintColors={{ true: 'grey', false: 'grey' }}
                                 />
                                 <Text style={{ fontSize: 13, color: "#000", fontWeight: "500", textTransform: "capitalize" }}>
@@ -1126,6 +583,7 @@ const AddGuestInPendingReport = ({ route }) => {
                     </View>
                 )}
             </View>
+
 
             {/* Dropdown for guest count */}
             <Text style={styles.label}>Total Guests</Text>

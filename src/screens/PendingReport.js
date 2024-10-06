@@ -111,7 +111,7 @@ const PendingReport = ({ navigation }) => {
                 data={pendingGuestDetails}
                 keyExtractor={item => item.index}
                 renderItem={({ item, index }) =>
-                    <View style={styles.container} key={index + 1}>
+                    <View style={styles.container} key={index}>
                         <View style={{ flex: 1, flexDirection: "row" }}>
                             <View style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}>
                                 <Image source={require('../assets/images/pendingReport.png')} style={{ height: 45, width: 45, borderWidth: 1, borderRadius: 45, borderColor: "#fff" }} />
