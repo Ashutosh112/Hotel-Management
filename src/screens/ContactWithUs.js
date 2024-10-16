@@ -15,9 +15,9 @@ const ContactWithUs = ({ navigation }) => {
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between" }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.labelText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>
+                    <Text style={[styles.labelText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>
                         हमसे संपर्क करें
                     </Text>
                 </View>
@@ -33,7 +33,7 @@ const ContactWithUs = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
                 <Text style={styles.text}>
-                    (सुबह 10 से शाम 6 बजे, सोमवार से शनिवार)।
+                    ( सुबह 10 से शाम 6 बजे, सोमवार से शनिवार )।
                 </Text>
                 <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate("BottomNavigator")}>
                     <Text style={styles.button}>ठीक है|</Text>
@@ -65,17 +65,17 @@ const styles = StyleSheet.create({
 
     },
     buttonContainer: {
-        borderRadius: 20,
+        borderRadius: 12,
         marginTop: 20,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 18,
+        fontSize: 12,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     },
     phoneNumber: {
         color: 'green',
-        fontSize: 14
+        fontSize: 14,
+        marginVertical: 10
     }
 });

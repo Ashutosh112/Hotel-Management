@@ -140,8 +140,6 @@ const AddGuestInPendingReport = ({ route, navigation }) => {
         // console.log("Updated GuestRoomDetails:", updatedGuestRoomDetails);
     };
 
-
-
     const GuestDetails = async () => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
@@ -164,17 +162,13 @@ const AddGuestInPendingReport = ({ route, navigation }) => {
 
         } catch (err) {
             setIsLoading(false)
-            console.log("Error fetching guest data", err);
         }
     };
-
 
     const [validationErrors, setValidationErrors] = useState({
         ContactNo: '',
         city: '',
         guests: guests.map(() => ({ sName: '', LastName: '', })),
-
-
     });
 
     const validateForm = () => {
@@ -349,20 +343,43 @@ const AddGuestInPendingReport = ({ route, navigation }) => {
     const [checkinDate, setCheckinDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
 
+    useEffect(() => {
+        // If checkin date is updated to today and checkout date is still in the past, update checkout date to today
+        if (moment(checkinDate).isSame(today, 'day') && moment(checkoutDate).isBefore(today, 'day')) {
+            setCheckoutDate(today);
+        }
+    }, [checkinDate]);
+
     const onChangeCheckout = (event, selectedDate) => {
         const currentDate = selectedDate || checkoutDate;
         setShowCheckoutPicker(false);
 
-        if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
+        // Allow if both checkin and checkout dates are yesterday or the same past date
+        if (moment(currentDate).isSame(checkinDate, 'day')) {
             setCheckoutDate(currentDate);
-            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
-        } else if (currentDate >= checkinDate) {
+        }
+        // Allow if both checkin and checkout are today
+        else if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
             setCheckoutDate(currentDate);
-            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
-        } else {
-            Alert.alert('Warning', 'चेकआउट कि दिनांक चेक-इन दिनांक से पहले नहीं हो सकती।');
+        }
+        // Allow if checkout is after or on the same day as checkin
+        else if (currentDate >= checkinDate) {
+            setCheckoutDate(currentDate);
+        }
+        // Show warning and update checkout date to today's date
+        else {
+            Alert.alert('Warning', 'चेकआउट कि दिनांक चेक-इन दिनांक से पहले नहीं हो सकती।', [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        // Automatically set checkout date to today's date
+                        setCheckoutDate(today);
+                    },
+                },
+            ]);
         }
     };
+
 
     const openDatePicker = () => {
         setShowDatePicker(true);
@@ -471,7 +488,6 @@ const AddGuestInPendingReport = ({ route, navigation }) => {
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 setIsLoading(false)
-                console.log("response>>..", response.data)
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -494,21 +510,21 @@ const AddGuestInPendingReport = ({ route, navigation }) => {
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी दर्ज करें</Text>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी दर्ज करें</Text>
                 </View>
             </View>
             <View style={{ marginHorizontal: 25 }}>
                 <View style={{ justifyContent: "center", alignItems: "center" }}>
-                    <Text style={[styles.modalText, { fontSize: 14, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
+                    <Text style={[styles.modalText, { fontSize: 12, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
                     <Text style={[styles.modalText, { textAlign: "justify" }]}>1. इस फॉर्म के माध्यम से आप गेस्ट की एंट्री सेव कर रहे हैं। इसे थाने में भेजने के लिए कृपया पेंडिंग रिपोर्ट में जाकर इस रिपोर्ट को सबमिट करें।</Text>
                     <Text style={[styles.modalText, { textAlign: "justify" }]}>2. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
-                    <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today)और कल(Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
+                    <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today) और कल (Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
                     <Text style={[styles.modalText, { textAlign: "justify" }]}>4. 5MB से अधिक की इमेज अपलोड नहीं हो पाएगी। कृपया इमेज का साइज कम करके अपलोड करें।</Text>
                     <Text style={[styles.modalText, { textAlign: "justify" }]}>4. होटलों की जिम्मेदारी है कि वे वेबसाइट के माध्यम से सबमिट की गई सभी अतिथि जानकारी की सटीकता और वैधता सुनिश्चित करें। इसमें अतिथि के नाम, मोबाइल नंबर, और आधार विवरण की पुष्टि शामिल है।</Text>
                 </View>
-                <Text style={[styles.lableText, { fontSize: 16, textAlign: "center", fontWeight: "600", color: "#000", width: "auto", marginTop: 20, marginBottom: 10 }]}>प्राथमिक अतिथि की जानकारी</Text>
+                <Text style={[styles.lableText, { fontSize: 14, textAlign: "center", fontWeight: "600", color: "#000", width: "auto", marginTop: 20, marginBottom: 10 }]}>प्राथमिक अतिथि की जानकारी</Text>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
                     <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
@@ -925,6 +941,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         width: '80%',
         borderRadius: 5,
+        fontSize: 12
     },
     dropdown: {
         borderWidth: 1,
@@ -990,14 +1007,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
         marginTop: 10,
+        fontSize: 12
     },
     placeholderStyle: {
-        fontSize: 14,
+        fontSize: 12,
         color: "grey"
     },
     selectedTextStyle: {
@@ -1010,7 +1028,7 @@ const styles = StyleSheet.create({
         color: "grey"
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
@@ -1023,21 +1041,21 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 100,
-        height: 100,
+        height: 80,
         marginVertical: 10,
     },
     buttonContainer: {
-        borderRadius: 15,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 10,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF'
     },
     button: {
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500"

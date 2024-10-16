@@ -1,81 +1,3 @@
-// import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native'
-// import React from 'react'
-// import BackIcon from "react-native-vector-icons/Ionicons"
-
-// const PendingReportDetails = ({ navigation }) => {
-//     return (
-//         <ScrollView >
-//             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
-//                 <TouchableOpacity onPress={() => navigation.goBack()}>
-//                     <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
-//                 </TouchableOpacity>
-//                 <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>Report Detail</Text>
-//             </View>
-//             <View style={{ padding: 15 }}>
-
-//                 <View >
-//                     <View style={{ backgroundColor: '#1AA7FF', borderTopLeftRadius: 5, borderTopRightRadius: 5, padding: 10, flexDirection: "row", justifyContent: "space-between" }}>
-//                         <Text style={{ color: "white" }}>चेक इन तारीख : 24-05-2024</Text>
-//                         <Text style={{ color: "white" }}>कुल व्यक्ति संख्या : 2</Text>
-
-//                     </View>
-//                     <View style={{ backgroundColor: '#1AA7FF', padding: 10, flexDirection: "row", justifyContent: "space-between" }}>
-//                         <Text style={{ color: "white" }}>चेक आउट तारीख : 24-05-2024</Text>
-//                         <Text style={{ color: "white" }}>रिपोर्ट सबमिट: नहीं</Text>
-//                     </View>
-//                     <View style={{ backgroundColor: "#fff", padding: 15, flexDirection: "row", justifyContent: "space-between" }}>
-//                         <View>
-//                             <Text style={{ color: "black", fontSize: 12 }}>नाम: Aman Gupta</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>जेंडर: Male</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>मोबाइल नंबर: 8871369705</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>पता: ujjain</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>शहर: ujjain</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>पिन: 456001</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>आईडी प्रकार: ???? ?????</Text>
-//                         </View>
-//                         <View style={{ alignItems: "center" }}>
-//                             <Text style={{ color: "black", fontSize: 12 }}>आईडी का Front:</Text>
-//                             <Image source={require('../assets/images/pendingReport.png')} style={{ height: 55, width: 55, borderWidth: 1, borderRadius: 55, borderColor: "#fff", marginTop: 5 }} />
-
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 20 }}>आईडी का Back:</Text>
-//                             <Image source={require('../assets/images/pendingReport.png')} style={{ height: 55, width: 55, borderWidth: 1, borderRadius: 55, borderColor: "#fff", marginTop: 5 }} />
-//                         </View>
-//                     </View>
-//                 </View>
-//                 <View style={{ marginTop: 15 }}>
-//                     <View style={{ backgroundColor: '#bfbfbf', borderTopLeftRadius: 5, borderTopRightRadius: 5, padding: 10, flexDirection: "row", justifyContent: "space-between" }}>
-//                         <Text style={{ color: "white" }}>अतिरिक्त अतिथि 1</Text>
-//                     </View>
-
-//                     <View style={{ backgroundColor: "#fff", padding: 15, flexDirection: "row", justifyContent: "space-between" }}>
-//                         <View>
-//                             <Text style={{ color: "black", fontSize: 12 }}>नाम: Dheeraj Kumar</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>जेंडर: Male</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>आईडी प्रकार: ???? ?????</Text>
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 10 }}>आईडी नंबर: 548574562</Text>
-
-//                         </View>
-//                         <View style={{ alignItems: "center" }}>
-//                             <Text style={{ color: "black", fontSize: 12 }}>आईडी का Front:</Text>
-//                             <Image source={require('../assets/images/pendingReport.png')} style={{ height: 55, width: 55, borderWidth: 1, borderRadius: 55, borderColor: "#fff", marginTop: 5 }} />
-
-//                             <Text style={{ color: "black", fontSize: 12, marginTop: 20 }}>आईडी का Back:</Text>
-//                             <Image source={require('../assets/images/pendingReport.png')} style={{ height: 55, width: 55, borderWidth: 1, borderRadius: 55, borderColor: "#fff", marginTop: 5 }} />
-//                         </View>
-//                     </View>
-//                 </View>
-//             </View>
-
-//         </ScrollView>
-//     )
-// }
-
-// export default PendingReportDetails
-
-// const styles = StyleSheet.create({})
-
-
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Dimensions, ScrollView, Image, Pressable } from 'react-native';
 import BackIcon from "react-native-vector-icons/Ionicons";
@@ -84,7 +6,6 @@ import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'
 import Spinner from './Spinner';
-import { scale, verticalScale } from 'react-native-size-matters';
 
 const PendingReportDetails = ({ navigation, route }) => {
 
@@ -111,8 +32,6 @@ const PendingReportDetails = ({ navigation, route }) => {
                 "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
-        console.log("sub", SubmitDate)
-        console.log("ooooooo", `${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`)
         await axios.post(`${baseUrl}GuestPandingDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${SubmitDate}&toDate=${SubmitDate}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
@@ -135,29 +54,40 @@ const PendingReportDetails = ({ navigation, route }) => {
         return submitDate.isBefore(yesterday);
     };
 
+    // Function to count gender
+    const getGenderCount = () => {
+        const maleCount = guestData.filter(guest => guest.gender.toLowerCase() === 'पुरुष').length;
+        const femaleCount = guestData.filter(guest => guest.gender.toLowerCase() === 'महिला').length;
+        return { maleCount, femaleCount };
+    };
+
+    const { maleCount, femaleCount } = getGenderCount();
+
     return (
         <ScrollView style={styles.container}>
             <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                    <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                 </TouchableOpacity>
-                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पेंडिंग रिपोर्ट डिटेल</Text>
+                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पेंडिंग रिपोर्ट डिटेल</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
 
             <View style={{ paddingVertical: 10, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 15, marginTop: 20, borderWidth: 1, borderColor: "#1b5372", paddingHorizontal: 15 }}>
                 <View style={{ justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>होटल का नाम :</Text> {commonData.HotelName}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>होटल का नाम :</Text> {commonData.HotelName}</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>चेक इन तारीख :</Text> {SubmitDate}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>चेक इन तारीख :</Text> {SubmitDate}</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>रिपोर्ट सबमिट :</Text> {commonData.isSubmitted == true ? "हाँ" : "रिपोर्ट सबमिट नहीं की गई है।"}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>रिपोर्ट सबमिट :</Text> {commonData.isSubmitted == true ? "हाँ" : "रिपोर्ट सबमिट नहीं की गई है।"}</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>कुल व्यक्ति संख्या :</Text> {guestData.length}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}>
+                        <Text style={{ fontSize: 10, color: "#8E8E8E" }}>कुल अतिथि :</Text> {guestData.length} ( {maleCount} पुरुष, {femaleCount} महिला )
+                    </Text>
                 </View>
             </View>
 
@@ -176,15 +106,15 @@ const PendingReportDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContent}>
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={[styles.text2, { textTransform: "capitalize" }]}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>नाम :</Text> {item.GuestName} {item.GuestLastName}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>जेंडर :</Text> {item.gender}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>मोबाइल नंबर :</Text> {item.ContactNo}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>पता :</Text> {item.Address}</Text>
+                            <Text style={[styles.text2, { textTransform: "capitalize" }]}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>नाम :</Text> {item.GuestName} {item.GuestLastName}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>जेंडर :</Text> {item.gender}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>मोबाइल नंबर :</Text> {item.ContactNo}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>पता :</Text> {item.Address}</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>यात्रा का उद्देश्य :</Text> {item.TravelReson}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>आईडी प्रकार :</Text> {item.IdentificationType}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>आईडी नंबर :</Text> {item.IdentificationNo}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>यात्रा का उद्देश्य :</Text> {item.TravelReson}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>आईडी प्रकार :</Text> {item.IdentificationType}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>आईडी नंबर :</Text> {item.IdentificationNo}</Text>
                         </View>
                     </View>
                     <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end", marginBottom: 10, marginHorizontal: 30 }}>
@@ -192,14 +122,14 @@ const PendingReportDetails = ({ navigation, route }) => {
 
                         {isDateOlderThanTodayAndYesterday(SubmitDate) ? (
                             <Pressable style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: "lightgrey", backgroundColor: "lightgrey", borderWidth: 1.5, marginTop: 10 }} >
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 6 }}>Edit</Text>
+                                <Text style={{ textAlign: "center", fontSize: 10, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 6 }}>Edit</Text>
                             </Pressable>
                         ) : (
                             <TouchableOpacity
                                 onPress={() => navigation.navigate("AddGuestInPendingReport", { guestsId: guestData[0].idGuestMaster })}
                                 // onPress={() => alert("In Progress")}
                                 style={{ justifyContent: "center", alignItems: "flex-end", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, marginTop: 10 }} >
-                                <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 6 }}>Edit</Text>
+                                <Text style={{ textAlign: "center", fontSize: 10, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 6 }}>Edit</Text>
                             </TouchableOpacity>
 
                         )}
@@ -210,7 +140,8 @@ const PendingReportDetails = ({ navigation, route }) => {
     );
 };
 
-export default PendingReportDetails;
+
+const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
     container: {
@@ -229,7 +160,7 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     guestHeader: {
-        height: 40,
+        height: 35,
         backgroundColor: "#1b5372",
         width: "100%",
         borderTopLeftRadius: 10,
@@ -237,7 +168,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     guestHeaderText: {
-        fontSize: 14,
+        fontSize: 12,
         color: "#fff",
         marginHorizontal: 10,
         fontWeight: "500"
@@ -258,8 +189,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     image: {
-        height: verticalScale(120),
-        width: scale(120),
+        width: screenWidth * 0.3,  // 40% of the screen width
+        height: screenWidth * 0.3, // Adjust the height similarly to maintain aspect ratio
+        marginTop: 10
+
     },
     text: {
         fontSize: 12,
@@ -269,7 +202,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 10
     },
     text2: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "500",
         color: "#000",
         marginTop: 5,
@@ -298,4 +231,5 @@ const styles = StyleSheet.create({
     },
 
 });
+export default PendingReportDetails;
 

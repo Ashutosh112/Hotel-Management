@@ -10,8 +10,6 @@ import moment from "moment";
 
 const PendingReport = ({ navigation }) => {
 
-    const [openModal, setOpenModal] = useState(false)
-
     useEffect(() => {
         pendingList()
     }, [])
@@ -33,15 +31,14 @@ const PendingReport = ({ navigation }) => {
         };
         let body = {}
         let url = `${baseUrl}AllPendingGuestList?HotelId=${updatedValue.idHotelMaster}`
-        console.log("url", url)
         await axios.post(url, body, config)
             .then((res) => {
                 setIsLoading(false)
+                console.log("res", res.data.Result)
                 setPendingGuestDetails(res.data.Result)
 
             })
             .catch(err => {
-                console.log("errror", err)
                 setIsLoading(false)
             });
     };
@@ -80,11 +77,11 @@ const PendingReport = ({ navigation }) => {
                     paddingRight: 15 // Add padding to ensure text doesn't go out
                 }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
                     <Text style={{
                         marginLeft: 10,
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: "400",
                         color: "#fff",
                         flexShrink: 1, // Ensure the text shrinks if necessary
@@ -96,9 +93,9 @@ const PendingReport = ({ navigation }) => {
                 </View>
             </View>
             <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
-                <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { fontWeight: "bold", fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>1. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
-                <Text style={[styles.modalText, { textAlign: "justify" }]}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
+                <Text style={[styles.modalText, { textAlign: "justify", marginBottom: 15 }]}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
             </View>
         </>
     );
@@ -106,6 +103,7 @@ const PendingReport = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F8" }}>
             <Spinner isLoading={isLoading} />
+
             <FlatList
                 ListHeaderComponent={HeaderComponent}
                 data={pendingGuestDetails}
@@ -125,7 +123,7 @@ const PendingReport = ({ navigation }) => {
                         <View style={{ flex: 1, flexDirection: "row" }}>
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                                 <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, elevation: 1.2 }} onPress={() => navigation.navigate("PendingReportDetails", { SubmitDate: item.SubmitDate })}>
-                                    <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>जानकारी देखें</Text>
+                                    <Text style={{ textAlign: "center", fontSize: 10, fontWeight: "400", color: "#fff", paddingHorizontal: 12, paddingVertical: 7 }}>जानकारी देखें</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -134,7 +132,7 @@ const PendingReport = ({ navigation }) => {
                                         <Text style={styles.disabledButtonText}>गेस्ट जोडे</Text>
                                     </TouchableOpacity>
                                 ) : (
-                                    <TouchableOpacity style={styles.activeButton} onPress={() => navigation.navigate("AddGuestInPendingReport", { SubmitDate: item.SubmitDate })}>
+                                    <TouchableOpacity style={styles.activeButton} onPress={() => navigation.navigate("CreateReport")}>
                                         <Text style={styles.buttonText}>गेस्ट जोडे</Text>
                                     </TouchableOpacity>
                                 )}
@@ -144,33 +142,26 @@ const PendingReport = ({ navigation }) => {
                                 {
                                     item.isSubmitted == false ?
                                         <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#1AA7FF', backgroundColor: '#1AA7FF', borderWidth: 1.5, elevation: 1.2 }} onPress={() => navigation.navigate("ReportSubmitScreen", { SubmitDate: item.SubmitDate })}>
-                                            <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "#fff", paddingHorizontal: 20, paddingVertical: 7 }}>रिपोर्ट सबमिट</Text>
+                                            <Text style={{ textAlign: "center", fontSize: 10, fontWeight: "400", color: "#fff", paddingHorizontal: 12, paddingVertical: 7 }}>रिपोर्ट सबमिट</Text>
                                         </TouchableOpacity>
                                         :
                                         <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", borderRadius: 4, borderColor: '#EEEEEE', backgroundColor: '#EEEEEE', borderWidth: 1.5 }} >
-                                            <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "400", color: "grey", paddingHorizontal: 20, paddingVertical: 7 }}>रिपोर्ट सबमिट</Text>
+                                            <Text style={{ textAlign: "center", fontSize: 10, fontWeight: "400", color: "grey", paddingHorizontal: 12, paddingVertical: 7 }}>रिपोर्ट सबमिट</Text>
                                         </TouchableOpacity>
                                 }
                             </View>
                         </View>
                     </View>
 
-                } />
-
-            {/* <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
-                <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
-                    <View style={styles.modalView}>
-                        <Text style={[styles.modalText, { fontWeight: "500", fontSize: 14 }]}>अभी तक पुलिस स्टेशन में सबमिट नहीं हुई पेंडिंग चेक-इन रिपोर्ट</Text>
-                        <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
-                        <Text style={[styles.modalText, { textAlign: "justify" }]}>1. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
-                        <Text style={[styles.modalText, { textAlign: "justify" }]}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
-
-                        <Pressable style={styles.modalButton} onPress={() => setOpenModal(false)}>
-                            <Text style={styles.textStyle}>ठीक</Text>
-                        </Pressable>
+                }
+                // If the list is empty, show this component
+                ListEmptyComponent={() => (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+                        <Text style={{ fontSize: 14, fontWeight: 'bold', color: 'gray' }}>कोई डेटा नहीं!</Text>
                     </View>
-                </Pressable>
-            </Modal> */}
+                )}
+            />
+
         </SafeAreaView>
     );
 };
@@ -180,7 +171,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "white",
         paddingHorizontal: 5,
-        height: 130,
+        height: 120,
         borderRadius: 10,
         elevation: 2,
         marginHorizontal: 15,
@@ -188,13 +179,13 @@ const styles = StyleSheet.create({
 
     },
     text1: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "500",
         color: "#000",
         marginLeft: 20
     },
     text2: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "400",
         color: "grey",
         marginLeft: 20,
@@ -227,7 +218,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: "black",
         fontSize: 12,
-        marginVertical: 10,
+        marginVertical: 5,
         fontWeight: "500"
     },
     modalOverlay: {
@@ -266,18 +257,18 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         textAlign: "center",
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "400",
         color: "#fff",
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         paddingVertical: 7,
     },
     disabledButtonText: {
         textAlign: "center",
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "400",
         color: "grey",
-        paddingHorizontal: 20,
+        paddingHorizontal: 12,
         paddingVertical: 7,
     }
 });

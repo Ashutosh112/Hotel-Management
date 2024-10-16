@@ -56,7 +56,6 @@ const SignupFirst = ({ navigation }) => {
             const res = await axios.post(`${baseUrl}SendOTPValidateMobileNo?sMobile=${mobileNumber}`, config);
             setIsLoading(false);
             setMobileNumber(mobileNumber); // Store the mobile number
-            console.log("ressss", res.data)
             if (res.data.StatusCode == 0) {
                 Alert.alert(
                     'OTP Sent',
@@ -102,7 +101,6 @@ const SignupFirst = ({ navigation }) => {
             axios.post(`${baseUrl}ValidateSignUpMobileOTP?sMobile=${mobileNumber}&Otp=${fullOtp}`, config)
                 .then((res) => {
                     setIsLoading(false);
-                    console.log("validtaeeee", res.data)
                     navigation.navigate("Signup", { mobileNumber: mobileNumber });
                     setShowOtpModal(false);
 
@@ -133,7 +131,7 @@ const SignupFirst = ({ navigation }) => {
 
                     <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center", marginTop: 20 }}>
                         <Text style={[styles.modalText, { fontSize: 14, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
-                        <Text style={[styles.modalText, { textAlign: "justify", marginTop: 8 }]}>आप इस नंबर को बाद में बदल नहीं पाएंगे। हमारे पोर्टल से सभी संदेश इसी नंबर पर भेजे जाएंगे।</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify", marginTop: 8, fontSize: 12 }]}>आप इस नंबर को बाद में बदल नहीं पाएंगे। हमारे पोर्टल से सभी संदेश इसी नंबर पर भेजे जाएंगे।</Text>
                     </View>
 
                     <Formik
@@ -147,7 +145,7 @@ const SignupFirst = ({ navigation }) => {
                     >
                         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                             <View style={styles.inputContainer}>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 20 }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "80%", marginTop: 20 }}>
                                     <Text style={styles.lableText}>Enter Primary Mobile Number</Text>
                                 </View>
                                 <TextInput
@@ -186,7 +184,7 @@ const SignupFirst = ({ navigation }) => {
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={styles.content}>We have sent a verification code to</Text>
-                                <Text style={[styles.content, { color: "#595970", marginTop: 5 }]}>{mobileNumber}</Text>
+                                <Text style={[styles.content, { color: "green", marginTop: 5 }]}>+91 {mobileNumber}</Text>
                             </View>
 
                             <View style={styles.otpContainer}>
@@ -292,11 +290,7 @@ const SignupFirst = ({ navigation }) => {
                             </View>
 
                             <View style={{ marginBottom: 15 }}>
-                                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 50 }]}
-
-                                    onPress={() => verifyOtp()}
-
-                                >
+                                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 25 }]} onPress={() => verifyOtp()}>
                                     <Text style={{ fontSize: 12, color: "#fff", letterSpacing: 1, }}>Submit</Text>
                                 </TouchableOpacity>
                             </View>
@@ -316,20 +310,20 @@ const SignupFirst = ({ navigation }) => {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>{subscriptionErrorMsg}</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12 }}
                                 onPress={() => Linking.openURL('https://pages.razorpay.com/pl_OVJS2jyJPemwHD/view')}
                             >
                                 <Text style={styles.textStyle}>Go to Link</Text>
                             </Pressable>
                             <Pressable
-                                style={{ backgroundColor: "#000", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15, marginLeft: 40 }}
+                                style={{ backgroundColor: "#000", paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12, marginLeft: 40 }}
                                 onPress={() => { setSubscriptionAlertModal(false) }}
                             >
                                 <Text style={styles.textStyle}>Cancel</Text>
@@ -380,19 +374,19 @@ const styles = StyleSheet.create({
     lableText: {
         fontSize: 12,
         color: "#000",
-        marginLeft: 0,
-        width: "45%",
-        marginTop: 10
+        marginTop: 10,
     },
     input: {
         width: Dimensions.get('window').width - 60,
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 15,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
+        fontSize: 12
+
     },
     inputContainer: {
         width: Dimensions.get('window').width,
@@ -400,17 +394,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     buttonContainer: {
-        borderRadius: 15,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 10,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF'
     },
     button: {
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500"
@@ -430,13 +424,13 @@ const styles = StyleSheet.create({
     otpBox: {
         borderColor: "#B5B5B5",
         borderWidth: 0.8,
-        width: 45,
+        width: 40,
         height: 40,
         marginHorizontal: 2,
         borderRadius: 10,
     },
     otpText: {
-        fontSize: 20,
+        fontSize: 14,
         color: "black",
         padding: 0,
         textAlign: 'center',
@@ -459,15 +453,15 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width - 50,
         backgroundColor: "#fff",
         borderRadius: 15,
-        minHeight: 330,
+        minHeight: 300,
     },
     modalheader: {
         flexDirection: "row",
         backgroundColor: '#1AA7FF',
-        padding: 15,
+        padding: 12,
         justifyContent: "center",
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
         alignItems: "center",
     },
     nextButton: {
@@ -475,8 +469,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: '#1AA7FF',
         marginHorizontal: 30,
-        padding: 10,
-        borderRadius: 15,
+        borderRadius: 12,
         paddingVertical: 10,
     },
     closeButton: {
@@ -508,10 +501,12 @@ const styles = StyleSheet.create({
     textStyle: {
         color: "white",
         textAlign: "center",
+        fontSize: 12,
+
     },
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 15,
+        fontSize: 14,
     },
 });

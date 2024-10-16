@@ -46,7 +46,6 @@ const NoCheckIn = ({ navigation }) => {
 
         await axios.post(url, {}, config)
             .then((response) => {
-                console.log("reeee", response)
                 setOpenModal(true);  // Open the first modal
             })
             .catch((error) => {
@@ -71,7 +70,7 @@ const NoCheckIn = ({ navigation }) => {
         await axios.post(`${baseUrl}ValidateDateForAddGuest?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${encodeURIComponent(getYesterdayDate())}`, {}, config)
 
             .then((res) => {
-                console.log("resss", res.data)
+                console.log("resssss", res.data)
                 setStatusCode(res.data)
             })
             .catch(err => {
@@ -85,14 +84,14 @@ const NoCheckIn = ({ navigation }) => {
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>जीरो चेक इन रिपोर्ट</Text>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>जीरो चेक इन रिपोर्ट</Text>
                 </View>
 
             </View>
             <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
-                <Text style={[styles.modalText, { fontWeight: "bold", fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { fontWeight: "bold", fontSize: 12 }]}>|| कृपया ध्यान दें ||</Text>
                 <Text style={[styles.modalText, { textAlign: "justify", marginTop: 15 }]}>1. अगर कल आपकी प्रॉपर्टी में कोई चेक इन नहीं हुआ है, तो आप यहाँ से जीरो चेक इन रिपोर्ट को पुलिस स्टेशन में सबमिट कर सकते हैं।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>2. अगर आप कल की चेक इन रिपोर्ट पहले ही सबमिट कर चुके हैं, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>3. अगर पेंडिंग रिपोर्ट सेक्शन में कल की तारीख की कोई चेक इन रिपोर्ट है, तो यह विकल्प आपके लिए डिसेबल रहेगा ।</Text>
@@ -101,23 +100,18 @@ const NoCheckIn = ({ navigation }) => {
             {
                 statusCode.StatusCode == 1 ?
                     <>
-                        <Text style={{ fontSize: 16, color: "#000", marginTop: 40, marginHorizontal: 25, fontWeight: "bold" }}>{statusCode.Message}</Text>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
-
-
+                        <Text style={{ fontSize: 14, color: "#000", marginTop: 40, marginHorizontal: 25, fontWeight: "bold" }}>{statusCode.Message}</Text>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 15 }}>
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
-                                onPress={() => navigation.navigate('BottomNavigator')}
-                            >
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12 }}
+                                onPress={() => navigation.navigate('BottomNavigator')}>
                                 <Text style={styles.textStyle}>ठीक है</Text>
                             </Pressable>
                         </View>
                     </>
-
                     :
                     <>
-                        <Text style={{ fontSize: 14, color: "#000", marginTop: 20, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
-
+                        <Text style={{ fontSize: 12, color: "#000", marginTop: 20, marginHorizontal: 25 }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
                         <Formik
                             initialValues={{ reporterName: '', agreeToTerms: false }}
                             validationSchema={validationSchema}
@@ -148,7 +142,7 @@ const NoCheckIn = ({ navigation }) => {
                                             onValueChange={(newValue) => setFieldValue('agreeToTerms', newValue)}
                                         />
                                         <Text style={{ fontSize: 12, color: "#000", fontWeight: "500", marginTop: 10, textAlign: "justify" }}>
-                                            कल मेरी होटल में कोई गेस्ट नहीं रुका था | मैं प्रमणित करता हु की इस रिपोर्ट में दी हुई जानकारी पूर्ण एवं सत्य है |
+                                            कल मेरी होटल में कोई गेस्ट नहीं रुका था | मैं प्रमाणित करता हु की इस रिपोर्ट में दी हुई जानकारी पूर्ण एवं सत्य है |
                                         </Text>
                                     </View>
                                     {errors.agreeToTerms && touched.agreeToTerms && (
@@ -170,12 +164,14 @@ const NoCheckIn = ({ navigation }) => {
             <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
-                        <Text style={[styles.modalText, { textAlign: "justify" }]}>आप 11 सितंबर के लिए गेस्ट रिपोर्ट सबमिट कर रहे हैं | एक बार रिपोर्ट सबमिट होने के बाद आप उसमें किसी भी तरह का बदलाव नहीं कर सकते और ना ही 11 सितंबर के लिए फिर से रिपोर्ट सबमिट कर सकते हैं|
+                        <Text style={[styles.modalText, { fontWeight: "bold" }]}>|| कृपया ध्यान दें ||</Text>
+                        <Text style={[styles.modalText, { textAlign: "justify", marginTop: 15 }]}>
+                            आप {new Date().toLocaleDateString("hi-IN", { day: 'numeric', month: 'long', year: 'numeric' })} के लिए गेस्ट रिपोर्ट सबमिट कर रहे हैं | एक बार रिपोर्ट सबमिट होने के बाद आप उसमें किसी भी तरह का बदलाव नहीं कर सकते और ना ही 11 सितंबर के लिए फिर से रिपोर्ट सबमिट कर सकते हैं|
                         </Text>
+
                         <Pressable style={styles.modalButton} onPress={() => {
                             setOpenModal(false);  // Close the first modal
-                            setconfirmSubmitModal(true);  // Open the second modal
+                            setconfirmSubmitModal(true)
                         }}>
                             <Text style={styles.textStyle}>रिपोर्ट सबमिट करे</Text>
                         </Pressable>
@@ -193,18 +189,15 @@ const NoCheckIn = ({ navigation }) => {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>धन्यवाद,आपकी {getYesterdayDate()} की गेस्ट रिपोर्ट सबमिट हो गई है</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
-
-
                             <Pressable
                                 style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
-                                onPress={() => navigation.navigate('BottomNavigator')}
-                            >
+                                onPress={() => navigation.navigate('BottomNavigator')} >
                                 <Text style={styles.textStyle}>होम पेज पर जाए</Text>
                             </Pressable>
                         </View>
@@ -212,7 +205,6 @@ const NoCheckIn = ({ navigation }) => {
                 </View>
             </Modal>
             {/* Open modal for submit report confirm end */}
-
 
             {/* Open modal for submit report confirm start */}
             <Modal transparent={true}
@@ -223,18 +215,15 @@ const NoCheckIn = ({ navigation }) => {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>धन्यवाद,आपकी {getYesterdayDate()} की गेस्ट रिपोर्ट सबमिट हो गई है</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
-
-
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
-                                onPress={() => navigation.navigate('BottomNavigator')}
-                            >
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12 }}
+                                onPress={() => navigation.navigate('BottomNavigator')}>
                                 <Text style={styles.textStyle}>होम पेज पर जाए</Text>
                             </Pressable>
                         </View>
@@ -263,23 +252,24 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
+        fontSize: 12
     },
     buttonContainer: {
-        borderRadius: 10,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF'
     },
     button: {
-        fontSize: 14,
+        fontSize: 12,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500"
@@ -297,16 +287,18 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 20,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        maxHeight: 300
     },
     textStyle: {
         color: "white",
         textAlign: "center",
+        fontSize: 12
     },
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 13,
+        fontSize: 12,
         marginVertical: 3,
         // fontWeight: "500"
     },
@@ -318,7 +310,7 @@ const styles = StyleSheet.create({
     },
     modalButton: {
         backgroundColor: "#024063",
-        paddingHorizontal: 40,
+        paddingHorizontal: 25,
         paddingVertical: 12,
         justifyContent: "center",
         alignItems: "center",
@@ -327,7 +319,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         // flex: 1,
-        height: 220,
+        maxHeight: 300,
         margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
@@ -337,13 +329,4 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
 
     },
-    textStyle: {
-        color: "white",
-        textAlign: "center",
-    },
-    // modalText: {
-    //     textAlign: "center",
-    //     color: "black",
-    //     fontSize: 15,
-    // },
 });

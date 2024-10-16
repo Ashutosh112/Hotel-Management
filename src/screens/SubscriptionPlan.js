@@ -1,4 +1,4 @@
-import { ImageBackground, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ImageBackground, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -55,7 +55,6 @@ const SubscriptionPlan = ({ navigation, route }) => {
         };
         await axios.post(`${baseUrl}Free7DaysTrail?HotelId=${hotelCategory}`, {}, config)
             .then((res) => {
-                console.log("ressssss", res.data)
                 setOpenModal(true)
                 setSubsResult(res.data.Result)
             })
@@ -72,22 +71,17 @@ const SubscriptionPlan = ({ navigation, route }) => {
                 <Text style={styles.text1}>कृपया अपना सब्सक्रिप्शन चुनें</Text>
             </View>
 
-            <View style={{ paddingVertical: 10, borderRadius: 10, marginHorizontal: 15, marginTop: 20, borderWidth: 1, borderColor: "grey", paddingHorizontal: 15 }}>
+            <View style={{ paddingVertical: 10, borderRadius: 10, marginHorizontal: 15, borderWidth: 1, borderColor: "grey", paddingHorizontal: 15 }}>
                 <Text style={styles.text2}>होटल का नाम - {hotelData.hotelName}</Text>
                 <Text style={styles.text2}>रजिस्टर्ड मोबाइल नंबर - {hotelData.contact}</Text>
                 <Text style={styles.text2}>कमरों की कुल संख्या - N/A</Text>
             </View>
 
-            <View style={{ borderWidth: 1, borderColor: "grey", borderRadius: 10, marginHorizontal: 15, marginTop: 20 }}>
-                <View style={styles.container2}>
-
-                </View>
-
+            <View style={{ borderWidth: 1, borderColor: "grey", borderRadius: 10, marginHorizontal: 20, marginTop: 20 }}>
                 <View style={styles.container2}>
                     <ImageBackground
                         source={require('../assets/images/greenbadge.png')}  // replace with your image path
-                        style={styles.image}
-                    >
+                        style={styles.image}>
                         <Text style={styles.text}>7 DAYS FREE TRIAL</Text>
                     </ImageBackground>
                 </View>
@@ -101,12 +95,7 @@ const SubscriptionPlan = ({ navigation, route }) => {
                 </TouchableOpacity>
             </View>
 
-            <View style={{ borderWidth: 1, borderColor: "grey", borderRadius: 10, marginHorizontal: 15, marginVertical: 20 }}>
-                <View style={styles.container2}>
-
-                </View>
-
-
+            <View style={{ borderWidth: 1, borderColor: "grey", borderRadius: 10, marginHorizontal: 20, marginVertical: 20 }}>
                 <View style={styles.container2}>
                     <ImageBackground
                         source={require('../assets/images/badgepink.png')}  // replace with your image path
@@ -189,8 +178,9 @@ const styles = StyleSheet.create({
     },
     text1: {
         color: "#22BFF1",
-        fontSize: 16,
-        marginVertical: 5
+        fontSize: 14,
+        marginVertical: 5,
+        fontWeight: "bold"
     },
     container2: {
         flex: 1,
@@ -217,7 +207,7 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     subscriptionPrice: {
-        fontSize: 28,
+        fontSize: 24,
         color: '#E8569D',
         fontWeight: 'bold',
         marginVertical: 10
@@ -228,9 +218,9 @@ const styles = StyleSheet.create({
         marginVertical: 20
     },
     payButtonText: {
-        width: "40%",
+        width: "35%",
         backgroundColor: '#E8569D',
-        fontSize: 14,
+        fontSize: 12,
         color: '#ffffff',
         fontWeight: 'bold',
         paddingVertical: 10,
@@ -256,6 +246,6 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 15,
+        fontSize: 14,
     },
 })

@@ -38,7 +38,6 @@ const SearchGuestDetails = ({ navigation, route }) => {
                 "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
-        console.log("rrrrrr", masterId)
         await axios.post(`${baseUrl}GuestDetails?idGuestMaster=${masterId}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
@@ -47,7 +46,6 @@ const SearchGuestDetails = ({ navigation, route }) => {
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("eeeerrr", err)
             });
     };
 
@@ -81,7 +79,6 @@ const SearchGuestDetails = ({ navigation, route }) => {
 
             {guestData.map((item, index) => (
                 <View key={index} style={styles.guestContainer}>
-                    {console.log("imageeeee", item.Image1)}
                     <View style={styles.guestHeader}>
                         <Text style={styles.guestHeaderText}>अतिथि क्र. {index + 1}</Text>
                     </View>

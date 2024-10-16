@@ -35,23 +35,22 @@ const ReportSubmitScreen = ({ navigation, route }) => {
         setIsLoading(true)
         const value = await AsyncStorage.getItem('hotelmgmt');
         let updatedValue = JSON.parse(value);
+        console.log("token>>>", updatedValue.Token)
         const config = {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
         await axios.post(`${baseUrl}ValidateSubmitDate?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(SubmitDate, "DD MMM YYYY").format("MM/DD/YYYY")}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("resss", res.data)
                 setGuestData(res.data.Message);
                 setCommonData(res.data.Result);
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("999999999999", err)
             });
     };
 
@@ -64,14 +63,14 @@ const ReportSubmitScreen = ({ navigation, route }) => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Content-type": "application/json",
-                "Authorization": `${updatedValue.Token}`
+                "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
 
         await axios.post(`${baseUrl}SubmitGuestData?HotelId=${updatedValue.idHotelMaster}&SubmitDate=${moment(SubmitDate, "DD MMM YYYY").format("MM/DD/YYYY")}&SubmitBy=${name}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("ressss", res.data)
+                setOpenModal(false)
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -85,7 +84,6 @@ const ReportSubmitScreen = ({ navigation, route }) => {
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errrr", err)
             });
     };
 
@@ -94,14 +92,14 @@ const ReportSubmitScreen = ({ navigation, route }) => {
             <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                    <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                 </TouchableOpacity>
-                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>रिपोर्ट सबमिट करें</Text>
+                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>रिपोर्ट सबमिट करें</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
 
             <View style={{ justifyContent: "center", alignItems: "center", marginTop: 10 }}>
-                <Text style={{ fontSize: 14, color: "#000", textAlign: "center" }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
+                <Text style={{ fontSize: 12, color: "#000", textAlign: "center" }}>चेक इन रिपोर्ट पुलिस स्टेशन को सबमिट करें</Text>
             </View>
             <Formik
                 initialValues={{ name: '' }}
@@ -130,7 +128,7 @@ const ReportSubmitScreen = ({ navigation, route }) => {
                             null
                         }
                         <View style={{ justifyContent: "center", alignItems: "center", marginTop: 10 }}>
-                            <Text style={{ fontSize: 13, color: "#000", textAlign: "justify", marginHorizontal: 23 }}>{guestData}</Text>
+                            <Text style={{ fontSize: 12, color: "#000", textAlign: "justify", marginHorizontal: 25, fontWeight: "bold" }}>{guestData} मैं प्रमाणित करता हूँ की इस रिपोर्ट में दी हुई जानकारी पूर्ण एवं सत्य है |</Text>
                         </View>
 
                         {/* Submit Button */}
@@ -150,25 +148,25 @@ const ReportSubmitScreen = ({ navigation, route }) => {
 
                         {/* Open modal for SUBMI REPORT start */}
                         <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal}>
-                            <Pressable style={styles.modalOverlay} onPress={() => setOpenModal(false)}>
+                            <Pressable style={styles.modalOverlay} >
                                 <View style={styles.modalView}>
                                     <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                        <Alert size={50} name="alert-circle-outline" color='#024063' />
+                                        <Alert size={40} name="alert-circle-outline" color='#024063' />
                                     </View>
 
                                     <Text style={styles.modalText}>आप {SubmitDate} के लिए गेस्ट रिपोर्ट को सबमिट कर रहे है| एक बार रिपोर्ट सबमिट होने के बाद आप उसमे किसी भी तरह का चेंज नहीं कर सकते है और नहीं {SubmitDate} के लिए आप फिर से रिपोर्ट सबमिट कर पाएंगे |</Text>
-                                    <Text style={styles.modalText}>|| कृपया ध्यान दें ||</Text>
+                                    <Text style={[styles.modalText, { fontWeight: "bold" }]}>|| कृपया ध्यान दें ||</Text>
                                     <Text style={[styles.modalText, { textAlign: "justify" }]}>1. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
                                     <Text style={[styles.modalText, { textAlign: "justify" }]}>2. GuestReport.in होटलों द्वारा सबमिट की गई अतिथि जानकारी की सामग्री या सटीकता के लिए जिम्मेदार नहीं है। </Text>
 
                                     <View style={{ width: "100%", justifyContent: "space-around", flexDirection: "row" }}>
                                         <Pressable
-                                            style={{ backgroundColor: "#024063", paddingHorizontal: 30, paddingVertical: 12, borderRadius: 10, marginTop: 30 }}
+                                            style={{ backgroundColor: "#024063", paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, marginTop: 10 }}
                                             onPress={handleSubmit} >
                                             <Text style={styles.textStyle}>सब्मिट करे</Text>
                                         </Pressable>
                                         <Pressable
-                                            style={{ backgroundColor: "#000", paddingHorizontal: 50, paddingVertical: 12, borderRadius: 10, marginTop: 30 }}
+                                            style={{ backgroundColor: "#000", paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, marginTop: 10 }}
                                             onPress={() => { setOpenModal(false) }} >
                                             <Text style={styles.textStyle}>रद्द</Text>
                                         </Pressable>
@@ -273,25 +271,25 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
         marginTop: 20,
-        // marginHorizontal: 10
+        fontSize: 12
     },
     buttonContainer: {
-        borderRadius: 20,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 14,
+        fontSize: 12,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
@@ -307,11 +305,12 @@ const styles = StyleSheet.create({
     textStyle: {
         color: "white",
         textAlign: "center",
+        fontSize: 12
     },
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 14,
+        fontSize: 12,
         marginVertical: 10
     },
     modalOverlay: {

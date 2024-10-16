@@ -36,7 +36,6 @@ const SubmittedReport = ({ navigation }) => {
                 setLoading(false);
             })
             .catch(err => {
-                console.log("errr", err)
                 setLoading(false);
             });
     };
@@ -66,9 +65,9 @@ const SubmittedReport = ({ navigation }) => {
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between" }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पुलिस स्टेशन में सबमिट की गई रिपोर्ट</Text>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>पुलिस स्टेशन में सबमिट की गई रिपोर्ट</Text>
                 </View>
                 {/* <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end" }}>
                     <TouchableOpacity onPress={() => setOpenModal(true)}>
@@ -77,7 +76,7 @@ const SubmittedReport = ({ navigation }) => {
                 </View> */}
             </View>
             <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
-                <Text style={[styles.modalText, { fontSize: 14 }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { fontSize: 12, fontWeight: "bold" }]}>|| कृपया ध्यान दें ||</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>इस पोर्टल पर आप एक महीने तक की पुरानी रिपोर्ट देख सकते हैं। अपने रिकॉर्ड के लिए आप समय-समय पर रिपोर्ट डाउनलोड कर के रख सकते हैं।</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
@@ -125,7 +124,7 @@ const SubmittedReport = ({ navigation }) => {
                 data.map((item, index) => (
                     <View key={index} style={styles.itemContainer}>
                         <View style={{ flex: 0.8, justifyContent: "center", alignItems: "flex-start" }}>
-                            <Image source={Logo} style={{ height: 45, width: 45 }} resizeMode="contain" />
+                            <Image source={Logo} style={{ height: 35, width: 35 }} resizeMode="contain" />
                         </View>
                         <View style={{ flex: 3 }}>
                             <View style={{ flex: 2, justifyContent: "center" }}>
@@ -134,7 +133,7 @@ const SubmittedReport = ({ navigation }) => {
                             </View>
                         </View>
                         <TouchableOpacity onPress={() => navigation.navigate("SubmittedReportDetails", { checkInD: item.SubmitDate, checkOutD: item.SubmitDate })} style={styles.detailButton}>
-                            <Text style={{ fontSize: 12, color: "#fff", paddingVertical: 7, paddingHorizontal: 5 }}>जानकारी देखें</Text>
+                            <Text style={{ fontSize: 10, color: "#fff", paddingVertical: 7 }}>जानकारी देखें</Text>
                         </TouchableOpacity>
                     </View>
                 ))
@@ -167,10 +166,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
         marginTop: 20,
     },
     inputContainer: {
@@ -180,10 +179,10 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     buttonContainer: {
-        borderRadius: 20,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
@@ -213,14 +212,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
         marginTop: 10
     },
     text: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "400",
         color: "#36454F",
         marginTop: 5
@@ -250,8 +249,8 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         flexDirection: "row",
         paddingHorizontal: 15,
-        marginHorizontal: 20,
-        height: 100,
+        marginHorizontal: 15,
+        height: 80,
         borderRadius: 10,
         elevation: 2,
         justifyContent: "center",
@@ -259,7 +258,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     detailButton: {
-        flex: 1,
+        flex: 1.2,
         borderWidth: 0.5,
         borderColor: "#024063",
         backgroundColor: "#024063",

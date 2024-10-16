@@ -56,7 +56,6 @@ const Login = ({ navigation }) => {
       const res = await axios.post(`${baseUrl}SendOTPLogin?sMobile=${mobileNumber}`, config);
       setIsLoading(false);
       setMobileNumber(mobileNumber); // Store the mobile number
-      console.log("rrrrr", res)
       if (res.data.StatusCode == 0) {
         Alert.alert(
           'OTP Sent',
@@ -76,7 +75,6 @@ const Login = ({ navigation }) => {
       }
     } catch (err) {
       setIsLoading(false);
-      console.log("errr", err)
     }
   };
 
@@ -127,7 +125,7 @@ const Login = ({ navigation }) => {
       <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
       <View style={styles.body}>
         <View style={{ flex: 0.8, justifyContent: "flex-start" }} onPress={() => navigation.navigate("Signup")}>
-          <Image source={Logo1} style={{ height: 80, width: 80, marginLeft: 20, marginTop: 20 }} resizeMode='contain' />
+          <Image source={Logo1} style={{ height: 65, width: 65, marginLeft: 20, marginTop: 20 }} resizeMode='contain' />
         </View>
 
         <View style={styles.logoContainer2}>
@@ -146,7 +144,7 @@ const Login = ({ navigation }) => {
           >
             {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
               <View style={styles.inputContainer}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 20 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "80%", marginTop: 20 }}>
                   <Text style={styles.lableText}>Mobile Number</Text>
                 </View>
                 <TextInput
@@ -195,7 +193,7 @@ const Login = ({ navigation }) => {
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={styles.content}>We have sent a verification code to</Text>
-                <Text style={[styles.content, { color: "#595970", marginTop: 5 }]}>{mobileNumber}</Text>
+                <Text style={[styles.content, { color: "green", marginTop: 5 }]}>+91 {mobileNumber}</Text>
               </View>
 
               <View style={styles.otpContainer}>
@@ -301,7 +299,7 @@ const Login = ({ navigation }) => {
               </View>
 
               <View style={{ marginBottom: 15 }}>
-                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 50 }]}
+                <TouchableOpacity style={[styles.nextButton, { paddingHorizontal: 25 }]}
 
                   onPress={() => verifyOtp()}
 
@@ -370,7 +368,7 @@ const styles = StyleSheet.create({
   },
   text2: {
     color: "#666666",
-    fontSize: 18,
+    fontSize: 16,
   },
   logoContainer1: {
     flex: 1,
@@ -398,10 +396,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#E3E2E2',
-    borderRadius: 15,
+    borderRadius: 12,
     paddingHorizontal: 20,
     color: "#000",
-    height: 50,
+    height: 45,
+    fontSize: 12
+
   },
   inputContainer: {
     width: Dimensions.get('window').width,
@@ -409,17 +409,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonContainer: {
-    borderRadius: 15,
+    borderRadius: 12,
     marginTop: 16,
     width: Dimensions.get('window').width - 60,
-    height: 50,
+    height: 45,
     marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: '#1AA7FF'
   },
   button: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
     color: '#fff',
     fontWeight: "500"
@@ -439,13 +439,13 @@ const styles = StyleSheet.create({
   otpBox: {
     borderColor: "#B5B5B5",
     borderWidth: 0.8,
-    width: 45,
+    width: 42,
     height: 40,
     marginHorizontal: 2,
-    borderRadius: 10,
+    borderRadius: 8,
   },
   otpText: {
-    fontSize: 20,
+    fontSize: 14,
     color: "black",
     padding: 0,
     textAlign: 'center',
@@ -467,16 +467,16 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height / 3,
     width: Dimensions.get('window').width - 50,
     backgroundColor: "#fff",
-    borderRadius: 15,
-    minHeight: 330,
+    borderRadius: 12,
+    minHeight: 300,
   },
   modalheader: {
     flexDirection: "row",
     backgroundColor: '#1AA7FF',
-    padding: 15,
+    padding: 10,
     justifyContent: "center",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
     alignItems: "center",
   },
   nextButton: {
@@ -484,8 +484,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: '#1AA7FF',
     marginHorizontal: 30,
-    padding: 10,
-    borderRadius: 15,
+    borderRadius: 12,
     paddingVertical: 10,
   },
   closeButton: {

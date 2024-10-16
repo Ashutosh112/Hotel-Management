@@ -22,6 +22,7 @@ const validationSchema = Yup.object().shape({
     propertyType: Yup.string().required('सम्पत्ती का प्रकार अनिवार्य'),
     gender: Yup.string().required('जेंडर अनिवार्य'),
     mobileNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
+    noOfRoom: Yup.string().required('कमरों की संख्या अनिवार्य'),
     // contactNumber: Yup.string().required('मोबाइल नंबर अनिवार्य').matches(/^[0-9]{10}$/, 'मोबाइल नंबर 10 अंकों का होना चाहिए'),
     address: Yup.string().required('होटल का पता अनिवार्य'),
     city: Yup.string().required('शहर अनिवार्य'),
@@ -31,7 +32,9 @@ const validationSchema = Yup.object().shape({
     emailID: Yup.string().required('होटल की ईमेल आईडी अनिवार्य'),
     // website: Yup.string().required('होटल की वेबसाइट अनिवार्य'),
     idFront: Yup.array().min(1, 'होटल का गुमस्ता अनिवार्य'),
-    idBack: Yup.array().min(1, 'मालिक का आधार अनिवार्य'),
+    aadharIdFront: Yup.array().min(1, 'मालिक का आधार अनिवार्य (Front)'),
+    aadharIdBack: Yup.array().min(1, 'मालिक का आधार अनिवार्य (Back)'),
+
 });
 
 const Signup = ({ navigation, route }) => {
@@ -55,7 +58,6 @@ const Signup = ({ navigation, route }) => {
     useEffect(() => {
         getState()
         getProType()
-        console.log("number----", mobileNumber)
     }, [])
 
     // Function to handle image selection
@@ -126,6 +128,7 @@ const Signup = ({ navigation, route }) => {
             hotelName: values.hotelName,
             address: values.address,
             contact: mobileNumber, // Using the mobile number from route
+            noOfRoom: values.noOfRoom,
             contactPerson: `${values.firstName} ${values.lastName}`,
             emailAddress: values.emailID,
             bActive: false,
@@ -136,7 +139,8 @@ const Signup = ({ navigation, route }) => {
             propertyType: values.propertyType,
             filePass: "",
             fileGumasta: values.idFront,
-            fileAdhar: values.idBack,
+            fileAdhar: values.aadharIdFront,
+            fileAdharBack: values.aadharIdBack,
             contactPersonMobile: values.mobileNumber,
             website: values.website,
         };
@@ -149,15 +153,9 @@ const Signup = ({ navigation, route }) => {
                 setIsLoading(false)
                 setOpenModal(true)
                 setHotelCategory(res.data.Result)
-                // const data = res.data;
-                // AsyncStorage.setItem("signupdetail", JSON.stringify(data));
-                // setTimeout(() => {
-                //     navigation.navigate("Login");
-                // }, 1500);
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errrr", err)
                 Toast.show({
                     type: 'info',
                     text1: 'Info',
@@ -256,7 +254,6 @@ const Signup = ({ navigation, route }) => {
         };
         await axios.post(`${baseUrl}GetAllPoliceStation?idCity=${cityId}`, config)
             .then((res) => {
-                console.log("police station", res.data)
 
                 const policeStationData = res.data.Result.map(item => ({
                     label: item.PoliceStationName,
@@ -281,6 +278,7 @@ const Signup = ({ navigation, route }) => {
                     propertyType: '',
                     mobileNumber: '',
                     // contactNumber: '',
+                    noOfRoom: '',
                     address: '',
                     city: '',
                     state: '',
@@ -290,7 +288,8 @@ const Signup = ({ navigation, route }) => {
                     filePass: "", // Example filePass value
                     website: '',
                     idFront: '',
-                    idBack: '',
+                    aadharIdFront: '',
+                    aadharIdBack: ''
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values) => {
@@ -300,7 +299,7 @@ const Signup = ({ navigation, route }) => {
                     <ScrollView style={styles.container}>
                         <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
                         <View style={{ justifyContent: "center", alignItems: "center", marginTop: 15 }}>
-                            <Image source={Logo} style={{ height: 80, width: 80 }} resizeMode='contain' />
+                            <Image source={Logo} style={{ height: 70, width: 70 }} resizeMode='contain' />
                             <Text style={[styles.text2, { marginTop: 5, fontWeight: "500" }]}>Hotel Guest<Text style={[styles.text2, { marginTop: 5, fontWeight: "400" }]}> Reporting System</Text></Text>
                             <Text style={styles.text2}>Property Registration Page</Text>
                         </View>
@@ -443,6 +442,21 @@ const Signup = ({ navigation, route }) => {
                                 value={values.roomQty}
                             />
                             {touched.roomQty && errors.roomQty ? <Text style={styles.errorText}>{errors.roomQty}</Text> : null} */}
+                            {/* Number Of Rooms */}
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                                <Text style={styles.lableText}>कमरों की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
+                            </View>
+                            <TextInput
+                                maxLength={10}
+                                keyboardType='number-pad'
+                                placeholderTextColor='darkgrey'
+                                placeholder='कमरों की कुल संख्या *'
+                                style={[styles.input, { marginTop: 8 }]}
+                                onChangeText={handleChange('noOfRoom')}
+                                onBlur={handleBlur('noOfRoom')}
+                                value={values.noOfRoom}
+                            />
+                            {touched.noOfRoom && errors.noOfRoom ? <Text style={styles.errorText}>{errors.noOfRoom}</Text> : null}
 
                             {/* Mobile Number */}
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
@@ -508,7 +522,7 @@ const Signup = ({ navigation, route }) => {
                                     itemTextStyle={styles.selectedTextStyle}
                                     labelField="label"
                                     valueField="value"
-                                    placeholder='City*'
+                                    placeholder='शहर*'
                                     search
                                     searchPlaceholder="Search"
                                     data={cityData}
@@ -539,7 +553,7 @@ const Signup = ({ navigation, route }) => {
                                     itemTextStyle={styles.selectedTextStyle}
                                     labelField="label"
                                     valueField="value"
-                                    placeholder='District*'
+                                    placeholder='ज़िला*'
                                     search
                                     searchPlaceholder="Search"
                                     data={districtData}
@@ -580,47 +594,69 @@ const Signup = ({ navigation, route }) => {
                             {touched.policeStation && errors.policeStation ? <Text style={styles.errorText}>{errors.policeStation}</Text> : null}
 
                             {/* // JSX structure with Formik */}
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "75%", marginTop: 10 }}>
                                 <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             </View>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
+                            <View style={{ alignItems: "center", justifyContent: "center", width: "90%" }}>
                                 {values.idFront.length > 0 ? (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        style={[styles.input, { height: 70, width: "90%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
                                         onPress={() => { onSelectImage(imagePicker, setFieldValue, 'idFront') }}>
-                                        <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
+                                        <Text style={{ fontSize: 12, color: "green" }}>होटल गुमस्ता Uploaded</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        style={[styles.input, { height: 70, width: "90%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
                                         onPress={() => onSelectImage(imagePicker, setFieldValue, 'idFront')}>
                                         <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                                     </TouchableOpacity>
                                 )}
+                            </View>
 
-                                {values.idBack.length > 0 ? (
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "75%" }}>
+                                {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>होटल का गुमस्ता <Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>}
+                            </View>
+
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
+
+                                {values.aadharIdFront.length > 0 ? (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
-                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'idBack')}>
-                                        <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
+                                        style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'aadharIdFront')}>
+                                        <Text style={{ fontSize: 10, color: "green" }}>मालिक का आधार Front Side Uploaded</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <TouchableOpacity
-                                        style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
-                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'idBack')}>
-                                        <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
+                                        style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'aadharIdFront')}>
+                                        <Image source={PhotoIcon} style={{ height: 20, width: 20 }} />
+                                    </TouchableOpacity>
+                                )}
+
+                                {values.aadharIdBack.length > 0 ? (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => { onSelectImage(imagePicker, setFieldValue, 'aadharIdBack') }}>
+                                        <Text style={{ fontSize: 10, color: "green" }}>मालिक का आधार Back Side Uploaded</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]}
+                                        onPress={() => onSelectImage(imagePicker, setFieldValue, 'aadharIdBack')}>
+                                        <Image source={PhotoIcon} style={{ height: 20, width: 20 }} />
                                     </TouchableOpacity>
                                 )}
                             </View>
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-                                {touched.idFront && errors.idFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>होटल का गुमस्ता</Text>}
-                                {touched.idBack && errors.idBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.idBack}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>मालिक का आधार</Text>}
+                                {touched.aadharIdFront && errors.aadharIdFront ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.aadharIdFront}</Text> : <Text style={[styles.lableText, { marginTop: 8 }]}>मालिक का आधार [Front] <Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>}
+                                {touched.aadharIdBack && errors.aadharIdBack ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.aadharIdBack}</Text> : <Text style={[styles.lableText, { marginTop: 8, width: "40%" }]}>मालिक का आधार [Back] <Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>}
                             </View>
+
                             {/* Submit Button */}
                             <TouchableOpacity style={styles.buttonContainer}
                                 onPress={() => {
-                                    if (!values.firstName || !values.lastName || !values.hotelName || !values.mobileNumber || !values.emailID || !values.propertyType || !values.address || !values.state || !values.city || !values.policeStation || values.idFront.length === 0 || values.idBack.length === 0) {
+                                    if (!values.firstName || !values.lastName || !values.hotelName || !values.mobileNumber || !values.noOfRoom || !values.emailID || !values.propertyType || !values.address || !values.state || !values.city || !values.policeStation || values.idFront.length === 0 || values.aadharIdFront.length === 0 || values.aadharIdBack.length === 0) {
                                         Toast.show({
                                             type: 'error',
                                             text1: 'Warning',
@@ -629,8 +665,7 @@ const Signup = ({ navigation, route }) => {
                                         return;
                                     }
                                     userSignup(values)
-                                }}
-                            >
+                                }}>
                                 <Text style={styles.button}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
@@ -648,14 +683,14 @@ const Signup = ({ navigation, route }) => {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>धन्यवाद, आपकी जानकारी सुरक्षित कर ली गई है। आप अगले चरण में अपनी रूम कैटेगरी जोड़ सकते हैं।</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 10 }}>
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12 }}
                                 onPress={() => navigation.navigate('AddRoomCategory', { hotelCategory: hotelCategory }, setOpenModal(false))}
                             >
                                 <Text style={styles.textStyle}>ठीक है</Text>
@@ -690,8 +725,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
         marginTop: 20,
+        fontSize: 12
     },
     inputContainer: {
         marginTop: 20,
@@ -705,20 +741,20 @@ const styles = StyleSheet.create({
     },
     text2: {
         color: "#666666",
-        fontSize: 18,
+        fontSize: 14,
     },
     buttonContainer: {
-        borderRadius: 20,
-        marginTop: 16,
+        borderRadius: 12,
+        marginTop: 20,
         width: Dimensions.get('window').width - 60,
-        height: 50,
-        marginBottom: 20,
+        height: 45,
+        marginBottom: 10,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 18,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
@@ -731,7 +767,7 @@ const styles = StyleSheet.create({
         fontSize: 12
     },
     placeholderStyle: {
-        fontSize: 14,
+        fontSize: 12,
         color: "grey"
     },
     selectedTextStyle: {
@@ -743,7 +779,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
@@ -764,10 +800,11 @@ const styles = StyleSheet.create({
     textStyle: {
         color: "white",
         textAlign: "center",
+        fontSize: 12
     },
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 14,
+        fontSize: 13,
     },
 });

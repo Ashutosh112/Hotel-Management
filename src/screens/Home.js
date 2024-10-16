@@ -55,7 +55,6 @@ const Home = ({ navigation }) => {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
                 const updatedValue = JSON.parse(value);
-                console.log("Hotel Data Fetched:", updatedValue);
                 setHotelData(updatedValue); // Update the state with fetched data
             } else {
                 console.log("No data found in AsyncStorage");
@@ -78,8 +77,8 @@ const Home = ({ navigation }) => {
             };
 
             const res = await axios.post(`${baseUrl}ValidateSubcription?HotelId=${updatedValue.idHotelMaster}`, {}, config);
+            console.log("redssss", res.data)
             setDetails(res.data.Message);
-            console.log("reeeeeeeeeeeeee1111111111", res.data)
             if (res.data.StatusCode === -1) {
                 setExpiryDetails(true);
             }
@@ -113,20 +112,9 @@ const Home = ({ navigation }) => {
                         <Text style={styles.text}>गेस्ट की जानकारी दर्ज करें</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("CreateReport")}>
-                    <View style={{ flex: 1 }}>
-                        <HomeIcon6 />
-                    </View>
-                    <View style={{ flex: 6 }}>
-                        <Text style={styles.text}>गेस्ट जोडे</Text>
-                    </View>
-                    <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
-                    </View>
-                </TouchableOpacity> */}
 
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("SearchGuest")}>
                     <View style={{ flex: 1 }}>
@@ -136,7 +124,7 @@ const Home = ({ navigation }) => {
                         <Text style={styles.text}>सर्च गेस्ट</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
 
@@ -148,7 +136,7 @@ const Home = ({ navigation }) => {
                         <Text style={styles.text}>सब्मीटेड रिपोर्ट</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
 
@@ -160,7 +148,7 @@ const Home = ({ navigation }) => {
                         <Text style={styles.text}>पेंडिंग रिपोर्ट</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
 
@@ -172,39 +160,39 @@ const Home = ({ navigation }) => {
                         <Text style={styles.text}>जीरो चेक इन रिपोर्ट</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("ContactWithUS")}>
                     <View style={{ flex: 1 }}>
-                        <ContactUs name="contacts" size={24} color='#1AA7FF' />
+                        <ContactUs name="contacts" size={20} color='#1AA7FF' />
                     </View>
                     <View style={{ flex: 6 }}>
                         <Text style={styles.text}>हमसे संपर्क करें</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.input} onPress={() => navigation.navigate("PrivacyPolicy")}>
                     <View style={{ flex: 1 }}>
-                        <PrivacyPolicyIcon name="policy" size={24} color='#1AA7FF' />
+                        <PrivacyPolicyIcon name="policy" size={20} color='#1AA7FF' />
                     </View>
                     <View style={{ flex: 6 }}>
                         <Text style={styles.text}>महत्वपूर्ण नियम एवं शर्तें</Text>
                     </View>
                     <View style={{ flex: 1.5, alignItems: "center" }}>
-                        <PlusIcon name="plus" size={22} color="#484C52" style={{ marginLeft: 15 }} />
+                        <PlusIcon name="plus" size={16} color="#484C52" style={{ marginLeft: 15 }} />
                     </View>
                 </TouchableOpacity>
 
 
 
-                <View style={styles.input} >
+                <View style={[styles.input, { marginBottom: 15 }]} >
                     <View style={{ flex: 1 }}>
-                        <Image source={SubscriptionIcon} style={{ height: 24, width: 24 }} />
+                        <Image source={SubscriptionIcon} style={{ height: 20, width: 20 }} />
                     </View>
                     <View style={{ flex: 5 }}>
                         <Text style={styles.text}>मैनेज सब्क्रिप्शन </Text>
@@ -232,14 +220,14 @@ const Home = ({ navigation }) => {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>{details}</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
                                 onPress={async () => {
                                     await AsyncStorage.removeItem('hotelmgmt'); // Remove token
                                     setExpiryDetails(false); // Close modal
@@ -276,13 +264,13 @@ const styles = StyleSheet.create({
     },
     input: {
         flexDirection: "row",
-        width: Dimensions.get('window').width - 40,
+        width: Dimensions.get('window').width - 45,
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 15,
+        borderRadius: 10,
         color: "#000",
-        height: 55,
+        height: 45,
         marginTop: 20,
         justifyContent: "center",
         alignItems: "center",
@@ -294,17 +282,17 @@ const styles = StyleSheet.create({
         // alignItems: "center",
     },
     text: {
-        fontSize: 14,
+        fontSize: 12,
         color: "#000",
         fontWeight: "400"
     },
     text1: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#024063",
         fontWeight: "400"
     },
     textStyle: {
-        fontSize: 12,
+        fontSize: 10,
         color: "white",
         textAlign: "center",
     },
@@ -323,7 +311,7 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 15,
+        fontSize: 14,
     },
 });
 

@@ -37,7 +37,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}SubmitedGuestDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${checkInD}&toDate=${checkInD}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("vvvv", res.data)
+                console.log("resss???????", res.data)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
@@ -46,29 +46,39 @@ const SubmittedReportDetails = ({ navigation, route }) => {
             });
     };
 
+    // Function to count gender
+    const getGenderCount = () => {
+        const maleCount = guestData.filter(guest => guest.gender.toLowerCase() === 'पुरुष').length;
+        const femaleCount = guestData.filter(guest => guest.gender.toLowerCase() === 'महिला').length;
+        return { maleCount, femaleCount };
+    };
+
+    const { maleCount, femaleCount } = getGenderCount();
 
     return (
         <ScrollView style={styles.container}>
             <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                    <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                 </TouchableOpacity>
-                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी रिपोर्ट</Text>
+                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी रिपोर्ट</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
-            <View style={{ paddingVertical: 10, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 15, marginTop: 20, borderWidth: 1, borderColor: "#1b5372", paddingHorizontal: 15 }}>
+            <View style={{ paddingVertical: 10, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 15, marginTop: 20, borderWidth: 0.5, borderColor: "#1b5372", paddingHorizontal: 15 }}>
                 <View style={{ justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>होटल का नाम :</Text> {hotelName}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>होटल का नाम :</Text> {hotelName}</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>सबमिट की तारीख :</Text> {checkInD}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>सबमिट की तारीख :</Text> {checkInD}</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>वारा प्रस्तुत रिपोर्ट :</Text> {commonData?.SubmitBy ? commonData.SubmitBy : "N/A"} ({moment(commonData?.CreatedDate).format("DD-MMM-YYYY LT")})</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>द्वारा प्रस्तुत रिपोर्ट :</Text> {commonData?.SubmitBy ? commonData.SubmitBy : "N/A"} ({moment(commonData?.CreatedDate).format("DD-MMM-YYYY LT")})</Text>
                 </View>
                 <View style={{ justifyContent: "space-between", marginTop: 8 }}>
-                    <Text style={{ fontSize: 12, color: "#000" }}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>कुल व्यक्ति संख्या :</Text> {guestData.length}</Text>
+                    <Text style={{ fontSize: 10, color: "#000" }}>
+                        <Text style={{ fontSize: 10, color: "#8E8E8E" }}>कुल अतिथि :</Text> {guestData.length} ( {maleCount} पुरुष, {femaleCount} महिला )
+                    </Text>
                 </View>
             </View>
 
@@ -79,7 +89,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContentImage}>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image1 }} style={styles.image} resizeMode="contain" />
+                            <Image source={{ uri: "data:image/jpeg;base64," + item.Image1 }} style={styles.image} resizeMode='contain' />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Image source={{ uri: "data:image/jpeg;base64," + item.Image2 }} style={styles.image} resizeMode="contain" />
@@ -87,15 +97,15 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                     </View>
                     <View style={styles.guestContent}>
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={[styles.text2, { textTransform: "capitalize" }]}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>नाम :</Text> {item.GuestName} {item.GuestLastName}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>जेंडर :</Text> {item.gender}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>मोबाइल नंबर :</Text> {item.ContactNo}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>पता :</Text> {item.Address}</Text>
+                            <Text style={[styles.text2, { textTransform: "capitalize" }]}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>नाम :</Text> {item.GuestName} {item.GuestLastName}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>जेंडर :</Text> {item.gender}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>मोबाइल नंबर :</Text> {item.ContactNo}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>पता :</Text> {item.Address ? item.Address : "N/A"}</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>यात्रा का उद्देश्य :</Text> {item.TravelReson}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>आईडी प्रकार :</Text> {item.IdentificationType}</Text>
-                            <Text style={styles.text2}><Text style={{ fontSize: 12, color: "#8E8E8E" }}>आईडी नंबर :</Text> {item.IdentificationNo}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>यात्रा का उद्देश्य :</Text> {item.TravelReson}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>आईडी प्रकार :</Text> {item.IdentificationType}</Text>
+                            <Text style={styles.text2}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>आईडी नंबर :</Text> {item.IdentificationNo}</Text>
                             <Text style={styles.text2}></Text>
                         </View>
                     </View>
@@ -106,6 +116,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
 };
 
 export default SubmittedReportDetails;
+const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
     container: {
@@ -125,7 +136,7 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     guestHeader: {
-        height: 40,
+        height: 35,
         backgroundColor: "#1b5372",
         width: "100%",
         borderTopLeftRadius: 10,
@@ -133,7 +144,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     guestHeaderText: {
-        fontSize: 14,
+        fontSize: 12,
         color: "#fff",
         marginHorizontal: 10,
         fontWeight: "500"
@@ -154,8 +165,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     image: {
-        height: verticalScale(120),
-        width: scale(120),
+        width: screenWidth * 0.3,  // 40% of the screen width
+        height: screenWidth * 0.3, // Adjust the height similarly to maintain aspect ratio
+        marginTop: 10
     },
     text: {
         fontSize: 12,
@@ -165,7 +177,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 10
     },
     text2: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: "400",
         color: "#000",
         marginTop: 5,

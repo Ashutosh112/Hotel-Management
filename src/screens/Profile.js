@@ -25,14 +25,15 @@ const Profile = ({ navigation }) => {
             const value = await AsyncStorage.getItem('hotelmgmt');
             if (value) {
                 let updatedValue = JSON.parse(value);
-                console.log("updatedValue", updatedValue)
                 setProfileDetails(updatedValue);
             }
         };
         fetchData();
-        getCategory()
     }, []);
 
+    useEffect(() => {
+        getCategory()
+    }, []);
 
     const addCategorie = async () => {
         setIsLoading(true)
@@ -68,7 +69,7 @@ const Profile = ({ navigation }) => {
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errrr", err.response)
+                console.log("errrr", err)
             });
     };
 
@@ -138,9 +139,9 @@ const Profile = ({ navigation }) => {
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, justifyContent: "space-between", alignItems: "center", paddingHorizontal: 15 }}>
                 <View style={{ flex: 6, flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>होटल प्रोफ़ाइल</Text>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>होटल प्रोफ़ाइल</Text>
                 </View>
                 <TouchableOpacity style={{ flex: 2, flexDirection: "row", justifyContent: "center", alignItems: 'center' }} onPress={() => setOpenModal(true)}>
                     <Text style={{ fontSize: 16, fontWeight: "500", color: "#fff" }}>Logout</Text>
@@ -292,7 +293,7 @@ const Profile = ({ navigation }) => {
                 <TextInput
                     placeholderTextColor='darkgrey'
                     value={roomCategory}
-                    placeholder='कमरे की श्रेणी*'
+                    placeholder='कमरे की श्रेणी'
                     onChangeText={(value) => { setRoomCategory(value) }}
                     style={[styles.input2, { marginTop: 8 }]} />
 
@@ -302,7 +303,7 @@ const Profile = ({ navigation }) => {
                 <TextInput
                     placeholderTextColor='darkgrey'
                     value={roomPrice}
-                    placeholder='मूल्य*'
+                    placeholder='मूल्य'
                     onChangeText={(value) => { setRoomPrice(value) }}
                     style={[styles.input2, { marginTop: 8 }]} />
 
@@ -322,22 +323,22 @@ const Profile = ({ navigation }) => {
                 <Pressable onPress={() => { setOpenModal(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <Alert size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <Alert size={35} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>क्या आप लॉग आउट करना चाहते हैं?</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row" }}>
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12 }}
                                 onPress={() => logout()}>
-                                <Text style={styles.textStyle}>Logout</Text>
+                                <Text style={styles.textStyle}>लॉग आउट</Text>
                             </Pressable>
                             <Pressable
-                                style={{ backgroundColor: "#000", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15, marginLeft: 40 }}
+                                style={{ backgroundColor: "#000", paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12, marginLeft: 40 }}
                                 onPress={() => { setOpenModal(false) }}
                             >
-                                <Text style={styles.textStyle}>Cancel</Text>
+                                <Text style={styles.textStyle}>नहीं</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -354,20 +355,20 @@ const Profile = ({ navigation }) => {
                 <Pressable onPress={() => { setAddCategoryAlertModal(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
                     <View style={styles.modalView}>
                         <View style={{ flex: 1 }}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" />
                         </View>
                         <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.modalText}>एक बार रूम कैटेगरी और रेट डालने के बाद आप इसे अपडेट नहीं कर पाएंगे।</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", flexDirection: "row", marginTop: 10 }}>
                             <Pressable
-                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15 }}
+                                style={{ backgroundColor: '#1AA7FF', paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12 }}
                                 onPress={() => addCategorie()}
                             >
                                 <Text style={styles.textStyle}>Save</Text>
                             </Pressable>
                             <Pressable
-                                style={{ backgroundColor: "#000", paddingHorizontal: 30, paddingVertical: 12, justifyContent: "center", alignItems: "center", borderRadius: 15, marginLeft: 40 }}
+                                style={{ backgroundColor: "#000", paddingHorizontal: 25, paddingVertical: 10, justifyContent: "center", alignItems: "center", borderRadius: 12, marginLeft: 40 }}
                                 onPress={() => { setAddCategoryAlertModal(false) }}
                             >
                                 <Text style={styles.textStyle}>Cancel</Text>
@@ -394,7 +395,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#EEEEEE',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
         height: 45,
@@ -406,11 +407,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
         height: 45,
         marginTop: 20,
+        fontSize: 12
     },
     inputContainer: {
         marginTop: 10,
@@ -418,17 +420,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     buttonContainer: {
-        borderRadius: 15,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
@@ -451,7 +453,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
@@ -472,11 +474,12 @@ const styles = StyleSheet.create({
     textStyle: {
         color: "white",
         textAlign: "center",
+        fontSize: 12
     },
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 15,
+        fontSize: 12,
     },
 
 });

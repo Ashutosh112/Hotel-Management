@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal, Alert, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, Dimensions, Pressable, Modal, Alert, Linking, ScrollView } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import { baseUrl } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import Spinner from './Spinner';
-import AlertIcon from "react-native-vector-icons/Ionicons";
+import Logo1 from "../assets/images/UjjainPoliceLogo.png";
 
 const AddRoomCategory = ({ navigation, route }) => {
     const hotelCategory = route.params.hotelCategory;
@@ -31,7 +31,6 @@ const AddRoomCategory = ({ navigation, route }) => {
             noOfRoom: 1,
             bChecked: true
         };
-        console.log("bodyyy", body)
         await axios.post(`${baseUrl}InsertCategory`, body, config)
             .then((res) => {
                 setIsLoading(false)
@@ -45,7 +44,6 @@ const AddRoomCategory = ({ navigation, route }) => {
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errrr", err.response)
             });
     };
 
@@ -67,21 +65,23 @@ const AddRoomCategory = ({ navigation, route }) => {
             })
             .catch(err => {
                 setIsLoading(false)
-                console.log("errr", err)
             });
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <Spinner isLoading={isLoading} />
             <StatusBar backgroundColor='#F5F5F8' barStyle="dark-content" hidden={false} />
             <View style={styles.body}>
+                <View style={{ justifyContent: "center", alignItems: "center" }} >
+                    <Image source={Logo1} style={{ height: 65, width: 65, marginTop: 20 }} resizeMode='contain' />
+                </View>
                 <View style={styles.logoContainer2}>
                     <Text style={[styles.text2, { marginTop: 5, fontWeight: "500" }]}>Hotel Guest Reporting System</Text>
                     <Text style={styles.text2}>होटल की रूम कैटेगरी और रेट प्लान बनाए</Text>
 
-                    <Text style={[styles.text2, { marginTop: 30, fontWeight: "500", fontSize: 14, color: "#000" }]}>|| कृपया ध्यान दें ||</Text>
-                    <Text style={[styles.text2, { marginTop: 20, fontWeight: "500", fontSize: 14, color: "#000" }]}>एक बार रूम कैटेगरी और रेट डालने के बाद आप इसे अपडेट नहीं कर पाएंगे।</Text>
+                    <Text style={[styles.text2, { marginTop: 30, fontWeight: "bold", fontSize: 12, color: "#000" }]}>|| कृपया ध्यान दें ||</Text>
+                    <Text style={[styles.text2, { marginTop: 10, fontWeight: "400", fontSize: 12, color: "#000", marginHorizontal: 25 }]}>एक बार रूम कैटेगरी और रेट डालने के बाद आप इसे अपडेट नहीं कर पाएंगे।</Text>
 
                     <Formik
                         initialValues={{ category: '', amount: '' }}
@@ -130,7 +130,7 @@ const AddRoomCategory = ({ navigation, route }) => {
                                     <Text style={styles.button}>Add Room</Text>
                                 </TouchableOpacity>
 
-                                <View style={{ flexDirection: "row", justifyContent: "space-around", width: "85%", marginTop: 10 }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "60%", marginTop: 5 }}>
                                     <TouchableOpacity style={[styles.buttonContainer, styles.buttonEqual]} onPress={() => navigation.navigate("SubscriptionPlan", { hotelCategory: hotelCategory }, console.log("hotelCategory", hotelCategory))}>
                                         <Text style={styles.button}>Skip</Text>
                                     </TouchableOpacity>
@@ -139,11 +139,11 @@ const AddRoomCategory = ({ navigation, route }) => {
                                         <Text style={styles.button}>Next</Text>
                                     </TouchableOpacity>
                                 </View>
-                                <View style={{ width: "90%", justifyContent: "center", paddingVertical: 10, elevation: 2, backgroundColor: "#F5F5F5", borderRadius: 10, paddingHorizontal: 15 }}>
+                                <View style={{ marginTop: 10, width: "90%", justifyContent: "center", paddingVertical: 10, backgroundColor: "#F5F5F5", borderRadius: 10, paddingHorizontal: 15 }}>
                                     <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
-                                        <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>S. No. </Text>
-                                        <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>कमरे की श्रेणी </Text>
-                                        <Text style={{ fontSize: 13, color: "#000", textAlign: "center", fontWeight: "500" }}>मूल्य </Text>
+                                        <Text style={{ fontSize: 12, color: "#000", textAlign: "center", fontWeight: "500" }}>S. No. </Text>
+                                        <Text style={{ fontSize: 12, color: "#000", textAlign: "center", fontWeight: "500" }}>कमरे की श्रेणी </Text>
+                                        <Text style={{ fontSize: 12, color: "#000", textAlign: "center", fontWeight: "500" }}>मूल्य </Text>
                                     </View>
                                     {categoryDetails.length < 1 ?
                                         <View style={{ justifyContent: "center", alignItems: "center", marginTop: 10 }}>
@@ -163,8 +163,7 @@ const AddRoomCategory = ({ navigation, route }) => {
                     </Formik>
                 </View>
             </View>
-
-        </View>
+        </ScrollView>
     );
 }
 
@@ -173,10 +172,8 @@ export default AddRoomCategory;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
-        flex: 1,
     },
     body: {
-        flex: 1,
         justifyContent: "center",
         alignItems: "center"
     },
@@ -188,17 +185,16 @@ const styles = StyleSheet.create({
     },
     text2: {
         color: "#024063",
-        fontSize: 18,
+        fontSize: 14,
     },
     logoContainer1: {
         flex: 1,
         justifyContent: "center",
     },
     logoContainer2: {
-        flex: 3,
         justifyContent: "flex-start",
         alignItems: "center",
-        marginTop: 60
+        marginTop: 10
     },
     logoContainer4: {
         flex: 1,
@@ -206,7 +202,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end"
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
@@ -217,10 +213,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 15,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
+        fontSize: 12
     },
     inputContainer: {
         width: Dimensions.get('window').width,
@@ -228,17 +225,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     buttonContainer: {
-        borderRadius: 15,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 10,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF'
     },
     button: {
-        fontSize: 16,
+        fontSize: 12,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500"
@@ -246,7 +243,8 @@ const styles = StyleSheet.create({
     buttonEqual: {
         flex: 1, // makes buttons take equal space in row
         marginHorizontal: 5, // adds some space between buttons
-        height: 50, // ensures equal height
+        height: 40, // ensures equal height
+        borderRadius: 12
     },
     greyText: {
         marginTop: 15,

@@ -91,7 +91,7 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
             ]}
             labelField="label"
             valueField="value"
-            placeholder="आईडी प्रकार*"
+            placeholder="आईडी प्रकार"
             value={guest.idType}
             onChange={item => handleGuestChange(index, 'idType', item.value)}
         />
@@ -132,23 +132,23 @@ const GuestForm = ({ index, guest, handleGuestChange, handleDocumentPicker, erro
         <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
             {guest.idFront ? (
                 <TouchableOpacity
-                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idFront')}>
+                    style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idFront')}>
                     <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity
-                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idFront')}>
+                    style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idFront')}>
                     <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                 </TouchableOpacity>
             )}
             {guest.idBack ? (
                 <TouchableOpacity
-                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idBack')}>
+                    style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idBack')}>
                     <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity
-                    style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idBack')}>
+                    style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(index, 'idBack')}>
                     <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                 </TouchableOpacity>
             )}
@@ -391,20 +391,73 @@ const CreateReport = ({ navigation }) => {
     const [checkinDate, setCheckinDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
 
+    // const onChangeCheckout = (event, selectedDate) => {
+    //     const currentDate = selectedDate || checkoutDate;
+    //     setShowCheckoutPicker(false);
+
+    //     // Allow if both checkin and checkout dates are yesterday or the same past date
+    //     if (moment(currentDate).isSame(checkinDate, 'day')) {
+    //         setCheckoutDate(currentDate);
+    //     }
+    //     // Allow if both checkin and checkout are today
+    //     else if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
+    //         setCheckoutDate(currentDate);
+    //     }
+    //     // Allow if checkout is after or on the same day as checkin
+    //     else if (currentDate >= checkinDate) {
+    //         setCheckoutDate(currentDate);
+    //     }
+    //     // Show warning and update checkout date to today's date
+    //     else {
+    //         Alert.alert('Warning', 'चेकआउट कि दिनांक चेक-इन दिनांक से पहले नहीं हो सकती।', [
+    //             {
+    //                 text: 'OK',
+    //                 onPress: () => {
+    //                     // Automatically set checkout date to today's date
+    //                     setCheckoutDate(today);
+    //                 },
+    //             },
+    //         ]);
+    //     }
+    // };
+
+    useEffect(() => {
+        // If checkin date is updated to today and checkout date is still in the past, update checkout date to today
+        if (moment(checkinDate).isSame(today, 'day') && moment(checkoutDate).isBefore(today, 'day')) {
+            setCheckoutDate(today);
+        }
+    }, [checkinDate]);
+
     const onChangeCheckout = (event, selectedDate) => {
         const currentDate = selectedDate || checkoutDate;
         setShowCheckoutPicker(false);
 
-        if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
+        // Allow if both checkin and checkout dates are yesterday or the same past date
+        if (moment(currentDate).isSame(checkinDate, 'day')) {
             setCheckoutDate(currentDate);
-            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
-        } else if (currentDate >= checkinDate) {
+        }
+        // Allow if both checkin and checkout are today
+        else if (moment(currentDate).isSame(today, 'day') && moment(checkinDate).isSame(today, 'day')) {
             setCheckoutDate(currentDate);
-            setFieldValue('checkoutDate', currentDate); // Assuming you have a setFieldValue function
-        } else {
-            Alert.alert('Warning', 'चेकआउट कि दिनांक चेक-इन दिनांक से पहले नहीं हो सकती।');
+        }
+        // Allow if checkout is after or on the same day as checkin
+        else if (currentDate >= checkinDate) {
+            setCheckoutDate(currentDate);
+        }
+        // Show warning and update checkout date to today's date
+        else {
+            Alert.alert('Warning', 'चेकआउट कि दिनांक चेक-इन दिनांक से पहले नहीं हो सकती।', [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        // Automatically set checkout date to today's date
+                        setCheckoutDate(today);
+                    },
+                },
+            ]);
         }
     };
+
 
     const openDatePicker = () => {
         setShowDatePicker(true);
@@ -685,17 +738,16 @@ const CreateReport = ({ navigation }) => {
             image1: idFront,
             image2: idBack
         };
-        console.log("bodyyy---", body)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 setIsLoading(false)
+                console.log("first", response.data)
                 setStatusCode(response.data)
                 setOpenModal2(true)
             })
             .catch(error => {
                 console.error('Error sending form data:');
                 setIsLoading(false)
-                console.log("errr", error.response)
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -712,23 +764,23 @@ const CreateReport = ({ navigation }) => {
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                        <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
-                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी दर्ज करें</Text>
+                    <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी दर्ज करें</Text>
                 </View>
             </View>
 
             <View style={{ marginHorizontal: 25, justifyContent: "center", alignItems: "center" }}>
-                <Text style={[styles.modalText, { fontSize: 14, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
+                <Text style={[styles.modalText, { fontSize: 12, fontWeight: "600" }]}>|| कृपया ध्यान दें ||</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>1. इस फॉर्म के माध्यम से आप गेस्ट की एंट्री सेव कर रहे हैं। इसे थाने में भेजने के लिए कृपया पेंडिंग रिपोर्ट में जाकर इस रिपोर्ट को सबमिट करें।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>2. एक बार रिपोर्ट थाने में सबमिट करने के बाद उस तारीख के लिए आप कोई नए गेस्ट की एंट्री नहीं कर पाएंगे।</Text>
-                <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today)और कल(Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
+                <Text style={[styles.modalText, { textAlign: "justify" }]}>3. आप सिर्फ आज (Today) और कल (Yesterday) के चेक-इन के लिए ही एंट्री कर सकते हैं।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>4. 5MB से अधिक की इमेज अपलोड नहीं हो पाएगी। कृपया इमेज का साइज कम करके अपलोड करें।</Text>
                 <Text style={[styles.modalText, { textAlign: "justify" }]}>4. होटलों की जिम्मेदारी है कि वे वेबसाइट के माध्यम से सबमिट की गई सभी अतिथि जानकारी की सटीकता और वैधता सुनिश्चित करें। इसमें अतिथि के नाम, मोबाइल नंबर, और आधार विवरण की पुष्टि शामिल है।</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
             <View style={styles.container}>
-                <Text style={[styles.lableText, { fontSize: 16, fontWeight: "600", color: "#000", width: "auto", marginVertical: 5 }]}>प्राथमिक अतिथि की जानकारी</Text>
+                <Text style={[styles.lableText, { fontSize: 14, fontWeight: "600", color: "#000", width: "auto", marginVertical: 5 }]}>प्राथमिक अतिथि की जानकारी</Text>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>प्रथम नाम<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
@@ -989,7 +1041,7 @@ const CreateReport = ({ navigation }) => {
                     {hotelCategories.length > 0 && (
                         <View style={{ justifyContent: "flex-start", alignItems: "flex-start" }}>
                             <Text style={{
-                                fontSize: 12,
+                                fontSize: 10,
                                 color: "#000",
                                 marginTop: 20,
                                 fontWeight: "500"
@@ -1003,7 +1055,7 @@ const CreateReport = ({ navigation }) => {
                                         onTintColor="grey"
                                         onFillColor='grey'
                                     />
-                                    <Text style={{ fontSize: 13, color: "#000", fontWeight: "500", textTransform: "capitalize" }}>{category.CategoryName} - {category.iPrice}</Text>
+                                    <Text style={{ fontSize: 12, color: "#000", fontWeight: "500", textTransform: "capitalize" }}>{category.CategoryName} - ₹{category.iPrice}</Text>
                                 </View>
                             ))}
                             <Text style={{
@@ -1017,29 +1069,29 @@ const CreateReport = ({ navigation }) => {
                     )}
                 </View>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 5 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     <Text style={styles.lableText}>आईडी के फोटो अपलोड करें<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                     {idFront ? (
                         <TouchableOpacity
-                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idFront')}>
+                            style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idFront')}>
                             <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity
-                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idFront')}>
+                            style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idFront')}>
                             <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                         </TouchableOpacity>
                     )}
                     {idBack ? (
                         <TouchableOpacity
-                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idBack')}>
+                            style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: 'grey', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idBack')}>
                             <Text style={{ fontSize: 12, color: "green" }}>Image Uploaded</Text>
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity
-                            style={[styles.input, { height: 80, width: "45%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idBack')}>
+                            style={[styles.input, { height: 70, width: "40%", backgroundColor: '#fff', borderColor: '#1AA7FF', borderStyle: 'dashed', justifyContent: "center", marginTop: 8, alignItems: "center" }]} onPress={() => handleDocumentPicker(-1, 'idBack')}>
                             <Image source={PhotoIcon} style={{ height: 25, width: 25 }} />
                         </TouchableOpacity>
                     )}
@@ -1068,19 +1120,22 @@ const CreateReport = ({ navigation }) => {
                 <Modal transparent={true} animationType={'fade'} hardwareAccelerated={true} visible={openModal2}>
                     <Pressable style={styles.modalOverlay} onPress={() => setOpenModal2(false)}>
                         <View style={styles.modalView}>
-                            <AlertIcon size={50} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
+                            <AlertIcon size={40} name="alert-circle-outline" color="#024063" style={{ marginLeft: 5 }} />
                             {
                                 statusCode.StatusCode == -1 ?
 
-                                    <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>{statusCode.Message}</Text>
+                                    <Text style={[styles.modalText, { fontWeight: "400", fontSize: 12 }]}>{statusCode.Message}</Text>
                                     :
                                     statusCode.StatusCode == 0 ?
-                                        <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>गेस्ट की एंट्री सेव हो गयी है | आप अन्य गेस्ट की जानकारी ऐड कर सकते है या पेंडिंग रिपोर्ट पे जेक इस रिपोर्ट को सबमिट कर सकते है</Text>
+                                        <Text style={[styles.modalText, { fontWeight: "400", fontSize: 12 }]}>गेस्ट की एंट्री सफलतापूर्वक सेव हो गई है। आप चाहें तो अन्य गेस्ट की जानकारी जोड़ सकते हैं, या पेंडिंग रिपोर्ट पर जाकर इस रिपोर्ट को सबमिट कर सकते हैं।</Text>
                                         :
                                         statusCode.StatusCode == 1 ?
-                                            <Text style={[styles.modalText, { fontWeight: "400", fontSize: 14 }]}>{statusCode.Message}</Text>
+                                            <Text style={[styles.modalText, { fontWeight: "400", fontSize: 12 }]}>{statusCode.Message}</Text>
                                             :
-                                            null
+                                            statusCode.StatusCode == -2 ?
+                                                <Text style={[styles.modalText, { fontWeight: "400", fontSize: 12 }]}>{statusCode.Message}</Text>
+                                                :
+                                                null
 
                             }
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -1098,7 +1153,11 @@ const CreateReport = ({ navigation }) => {
                                                 <Pressable style={styles.modalButton} onPress={() => navigation.navigate('BottomNavigator')}>
                                                     <Text style={styles.textStyle}>ठीक</Text>
                                                 </Pressable> :
-                                                null
+                                                statusCode.StatusCode == -2 ?
+                                                    <Pressable style={styles.modalButton} onPress={() => setOpenModal2(false)}>
+                                                        <Text style={styles.textStyle}>ठीक</Text>
+                                                    </Pressable> :
+                                                    null
                                 }
                             </View>
                         </View>
@@ -1137,6 +1196,7 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
+        fontSize: 12
     },
     successText: {
         color: 'green',
@@ -1156,7 +1216,7 @@ const styles = StyleSheet.create({
     modalText: {
         textAlign: "center",
         color: "black",
-        fontSize: 12,
+        fontSize: 10,
         marginVertical: 7,
         fontWeight: "500"
     },
@@ -1168,21 +1228,23 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 20,
         color: "#000",
-        height: 50,
+        height: 45,
         marginTop: 10,
+        fontSize: 12
+
     },
     buttonContainer: {
-        borderRadius: 20,
+        borderRadius: 12,
         marginTop: 30,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 18,
+        fontSize: 16,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
@@ -1195,7 +1257,7 @@ const styles = StyleSheet.create({
         fontSize: 12
     },
     placeholderStyle: {
-        fontSize: 14,
+        fontSize: 12,
         color: "grey"
     },
     selectedTextStyle: {
@@ -1208,7 +1270,7 @@ const styles = StyleSheet.create({
         color: "grey"
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
@@ -1242,12 +1304,13 @@ const styles = StyleSheet.create({
     },
     modalButton: {
         backgroundColor: "#024063",
-        paddingHorizontal: 40,
-        paddingVertical: 12,
+        paddingHorizontal: 25,
+        paddingVertical: 10,
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: 10,
-        marginVertical: 10
+        borderRadius: 12,
+        marginVertical: 10,
+        maxHeight: 300
     },
 });
 

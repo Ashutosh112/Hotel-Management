@@ -9,7 +9,7 @@ const Spinner = (props) => {
             animationType={'fade'}
             visible={props.isLoading}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000060' }}>
-                <Lottie source={require('../assets/images/animationLottie.json')} autoPlay loop style={{ height: 70, width: 70 }} />
+                <Lottie source={require('../assets/images/animationLottie.json')} autoPlay loop style={{ height: 50, width: 50 }} />
             </View>
         </Modal>
     )

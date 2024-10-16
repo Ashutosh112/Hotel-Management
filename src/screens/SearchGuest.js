@@ -36,11 +36,9 @@ const SearchGuest = ({ navigation }) => {
                 "Authorization": `Bearer ${updatedValue.Token}`
             }
         };
-        console.log("bodyyyyy", `${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${firstName}&AadharNo=${idNumberValue}&sMobile=${mobileNumber}`)
         await axios.post(`${baseUrl}SearchGuest?HotelId=${updatedValue.idHotelMaster}&GuestName=${firstName}&AadharNo=${idNumberValue}&sMobile=${mobileNumber}`, {}, config)
             .then((res) => {
                 setIsLoading(false);
-                console.log("reeee", res.data.Result)
                 setGuestData(res.data.Result);
             })
             .catch(err => {
@@ -54,9 +52,9 @@ const SearchGuest = ({ navigation }) => {
             <Spinner isLoading={isLoading} />
             <View style={{ flexDirection: "row", height: 100, width: Dimensions.get('window').width, backgroundColor: "#024063", borderBottomRightRadius: 15, alignItems: "center", justifyContent: "flex-start" }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <BackIcon name="arrow-back-outline" size={22} color="#fff" style={{ marginLeft: 15 }} />
+                    <BackIcon name="arrow-back-outline" size={20} color="#fff" style={{ marginLeft: 15 }} />
                 </TouchableOpacity>
-                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 18, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>सर्च गेस्ट</Text>
+                <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>सर्च गेस्ट</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
 
@@ -151,10 +149,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#E3E2E2',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 20,
         color: "#000",
-        height: 43,
+        height: 45,
         marginTop: 20,
     },
     inputContainer: {
@@ -163,17 +161,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     buttonContainer: {
-        borderRadius: 20,
+        borderRadius: 12,
         marginTop: 16,
         width: Dimensions.get('window').width - 60,
-        height: 50,
+        height: 45,
         marginBottom: 20,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#1AA7FF',
     },
     button: {
-        fontSize: 18,
+        fontSize: 14,
         textAlign: 'center',
         color: '#fff',
         fontWeight: "500",
@@ -196,7 +194,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     lableText: {
-        fontSize: 12,
+        fontSize: 10,
         color: "#000",
         marginLeft: 0,
         width: "45%",
