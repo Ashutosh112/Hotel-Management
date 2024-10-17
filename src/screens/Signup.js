@@ -147,7 +147,6 @@ const Signup = ({ navigation, route }) => {
 
         const data = body;
         AsyncStorage.setItem("signupdetail", JSON.stringify(data));
-
         axios.post(`${baseUrl}HotelSignUp`, body, config)
             .then(res => {
                 setIsLoading(false)
@@ -163,7 +162,6 @@ const Signup = ({ navigation, route }) => {
                 });
             });
     };
-
 
     const getProType = async () => {
         const config = {
@@ -427,30 +425,15 @@ const Signup = ({ navigation, route }) => {
                             />
                             {touched.propertyType && errors.propertyType ? <Text style={styles.errorText}>{errors.propertyType}</Text> : null}
 
-                            {/* Room Quantity */}
-                            {/* <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
-                                <Text style={styles.lableText}>कमरों की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
-                            </View>
-                            <TextInput
-                                maxLength={10}
-                                keyboardType='number-pad'
-                                placeholderTextColor='darkgrey'
-                                placeholder='कमरों की संख्या*'
-                                style={[styles.input, { marginTop: 8 }]}
-                                onChangeText={handleChange('roomQty')}
-                                onBlur={handleBlur('roomQty')}
-                                value={values.roomQty}
-                            />
-                            {touched.roomQty && errors.roomQty ? <Text style={styles.errorText}>{errors.roomQty}</Text> : null} */}
                             {/* Number Of Rooms */}
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10 }}>
                                 <Text style={styles.lableText}>कमरों की कुल संख्या<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             </View>
                             <TextInput
-                                maxLength={10}
+                                maxLength={3}
                                 keyboardType='number-pad'
                                 placeholderTextColor='darkgrey'
-                                placeholder='कमरों की कुल संख्या *'
+                                placeholder='कमरों की कुल संख्या*'
                                 style={[styles.input, { marginTop: 8 }]}
                                 onChangeText={handleChange('noOfRoom')}
                                 onBlur={handleBlur('noOfRoom')}
@@ -499,9 +482,7 @@ const Signup = ({ navigation, route }) => {
                                         getCity(item.value); // Call getCity when stateValue changes
                                         getDistrict(item.value)
                                     }}
-
                                 />
-
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
                                 {touched.state && errors.state ? <Text style={[styles.errorText, { marginLeft: 0, width: "45%", }]}>{errors.state}</Text> : null}
@@ -544,7 +525,6 @@ const Signup = ({ navigation, route }) => {
                                 <Text style={styles.lableText}>District<Text style={[styles.lableText, { color: "red" }]}>*</Text></Text>
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "85%" }}>
-
                                 <Dropdown
                                     style={[styles.input, { marginTop: 8 }]}
                                     placeholderStyle={styles.placeholderStyle}

@@ -7,6 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'
 import Spinner from './Spinner';
 import { ScaledSheet, moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import RNHTMLtoPDF from 'react-native-html-to-pdf'; // Import the PDF library
+import { ToastAndroid } from 'react-native';
+import RNFS from 'react-native-fs'; // Import the RNFS library
 
 const SubmittedReportDetails = ({ navigation, route }) => {
 
@@ -37,7 +40,6 @@ const SubmittedReportDetails = ({ navigation, route }) => {
         await axios.post(`${baseUrl}SubmitedGuestDetailForReport?HotelId=${updatedValue.idHotelMaster}&fromDate=${checkInD}&toDate=${checkInD}`, {}, config)
             .then((res) => {
                 setIsLoading(false)
-                console.log("resss???????", res.data)
                 setGuestData(res.data.Result);
                 setCommonData(res.data.Result[0])
             })
@@ -55,6 +57,133 @@ const SubmittedReportDetails = ({ navigation, route }) => {
 
     const { maleCount, femaleCount } = getGenderCount();
 
+    // Function to generate PDF
+    const generatePDF = async () => {
+        const getFormattedDate = () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+        };
+        const submitBy = commonData?.SubmitBy ? commonData.SubmitBy : "N/A";
+        const formattedDate = moment(commonData?.CreatedDate).format("DD-MMM-YYYY LT");
+
+        let htmlContent = `
+            <html>
+                <head>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 10px;
+                        }
+                        .header {
+                            background-color: #024063;
+                            color: white;
+                            text-align: center;
+                            padding: 10px;
+                        }
+                        .detailsContainer {
+                            margin-top: 20px;
+                        }
+                        .detailText {
+                            font-size: 16px;
+                            margin-bottom: 10px;
+                        }
+                        .guestContainer {
+                            border: 1px solid #ccc;
+                            padding: 10px;
+                            margin-top: 10px;
+                        }
+                        .guestHeader {
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        }
+                        .guestContent {
+                            display: flex;
+                            justify-content: space-between;
+                        }
+                        .text2 {
+                            font-size: 14px;
+                            margin-bottom: 5px;
+                        }
+                        .image {
+                            width: 100px;
+                            height: 100px;
+                        }
+                        .downloadButton {
+                            background-color: #024063;
+                            color: white;
+                            text-align: center;
+                            padding: 10px;
+                            margin-top: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>पेंडिंग रिपोर्ट डिटेल</h1>
+                    </div>
+                    <div class="detailsContainer">
+                        <p class="detailText">होटल का नाम: ${commonData.HotelName || 'Test Hotel'}</p>
+                        <p class="detailText">चेक इन तारीख: ${checkInD}</p>
+                        <p class="detailText">द्वारा प्रस्तुत रिपोर्ट : ${submitBy} (${formattedDate})</p>
+                        <p class="detailText">कुल अतिथि: ${guestData?.length || 0}</p>
+                    </div>
+                    ${guestData?.map((item, index) => `
+                        <div class="guestContainer">
+                            <div class="guestHeader">अतिथि क्र. ${index + 1}</div>
+                            <div class="guestContent">
+                                <div>
+                                    <img class="image" src="data:image/jpeg;base64,${item.Image1}" alt="Guest-Image-1" />
+                                    <p class="text2">नाम: ${item.GuestName} ${item.GuestLastName}</p>
+                                    <p class="text2">जेंडर: ${item.gender}</p>
+                                    <p class="text2">मोबाइल नंबर: ${item.ContactNo}</p>
+                                    <p class="text2">पता: ${item.Address}</p>
+                                </div>
+                                <div>
+                                    <p class="text2">यात्रा का उद्देश्य: ${item.TravelReson}</p>
+                                    <p class="text2">आईडी प्रकार: ${item.IdentificationType}</p>
+                                    <p class="text2">आईडी नंबर: ${item.IdentificationNo}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </body>
+            </html>
+        `;
+
+        let options = {
+            html: htmlContent,
+            fileName: `HotelGuest_Submitted_Report_${getFormattedDate()}`,
+            directory: 'Documents',  // Save in the app's Documents directory temporarily
+        };
+
+        try {
+            // Generate the PDF file
+            let file = await RNHTMLtoPDF.convert(options);
+
+            if (file && file.filePath) {
+                // Define the public Downloads path where the file will be moved
+                const destPath = `${RNFS.DownloadDirectoryPath}/Submitted_Report_${getFormattedDate()}.pdf`;
+
+                // Move the file from app-specific directory to public Downloads
+                await RNFS.moveFile(file.filePath, destPath);
+
+                // Notify user with a toast message
+                ToastAndroid.show("PDF saved to: " + destPath, ToastAndroid.LONG);
+            } else {
+                console.error("No file generated");
+            }
+        } catch (error) {
+            // Detailed error handling
+            ToastAndroid.show("Error generating or moving PDF: " + error.message, ToastAndroid.LONG);
+        }
+    };
+
     return (
         <ScrollView style={styles.container}>
             <Spinner isLoading={isLoading} />
@@ -65,6 +194,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                 <Text style={[styles.lableText, { marginLeft: 10, fontSize: 14, fontWeight: "400", color: "#fff", width: "auto", marginTop: 0 }]}>अतिथि की जानकारी रिपोर्ट</Text>
             </View>
             <StatusBar backgroundColor="#024063" barStyle="light-content" hidden={false} />
+
             <View style={{ paddingVertical: 10, elevation: 1, backgroundColor: "white", borderRadius: 10, marginHorizontal: 15, marginTop: 20, borderWidth: 0.5, borderColor: "#1b5372", paddingHorizontal: 15 }}>
                 <View style={{ justifyContent: "space-between" }}>
                     <Text style={{ fontSize: 10, color: "#000" }}><Text style={{ fontSize: 10, color: "#8E8E8E" }}>होटल का नाम :</Text> {hotelName}</Text>
@@ -80,6 +210,12 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                         <Text style={{ fontSize: 10, color: "#8E8E8E" }}>कुल अतिथि :</Text> {guestData.length} ( {maleCount} पुरुष, {femaleCount} महिला )
                     </Text>
                 </View>
+            </View>
+            {/* Download PDF Button */}
+            <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
+                <TouchableOpacity style={styles.downloadButton} onPress={generatePDF}>
+                    <Text style={styles.downloadButtonText}>Download</Text>
+                </TouchableOpacity>
             </View>
 
             {guestData.map((item, index) => (
@@ -111,6 +247,7 @@ const SubmittedReportDetails = ({ navigation, route }) => {
                     </View>
                 </View>
             ))}
+
         </ScrollView>
     );
 };
@@ -204,6 +341,19 @@ const styles = StyleSheet.create({
         width: "45%",
         marginTop: 10
     },
-
+    downloadButton: {
+        backgroundColor: "#1AA7FF",
+        padding: 8,
+        margin: 15,
+        borderRadius: 7,
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 0,
+        width: "25%",
+    },
+    downloadButtonText: {
+        color: "#fff",
+        fontSize: 12,
+    },
 });
 

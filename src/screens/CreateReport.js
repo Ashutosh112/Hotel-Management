@@ -480,19 +480,26 @@ const CreateReport = ({ navigation }) => {
         }
         setErrors(prevErrors => ({ ...prevErrors, phoneNumber: error }));
     };
-
     const validateName = (text, field) => {
         let error = '';
+
+        // Check for numbers
         if (/[\d]/.test(text)) {
             error = 'नाम में संख्याएँ नहीं हो सकतीं';
         }
+        // Check for special characters and Hindi fonts
+        else if (/[^A-Za-z\s]/.test(text)) {
+            error = 'विशेष वर्ण और हिंदी अक्षर मान्य नहीं हैं';
+        }
         setErrors(prevErrors => ({ ...prevErrors, [field]: error }));
+        // Update the appropriate state based on the field
         if (field === 'name') {
             setName(text);
         } else {
             setLastName(text);
         }
     };
+
 
     const handleCityChange = (text) => {
         // Remove numeric and special characters from the text
@@ -738,6 +745,7 @@ const CreateReport = ({ navigation }) => {
             image1: idFront,
             image2: idBack
         };
+        console.log("Body", body.details)
         await axios.post(`${baseUrl}InsertUpdateDeleteGuestMaster`, body, config)
             .then(response => {
                 setIsLoading(false)
