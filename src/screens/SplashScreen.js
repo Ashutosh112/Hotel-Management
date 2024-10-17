@@ -29,7 +29,7 @@ const SplashScreen = ({ navigation }) => {
         <View style={styles.container}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" hidden={false} />
             <View style={styles.logoContainer1}>
-                <Image source={Logo1} style={{ height: 80, width: 80, marginLeft: 20 }} resizeMode='contain' />
+                <Image source={Logo1} style={{ height: 65, width: 65, marginLeft: 20 }} resizeMode='contain' />
             </View>
             <View style={styles.logoContainer2}>
                 <Logo2 />
